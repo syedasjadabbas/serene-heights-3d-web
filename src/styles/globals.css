@@ -1,0 +1,187 @@
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/fraunces/wght-italic.css';
+@import '@fontsource-variable/inter';
+
+:root {
+  /* Brand color */
+  --color-forest-950: #101d18;
+  --color-forest-900: #16281f;
+  --color-forest-800: #1f3a2d;
+  --color-forest: #274435;
+  --color-forest-700: #345544;
+  --color-forest-600: #45705a;
+
+  --color-cream: #f4efe4;
+  --color-cream-dim: #e9e2d1;
+  --color-black: #0b0c0a;
+
+  --color-text-on-dark: var(--color-cream);
+  --color-text-on-dark-muted: rgb(244 239 228 / 64%);
+  --color-text-on-light: var(--color-black);
+  --color-text-on-light-muted: rgb(11 12 10 / 58%);
+
+  --color-border-on-dark: rgb(244 239 228 / 16%);
+  --color-border-on-light: rgb(11 12 10 / 12%);
+
+  --color-bg: var(--color-forest-900);
+  --color-fg: var(--color-cream);
+
+  /* Type */
+  --font-display: 'Fraunces Variable', 'Fraunces', ui-serif, Georgia, serif;
+  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --text-display: clamp(3.4rem, 2.2rem + 7.2vw, 10.5rem);
+  --text-h1: clamp(2.4rem, 1.6rem + 3.2vw, 4.75rem);
+  --text-h2: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+  --text-lead: clamp(1.15rem, 1rem + 0.6vw, 1.5rem);
+  --text-body: clamp(1rem, 0.94rem + 0.24vw, 1.125rem);
+  --text-small: 0.8125rem;
+  --text-label: 0.75rem;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.12em;
+  --tracking-widest: 0.22em;
+
+  --leading-tight: 0.98;
+  --leading-snug: 1.15;
+  --leading-normal: 1.5;
+
+  /* Layout */
+  --container-max: 1560px;
+  --container-pad: clamp(20px, 4.4vw, 64px);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  --radius-sm: 6px;
+  --radius-md: 14px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  text-size-adjust: 100%;
+}
+
+html.lenis,
+html.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+html.lenis-smooth body {
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+#root {
+  min-height: 100%;
+  isolation: isolate;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  font: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.next-spacer {
+  height: 100vh;
+  background: var(--color-forest-950);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

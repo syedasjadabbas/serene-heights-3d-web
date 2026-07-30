@@ -1,0 +1,146 @@
+.photography {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.photography::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(16 29 24 / 38%), rgb(16 29 24 / 14%) 40%, rgb(16 29 24 / 52%));
+  pointer-events: none;
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale(1);
+  clip-path: inset(0%);
+  will-change: transform, opacity, clip-path;
+}
+
+.background {
+  object-position: 50% 46%;
+  transform-origin: 50% 45%;
+}
+
+.bottom {
+  object-position: 50% 62%;
+  transform-origin: 50% 45%;
+}
+
+.building {
+  object-position: 66% 52%;
+  transform-origin: 50% 45%;
+}
+
+.scene01 {
+  object-position: 62% 46%;
+  transform-origin: 70% 48%;
+}
+
+.scene02 {
+  object-position: 64% 42%;
+  transform-origin: 68% 58%;
+}
+
+.scene03 {
+  object-position: 60% 52%;
+  transform-origin: 58% 32%;
+}
+
+.scene04 {
+  object-position: 58% 42%;
+  transform-origin: 55% 12%;
+}
+
+.scene05 {
+  object-position: 55% 42%;
+  transform-origin: 50% 35%;
+}
+
+.foreground {
+  object-position: 50% 45%;
+  transform-origin: 50% 45%;
+}
+
+@media (max-width: 1080px) {
+  .background {
+    object-position: 50% 40%;
+  }
+
+  .bottom {
+    object-position: 50% 56%;
+  }
+
+  .building {
+    object-position: 70% 48%;
+  }
+
+  .scene01 {
+    object-position: 66% 40%;
+  }
+
+  .scene02 {
+    object-position: 68% 38%;
+  }
+
+  .scene03 {
+    object-position: 64% 48%;
+  }
+
+  .scene04 {
+    object-position: 60% 40%;
+  }
+
+  .scene05 {
+    object-position: 55% 38%;
+  }
+}
+
+@media (max-width: 640px) {
+  .background {
+    object-position: 52% 36%;
+  }
+
+  .bottom {
+    object-position: 50% 50%;
+  }
+
+  .building {
+    object-position: 74% 44%;
+  }
+
+  .scene01 {
+    object-position: 70% 36%;
+  }
+
+  .scene02 {
+    object-position: 72% 34%;
+  }
+
+  .scene03 {
+    object-position: 68% 44%;
+  }
+
+  .scene04 {
+    object-position: 62% 38%;
+  }
+
+  .scene05 {
+    object-position: 55% 34%;
+  }
+}
