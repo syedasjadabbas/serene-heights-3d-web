@@ -1,0 +1,325 @@
+.section {
+  position: relative;
+  background: var(--color-black);
+  padding-block: clamp(140px, 18vh, 200px) clamp(100px, 14vh, 160px);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.statement {
+  max-width: 900px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3.25rem);
+  line-height: 1.15;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-cream);
+  margin-bottom: clamp(64px, 9vh, 112px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+.column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: rgb(244 239 228 / 4%);
+  border: 1px solid var(--color-border-on-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-7) var(--space-6) var(--space-9);
+}
+
+.heading {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
+  margin-bottom: var(--space-4);
+}
+
+.headingGold {
+  color: var(--color-accent-gold);
+}
+
+.headingSage {
+  color: var(--color-accent-sage);
+}
+
+.headingMist {
+  color: var(--color-accent-mist);
+}
+
+.description {
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  color: var(--color-text-on-dark-muted);
+  margin-bottom: var(--space-7);
+}
+
+/* --- Residences: stacked factual cards (Blocks-column structural echo) --- */
+
+.factStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.factCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--color-cream);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: 0 12px 24px -16px rgb(0 0 0 / 45%);
+}
+
+.factIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+}
+
+.factIconGold {
+  background: rgb(206 162 92 / 18%);
+  color: var(--color-accent-gold);
+}
+
+.factHeadline {
+  display: block;
+  font-weight: 700;
+  font-size: var(--text-body);
+  color: var(--color-text-on-light);
+}
+
+.factCaption {
+  display: block;
+  font-size: var(--text-small);
+  color: var(--color-text-on-light-muted);
+}
+
+/* --- Payment Plan: fanned rotated cards (Mortgage-column structural echo) --- */
+
+.paymentFan {
+  position: relative;
+  height: 320px;
+  margin-inline: var(--space-4);
+}
+
+.paymentCard {
+  position: absolute;
+  left: 50%;
+  width: 82%;
+  height: 112px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  color: var(--color-cream);
+  box-shadow: 0 20px 32px -18px rgb(0 0 0 / 55%);
+}
+
+.paymentCardA {
+  background: var(--color-forest-800);
+  top: 0;
+  transform: translateX(-58%) rotate(var(--rotate, 0deg));
+}
+
+.paymentCardB {
+  background: var(--color-forest-700);
+  top: 96px;
+  transform: translateX(-50%) rotate(var(--rotate, 0deg));
+  z-index: 1;
+}
+
+.paymentCardC {
+  background: var(--color-forest-600);
+  top: 192px;
+  transform: translateX(-42%) rotate(var(--rotate, 0deg));
+  z-index: 2;
+}
+
+.paymentValue {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-h2);
+  letter-spacing: var(--tracking-tight);
+}
+
+.paymentLabel {
+  font-size: var(--text-label);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-on-dark-muted);
+}
+
+/* --- Smart Property Unit: single rotated focal card (Mint-column structural echo) --- */
+
+.unitCardWrap {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--space-4) var(--space-6);
+}
+
+.unitCard {
+  width: 100%;
+  max-width: 280px;
+  padding: var(--space-6) var(--space-5);
+  background: linear-gradient(160deg, rgb(142 163 191 / 20%), var(--color-forest-950) 70%);
+  border: 1px solid rgb(142 163 191 / 35%);
+  border-radius: var(--radius-lg);
+  transform: rotate(6deg);
+  box-shadow: 0 28px 48px -20px rgb(0 0 0 / 60%);
+}
+
+.unitHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.unitHeaderLabel {
+  font-size: var(--text-label);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-cream);
+}
+
+.unitHeaderTag {
+  font-size: var(--text-small);
+  color: var(--color-accent-mist);
+  border: 1px solid rgb(142 163 191 / 45%);
+  border-radius: var(--radius-pill);
+  padding: 2px 10px;
+}
+
+.unitRoi {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--space-5);
+}
+
+.unitRoiValue {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 1.7rem + 1vw, 2.5rem);
+  color: var(--color-cream);
+  letter-spacing: var(--tracking-tight);
+}
+
+.unitRoiCaption {
+  font-size: var(--text-small);
+  color: var(--color-text-on-dark-muted);
+}
+
+.unitDivider {
+  height: 1px;
+  background: rgb(244 239 228 / 14%);
+  margin-bottom: var(--space-5);
+}
+
+.unitStats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.unitStatRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-small);
+  color: var(--color-text-on-dark-muted);
+}
+
+.unitStatRow span:last-child {
+  color: var(--color-cream);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.unitFooter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.unitFooterTag {
+  font-size: 0.6875rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-on-dark-muted);
+  border: 1px solid rgb(244 239 228 / 14%);
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+}
+
+.disclaimer {
+  font-size: var(--text-small);
+  font-style: italic;
+  color: var(--color-text-on-dark-muted);
+  opacity: 0.75;
+  margin-bottom: var(--space-6);
+}
+
+/* --- Shared CTA: circular arrow button, bottom-right of each column --- */
+
+.cta {
+  position: absolute;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-pill);
+  color: var(--color-black);
+  transition:
+    transform 0.35s var(--ease-out-soft),
+    background-color 0.35s var(--ease-out-soft);
+}
+
+.cta:hover {
+  transform: scale(1.08);
+}
+
+.ctaGold {
+  background: var(--color-accent-gold);
+}
+
+.ctaSage {
+  background: var(--color-accent-sage);
+}
+
+.ctaMist {
+  background: var(--color-accent-mist);
+}
+
+@media (max-width: 1080px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+  }
+
+  .column {
+    padding-bottom: var(--space-8);
+  }
+}

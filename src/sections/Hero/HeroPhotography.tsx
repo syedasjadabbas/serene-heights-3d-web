@@ -27,7 +27,6 @@ function getBreakpointConfig(width: number): BreakpointConfig {
  */
 const HeroPhotography = forwardRef<HeroPhotographyHandle>(function HeroPhotography(_props, ref) {
   const rawProgressRef = useRef(0)
-  const smoothedProgressRef = useRef(0)
   const imageRefs = useRef<(HTMLImageElement | null)[]>([])
   const breakpointRef = useRef<BreakpointConfig>(
     getBreakpointConfig(typeof window === 'undefined' ? 1440 : window.innerWidth),
@@ -64,11 +63,16 @@ const HeroPhotography = forwardRef<HeroPhotographyHandle>(function HeroPhotograp
   useEffect(() => {
     if (HERO_PHOTOS.length === 0) return
 
-    const tick = (_time: number, deltaTime: number) => {
-      const smoothing = Math.min(1, (deltaTime || 0.016) * 4)
-      smoothedProgressRef.current += (rawProgressRef.current - smoothedProgressRef.current) * smoothing
-
-      const progress = smoothedProgressRef.current
+    // Reads rawProgressRef directly (no extra ticker-side lag) — GSAP's own
+    // scrub:1 already smooths the incoming value, and this layer's opacity
+    // handoff to DeconstructionSequence's canvas (also unsmoothed) depends on
+    // both reading the identical progress each tick. An added lag here used to
+    // be masked by 13 staggered, overlapping photo envelopes; with only the 3
+    // establishing layers left (all sharing one envelope) a lagging progress
+    // desyncs from the canvas's fade-in and both layers can read near-zero at
+    // once, especially on fast reverse scroll.
+    const tick = () => {
+      const progress = rawProgressRef.current
       const { amplitude } = breakpointRef.current
 
       for (let i = 0; i < HERO_PHOTOS.length; i += 1) {

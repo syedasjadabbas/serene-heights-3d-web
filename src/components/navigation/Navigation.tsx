@@ -5,8 +5,15 @@ import Logo from '../ui/Logo'
 import Button from '../ui/Button'
 import styles from './Navigation.module.css'
 
-const LEFT_LINKS = ['Stay', 'Experience', 'Dining']
-const RIGHT_LINKS = ['Gallery', 'About', 'Contact']
+const NAV_ITEMS = [
+  { label: 'ABOUT', href: '#about' },
+  { label: 'AMENITIES', href: '#amenities' },
+  { label: 'PAYMENT PLAN', href: '#payment-plan' },
+  { label: 'FLOOR PLANS', href: '#floor-plans' },
+  { label: 'PROGRESS', href: '#progress' },
+  { label: 'BLOG', href: '#blog' },
+  { label: 'SMART PROPERTY UNIT', href: '#smart-unit', extra: true },
+]
 
 export default function Navigation() {
   const navRef = useRef<HTMLElement>(null)
@@ -25,7 +32,7 @@ export default function Navigation() {
       )
 
       ScrollTrigger.create({
-        start: 'top -80',
+        start: 'top -60',
         end: 99999,
         toggleClass: { targets: barRef.current, className: styles.scrolled },
       })
@@ -39,79 +46,81 @@ export default function Navigation() {
     if (!panel) return
 
     if (isOpen) {
-      gsap.to(panel, { opacity: 1, visibility: 'visible', duration: 0.45, ease: 'power2.out' })
+      document.body.style.overflow = 'hidden'
+      gsap.to(panel, { opacity: 1, visibility: 'visible', duration: 0.35, ease: 'power2.out' })
       gsap.fromTo(
         panel.querySelectorAll(`.${styles.mobileLink}`),
         { y: 16, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, stagger: 0.06, delay: 0.1, ease: 'power2.out' },
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.04, delay: 0.06, ease: 'power2.out' },
       )
     } else {
+      document.body.style.overflow = ''
       gsap.to(panel, {
         opacity: 0,
-        duration: 0.3,
+        duration: 0.25,
         ease: 'power2.in',
         onComplete: () => gsap.set(panel, { visibility: 'hidden' }),
       })
     }
   }, [isOpen])
 
-  const allLinks = [...LEFT_LINKS, ...RIGHT_LINKS]
-
   return (
     <header ref={navRef} className={styles.nav}>
       <div ref={barRef} className={styles.bar}>
-        <nav className={styles.linksLeft} aria-label="Primary">
-          {LEFT_LINKS.map((label) => (
-            <a key={label} href={`#${label.toLowerCase()}`} className={styles.link}>
-              {label}
-            </a>
-          ))}
-        </nav>
-
         <a href="#top" className={styles.brand} aria-label="Serene Heights, home">
           <Logo />
         </a>
 
-        <nav className={styles.linksRight} aria-label="Secondary">
-          {RIGHT_LINKS.map((label) => (
-            <a key={label} href={`#${label.toLowerCase()}`} className={styles.link}>
-              {label}
+        <nav className={styles.linksCenter} aria-label="Primary Navigation">
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className={`${styles.link} ${item.extra ? styles.desktopExtra : ''}`}
+            >
+              <span>{item.label}</span>
             </a>
           ))}
         </nav>
 
-        <Button href="#book" variant="primary" className={styles.cta}>
-          Book Now
-        </Button>
+        <div className={styles.actions}>
+          <Button href="#enquire" variant="primary" className={styles.cta}>
+            ENQUIRE NOW
+          </Button>
 
-        <button
-          type="button"
-          className={styles.menuToggle}
-          data-open={isOpen}
-          aria-expanded={isOpen}
-          aria-controls="mobile-menu"
-          aria-label={isOpen ? 'Close menu' : 'Open menu'}
-          onClick={() => setIsOpen((prev) => !prev)}
-        >
-          <span />
-          <span />
-        </button>
+          <button
+            type="button"
+            className={styles.menuToggle}
+            data-open={isOpen}
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
+            aria-label={isOpen ? 'Close menu' : 'Open menu'}
+            onClick={() => setIsOpen((prev) => !prev)}
+          >
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
 
-      <div id="mobile-menu" ref={panelRef} className={styles.mobilePanel}>
-        {allLinks.map((label) => (
-          <a
-            key={label}
-            href={`#${label.toLowerCase()}`}
-            className={styles.mobileLink}
-            onClick={() => setIsOpen(false)}
-          >
-            {label}
-          </a>
-        ))}
-        <Button href="#book" variant="primary" onClick={() => setIsOpen(false)}>
-          Book Now
-        </Button>
+      <div id="mobile-menu" ref={panelRef} className={styles.mobilePanel} aria-hidden={!isOpen}>
+        <div className={styles.mobileLinksContainer}>
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className={styles.mobileLink}
+              onClick={() => setIsOpen(false)}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+        <div className={styles.mobileCtaWrap}>
+          <Button href="#enquire" variant="primary" onClick={() => setIsOpen(false)}>
+            ENQUIRE NOW
+          </Button>
+        </div>
       </div>
     </header>
   )

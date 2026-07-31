@@ -15,6 +15,10 @@
   --color-cream-dim: #e9e2d1;
   --color-black: #0b0c0a;
 
+  --color-accent-gold: #cea25c;
+  --color-accent-sage: #8db69a;
+  --color-accent-mist: #8ea3bf;
+
   --color-text-on-dark: var(--color-cream);
   --color-text-on-dark-muted: rgb(244 239 228 / 64%);
   --color-text-on-light: var(--color-black);

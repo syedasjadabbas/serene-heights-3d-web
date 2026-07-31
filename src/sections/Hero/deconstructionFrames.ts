@@ -1,7 +1,7 @@
-export const FRAME_COUNT = 75
+export const FRAME_COUNT = 96
 export const FRAME_WIDTH = 1280
 export const FRAME_HEIGHT = 720
-export const FRAME_BASE_PATH = '/media/serene-heights/hero/deconstruction/sequence'
+export const FRAME_BASE_PATH = '/media/serene-heights/hero/exploded-sequence'
 
 /** cover-fit anchor (0-100), matching heroPhotos.ts's focal convention — the
  * building mass in V2 sits left-of-centre with the freestanding tower further right. */
@@ -14,13 +14,13 @@ export const FOCAL = { x: 45, y: 46 }
  * TRANSITION_END through SEQUENCE_HOLD it owns the visual outright and maps
  * scroll to sequence frame; past SEQUENCE_HOLD it holds the final clean frame.
  *
- * TRANSITION_START intentionally starts BEFORE HeroPhotography's last envelope
- * exits (0.55, see heroPhotos.ts) — this layer fades in while photography is
- * still fading out, so the handoff is a genuine opacity overlap rather than a
- * sequential cut (which left a dead gap at exactly 0.55 in testing: photography
- * already at 0 opacity, canvas not yet begun). */
-export const TRANSITION_START = 0.5
-export const TRANSITION_END = 0.6
+ * TRANSITION_START lines up with HeroPhotography's own fade-out window
+ * (peakOut 0.3 -> exit 0.4, see heroPhotos.ts) — this layer fades in while the
+ * establishing photography is fading out over the exact same span, so the
+ * handoff is a genuine opacity crossfade with no dead gap where both layers
+ * are near-invisible and the dark background shows through. */
+export const TRANSITION_START = 0.3
+export const TRANSITION_END = 0.4
 
 /**
  * progress -> sequence frame index, piecewise-linear. The source clip holds an
@@ -31,7 +31,7 @@ export const TRANSITION_END = 0.6
  */
 const FRAME_BREAKPOINTS: Array<[progress: number, frame: number]> = [
   [TRANSITION_END, 0],
-  [0.7, 48],
+  [0.55, 48],
   [0.94, FRAME_COUNT - 1],
 ]
 
