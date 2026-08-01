@@ -4,69 +4,82 @@ import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
 import styles from './SectionSeven.module.css'
 
-interface JourneyStage {
-  num: string
-  stage: string
+interface InvestmentStage {
+  id: string
+  number: string
+  tag: string
   title: string
-  metric: string
+  highlight: string
   description: string
+  blueprintData: string
 }
 
-const LIFECYCLE_STAGES: JourneyStage[] = [
+const INVESTMENT_STAGES: InvestmentStage[] = [
   {
-    num: '01',
-    stage: 'SELECTION',
-    title: 'Choose Property Unit',
-    metric: '150+ SUITES / 50 SQ FT UNITS',
-    description: 'Select whole 1, 2, or 3-bedroom hotel residences or fractional 50 sq ft Smart Property Units.',
+    id: 'residence',
+    number: '01',
+    tag: 'SELECTION',
+    title: 'Choose your residence.',
+    highlight: '150+ Hotel Apartments / 50 sq ft Smart Units',
+    description:
+      'Select whole 1, 2, or 3-bedroom mountain suites or fractional Smart Property Units designed for flexible ownership.',
+    blueprintData: 'UNIT TYPE A1-C3 · ELEV 7,906 FT',
   },
   {
-    num: '02',
-    stage: 'BOOKING',
-    title: 'Booking Down Payment',
-    metric: '30% DEPOSIT',
-    description: 'Secure your allotment with a 30% down payment (starting from PKR 675,000 for Smart Units).',
+    id: 'reservation',
+    number: '02',
+    tag: 'RESERVATION',
+    title: 'Reserve your unit.',
+    highlight: '30% Initial Down Payment',
+    description:
+      'Secure your allotment with an initial 30% deposit and lock in early prime real estate valuation in Nathia Gali.',
+    blueprintData: 'BOOKING DEPOSIT · 36-MONTH PLAN',
   },
   {
-    num: '03',
-    stage: 'INSTALLMENTS',
-    title: '36-Month Payment Plan',
-    metric: '36 MONTHS',
-    description: 'Structure remaining balance across 36 monthly installments linked to development milestones.',
+    id: 'construction',
+    number: '03',
+    tag: 'DEVELOPMENT',
+    title: 'Construction progresses.',
+    highlight: '36-Month Milestone Execution',
+    description:
+      'Track precision structural milestones built by DM Consortium using weather-resistant alpine stone and thermal glass.',
+    blueprintData: 'DM CONSORTIUM · MILESTONE STAGE 03',
   },
   {
-    num: '04',
-    stage: 'CONSTRUCTION',
-    title: 'Milestone Execution',
-    metric: 'DM CONSORTIUM',
-    description: 'Track precision structural execution built to withstand alpine winter conditions at 7,906 ft.',
+    id: 'completion',
+    number: '04',
+    tag: 'HANDOVER',
+    title: 'Property is completed.',
+    highlight: 'Freehold Title Deed · PKR 0 Maintenance',
+    description:
+      'Receive full ownership rights with 100% freehold title deed and zero ongoing owner maintenance fees.',
+    blueprintData: 'FREEHOLD TITLE DEED · PKR 0 FEES',
   },
   {
-    num: '05',
-    stage: 'OWNERSHIP',
-    title: 'Title Deed & Zero Maintenance',
-    metric: 'PKR 0 MAINTENANCE',
-    description: 'Receive 100% freehold title deed ownership with zero ongoing owner maintenance fees.',
+    id: 'management',
+    number: '05',
+    tag: 'HOSPITALITY',
+    title: 'Rental management begins.',
+    highlight: '5-Star Resort Operations',
+    description:
+      'DM Consortium handles guest reservations, housekeeping, suite maintenance, and 24-hour executive concierge.',
+    blueprintData: 'DM HOSPITALITY · 5-STAR OPERATION',
   },
   {
-    num: '06',
-    stage: 'HOSPITALITY',
-    title: 'Turnkey Suite Operations',
-    metric: '5-STAR SERVICE',
-    description: 'DM Consortium handles all suite marketing, guest reception, housekeeping, and maintenance.',
-  },
-  {
-    num: '07',
-    stage: 'YIELD RETURNS',
-    title: '13–15% Annual ROI',
-    metric: '13–15% / YR',
-    description: 'Enjoy automated quarterly rental yield payouts combined with strong mountain real estate appreciation.',
+    id: 'yield',
+    number: '06',
+    tag: 'RETURNS',
+    title: 'Monthly income starts.',
+    highlight: '13–15% Projected Annual ROI',
+    description:
+      'Receive automated quarterly rental yield distributions paired with long-term capital appreciation.',
+    blueprintData: 'NET ANNUAL YIELD · 13–15% ROI',
   },
 ]
 
 export default function SectionSeven() {
   const sectionRef = useRef<HTMLElement>(null)
-  const lineRef = useRef<HTMLDivElement>(null)
+  const lineRef = useRef<SVGPathElement>(null)
   const stagesRef = useRef<(HTMLDivElement | null)[]>([])
 
   useLayoutEffect(() => {
@@ -75,53 +88,69 @@ export default function SectionSeven() {
     const ctx = gsap.context(() => {
       registerScrollTrigger()
 
-      // Timeline vertical progress line draw
-      if (lineRef.current) {
-        gsap.fromTo(
-          lineRef.current,
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 40%',
-              end: 'bottom 70%',
-              scrub: true,
-            },
+      // SVG Blueprint Connecting Line Drawing
+      const line = lineRef.current
+      if (line) {
+        const lineLen = line.getTotalLength()
+        gsap.set(line, {
+          strokeDasharray: lineLen,
+          strokeDashoffset: lineLen,
+        })
+
+        gsap.to(line, {
+          strokeDashoffset: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 40%',
+            end: 'bottom 80%',
+            scrub: true,
           },
-        )
+        })
       }
 
-      // Stages active highlight triggers
+      // Viewport stage scroll reveals
       stagesRef.current.forEach((stage) => {
         if (!stage) return
-        const card = stage.querySelector(`.${styles.stageCard}`)
-        const dot = stage.querySelector(`.${styles.stageDot}`)
+        const num = stage.querySelector(`.${styles.giantNumber}`)
+        const text = stage.querySelector(`.${styles.textWrap}`)
 
-        gsap.fromTo(
-          card,
-          { opacity: 0.2, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: stage,
-              start: 'top 75%',
-              toggleActions: 'play none none reverse',
-              onEnter: () => {
-                stage.setAttribute('data-active', 'true')
-                if (dot) gsap.to(dot, { scale: 1.4, duration: 0.3 })
-              },
-              onLeaveBack: () => {
-                stage.removeAttribute('data-active')
-                if (dot) gsap.to(dot, { scale: 1.0, duration: 0.3 })
+        if (num) {
+          gsap.fromTo(
+            num,
+            { opacity: 0.15, scale: 0.9, y: 50 },
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: 1.0,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: stage,
+                start: 'top 70%',
+                toggleActions: 'play none none reverse',
               },
             },
-          },
-        )
+          )
+        }
+
+        if (text) {
+          gsap.fromTo(
+            text,
+            { opacity: 0, y: 40 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.9,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: stage,
+                start: 'top 65%',
+                toggleActions: 'play none none reverse',
+              },
+            },
+          )
+        }
       })
     }, sectionRef)
 
@@ -130,55 +159,59 @@ export default function SectionSeven() {
 
   return (
     <section ref={sectionRef} id="investment" className={styles.section}>
-      <div className={`container ${styles.inner}`}>
-        {/* Section Header */}
-        <div className={styles.header}>
-          <p className={styles.eyebrow}>
-            <span className={styles.eyebrowNum}>07</span>
-            <span className={styles.eyebrowDivider}>/</span>
-            <span>INVESTMENT JOURNEY</span>
-          </p>
-          <h2 className={styles.headline}>
-            A structured path to alpine asset ownership.
-          </h2>
-        </div>
+      {/* Section Header */}
+      <div className={`container ${styles.header}`}>
+        <p className={styles.eyebrow}>
+          <span className={styles.eyebrowNum}>07</span>
+          <span className={styles.eyebrowDivider}>/</span>
+          <span>THE INVESTMENT PROCESS</span>
+        </p>
+        <h2 className={styles.headerTitle}>
+          Your path to alpine asset ownership.
+        </h2>
+      </div>
 
-        {/* Lifecycle Timeline Container */}
-        <div className={styles.timelineWrap}>
-          {/* Animated Vertical Line */}
-          <div className={styles.lineTrack}>
-            <div ref={lineRef} className={styles.lineActive} />
-          </div>
+      {/* Full-Viewport Timeline Journey Container */}
+      <div className={styles.journeyContainer}>
+        {/* Animated Blueprint Canvas Vector Line */}
+        <svg className={styles.svgCanvas} viewBox="0 0 1000 3000" preserveAspectRatio="none" aria-hidden="true">
+          <path
+            ref={lineRef}
+            d="M 500,50 C 300,500 320,1000 500,1500 C 680,2000 660,2500 500,2950"
+            className={styles.svgPath}
+          />
+        </svg>
 
-          {/* Timeline Stages List */}
-          <div className={styles.stagesList}>
-            {LIFECYCLE_STAGES.map((item, idx) => (
-              <div
-                key={item.num}
-                ref={(el) => { stagesRef.current[idx] = el }}
-                className={styles.stageRow}
-              >
-                {/* Center Node Dot */}
-                <div className={styles.stageDotWrap}>
-                  <div className={styles.stageDot} />
+        {/* Viewport Stages */}
+        <div className={styles.stagesViewportList}>
+          {INVESTMENT_STAGES.map((item, idx) => (
+            <div
+              key={item.id}
+              ref={(el) => { stagesRef.current[idx] = el }}
+              className={styles.stageViewport}
+            >
+              <div className={`container ${styles.stageInner}`}>
+                {/* Giant Number */}
+                <div className={styles.numberColumn}>
+                  <span className={styles.giantNumber}>{item.number}</span>
+                  <span className={styles.blueprintCallout}>{item.blueprintData}</span>
                 </div>
 
-                {/* Stage Card */}
-                <div className={styles.stageCard}>
-                  <div className={styles.stageMeta}>
-                    <span className={styles.stageNum}>{item.num}</span>
-                    <span className={styles.stageTag}>{item.stage}</span>
-                    <span className={styles.stageMetric}>{item.metric}</span>
+                {/* Editorial Content */}
+                <div className={styles.textWrap}>
+                  <div className={styles.metaRow}>
+                    <span className={styles.tagLabel}>{item.tag}</span>
                   </div>
-                  <h3 className={styles.stageTitle}>{item.title}</h3>
-                  <p className={styles.stageDesc}>{item.description}</p>
+
+                  <h3 className={styles.stageHeadline}>{item.title}</h3>
+                  <div className={styles.highlightBadge}>{item.highlight}</div>
+                  <p className={styles.stageDescription}>{item.description}</p>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   )
 }
-
