@@ -1,0 +1,80 @@
+.section {
+  position: relative;
+  z-index: 2;
+  background: #101d18;
+  padding-block: clamp(120px, 16vh, 200px);
+}
+
+.inner {
+  display: flex;
+  justify-content: center;
+}
+
+.contentBox {
+  max-width: 820px;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-sans);
+  font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 228, 0.85);
+  margin-bottom: var(--space-4);
+  background: rgba(16, 26, 22, 0.5);
+  border: 1px solid rgba(244, 239, 228, 0.15);
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+}
+
+.eyebrowNum {
+  color: var(--color-accent-gold);
+}
+
+.eyebrowDivider {
+  color: rgba(244, 239, 228, 0.35);
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 2rem + 3.5vw, 4.8rem);
+  line-height: 1.05;
+  color: var(--color-cream);
+  margin-bottom: var(--space-5);
+}
+
+.paragraph {
+  font-family: var(--font-sans);
+  font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.25rem);
+  line-height: 1.6;
+  color: rgba(244, 239, 228, 0.82);
+  margin-bottom: var(--space-7);
+}
+
+.authorBadge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid rgba(244, 239, 228, 0.12);
+}
+
+.authorTitle {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--color-accent-gold);
+}
+
+.authorSub {
+  font-size: 0.75rem;
+  color: rgba(244, 239, 228, 0.55);
+}

@@ -1,0 +1,105 @@
+.section {
+  position: relative;
+  z-index: 2;
+  background: #0e1814;
+  padding-block: clamp(120px, 16vh, 200px);
+  overflow: hidden;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  max-width: 860px;
+  margin-bottom: clamp(56px, 8vh, 96px);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-sans);
+  font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 228, 0.85);
+  margin-bottom: var(--space-4);
+  background: rgba(16, 26, 22, 0.5);
+  border: 1px solid rgba(244, 239, 228, 0.15);
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+}
+
+.eyebrowNum {
+  color: var(--color-accent-gold);
+}
+
+.eyebrowDivider {
+  color: rgba(244, 239, 228, 0.35);
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 1.8rem + 3vw, 4.2rem);
+  line-height: 1.06;
+  color: var(--color-cream);
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(24px, 4vw, 48px);
+}
+
+.galleryCard {
+  position: relative;
+  height: 420px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(244, 239, 228, 0.14);
+  overflow: hidden;
+  box-shadow: 0 24px 48px -18px rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-6);
+  will-change: transform;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(14, 24, 20, 0.85) 0%, transparent 60%);
+}
+
+.cardContent {
+  position: relative;
+  z-index: 2;
+}
+
+.cardTag {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent-gold);
+  margin-bottom: var(--space-2);
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 1.3rem + 1vw, 2.2rem);
+  line-height: 1.1;
+  color: var(--color-cream);
+}
+
+@media (max-width: 900px) {
+  .galleryGrid {
+    grid-template-columns: 1fr;
+  }
+}

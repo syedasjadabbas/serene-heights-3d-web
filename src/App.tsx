@@ -5,6 +5,12 @@ import Hero from './sections/Hero/Hero'
 import SectionTwo from './sections/SectionTwo/SectionTwo'
 import SectionThree from './sections/SectionThree/SectionThree'
 import SectionFour from './sections/SectionFour/SectionFour'
+import SectionFive from './sections/SectionFive/SectionFive'
+import SectionSix from './sections/SectionSix/SectionSix'
+import SectionSeven from './sections/SectionSeven/SectionSeven'
+import SectionEight from './sections/SectionEight/SectionEight'
+import SectionNine from './sections/SectionNine/SectionNine'
+import SectionTen from './sections/SectionTen/SectionTen'
 import { initLenis } from './motion/lenis'
 
 function App() {
@@ -26,6 +32,12 @@ function App() {
         <SectionTwo />
         <SectionThree />
         <SectionFour />
+        <SectionFive />
+        <SectionSix />
+        <SectionSeven />
+        <SectionEight />
+        <SectionNine />
+        <SectionTen />
       </main>
     </>
   )
