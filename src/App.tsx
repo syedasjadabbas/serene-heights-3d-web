@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import Navigation from './components/navigation/Navigation'
+import MasterVisualStage from './components/stage/MasterVisualStage'
 import Hero from './sections/Hero/Hero'
 import SectionTwo from './sections/SectionTwo/SectionTwo'
 import { initLenis } from './motion/lenis'
@@ -16,6 +17,7 @@ function App() {
 
   return (
     <>
+      <MasterVisualStage />
       <Navigation />
       <main>
         <Hero />

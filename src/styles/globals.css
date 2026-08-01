@@ -1,5 +1,5 @@
-@import '@fontsource-variable/fraunces';
-@import '@fontsource-variable/fraunces/wght-italic.css';
+@import '@fontsource-variable/cormorant-garamond';
+@import '@fontsource-variable/cormorant-garamond/wght-italic.css';
 @import '@fontsource-variable/inter';
 
 :root {
@@ -15,12 +15,8 @@
   --color-cream-dim: #e9e2d1;
   --color-black: #0b0c0a;
 
-  --color-accent-gold: #cea25c;
-  --color-accent-sage: #8db69a;
-  --color-accent-mist: #8ea3bf;
-
   --color-text-on-dark: var(--color-cream);
-  --color-text-on-dark-muted: rgb(244 239 228 / 64%);
+  --color-text-on-dark-muted: rgb(244 239 228 / 70%);
   --color-text-on-light: var(--color-black);
   --color-text-on-light-muted: rgb(11 12 10 / 58%);
 
@@ -31,7 +27,7 @@
   --color-fg: var(--color-cream);
 
   /* Type */
-  --font-display: 'Fraunces Variable', 'Fraunces', ui-serif, Georgia, serif;
+  --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', ui-serif, Georgia, serif;
   --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   --text-display: clamp(3.4rem, 2.2rem + 7.2vw, 10.5rem);

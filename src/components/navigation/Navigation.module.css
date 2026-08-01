@@ -59,11 +59,11 @@
 .link {
   position: relative;
   font-family: var(--font-sans);
-  font-size: clamp(0.68rem, 0.62rem + 0.3vw, 0.76rem);
+  font-size: clamp(0.7rem, 0.64rem + 0.25vw, 0.78rem);
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(244, 239, 228, 0.85);
   padding: 6px 12px;
   border-radius: var(--radius-pill);
   transition:
@@ -71,11 +71,12 @@
     background-color 0.25s var(--ease-out-soft);
   white-space: nowrap;
   text-decoration: none;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .link:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .actions {
@@ -86,9 +87,10 @@
 }
 
 .cta {
-  font-size: 0.72rem;
-  padding: 0.7em 1.4em;
-  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  padding: 0.75em 1.5em;
+  letter-spacing: 0.14em;
+  font-weight: 600;
 }
 
 .menuToggle {
