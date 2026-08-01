@@ -90,76 +90,89 @@ export default function SectionThree() {
     const ctx = gsap.context(() => {
       registerScrollTrigger()
 
-      // Header entrance animation
-      gsap.fromTo(
-        headerRef.current,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.0,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none reverse',
-          },
-        },
-      )
-
-      // Main SVG Blueprint Line Drawing Animation 1:1 on Scroll
-      const path = mainPathRef.current
-      if (path) {
-        const pathLength = path.getTotalLength()
-        gsap.set(path, {
-          strokeDasharray: pathLength,
-          strokeDashoffset: pathLength,
-        })
-
-        gsap.to(path, {
-          strokeDashoffset: 0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 50%',
-            end: 'bottom 75%',
-            scrub: true,
-          },
-        })
-      }
-
-      // Feature Nodes entrance and active highlight
-      nodesRef.current.forEach((node) => {
-        if (!node) return
-        const card = node.querySelector(`.${styles.nodeContent}`)
-        const marker = node.querySelector(`.${styles.nodeMarker}`)
-        const line = node.querySelector(`.${styles.nodePointerLine}`)
-
+      // Header entrance reveal
+      if (headerRef.current) {
         gsap.fromTo(
-          card,
-          { opacity: 0, y: 40, scale: 0.97 },
+          headerRef.current,
+          { opacity: 0, y: 40 },
           {
             opacity: 1,
             y: 0,
-            scale: 1,
-            duration: 0.85,
+            duration: 0.9,
             ease: 'power3.out',
             scrollTrigger: {
-              trigger: node,
-              start: 'top 78%',
+              trigger: headerRef.current,
+              start: 'top 82%',
               toggleActions: 'play none none reverse',
-              onEnter: () => {
-                node.setAttribute('data-active', 'true')
-                if (marker) gsap.to(marker, { scale: 1.3, duration: 0.35, ease: 'back.out(1.7)' })
-                if (line) gsap.to(line, { opacity: 1, scaleX: 1, duration: 0.4 })
-              },
-              onLeaveBack: () => {
-                node.removeAttribute('data-active')
-                if (marker) gsap.to(marker, { scale: 1.0, duration: 0.3 })
-                if (line) gsap.to(line, { opacity: 0.4, duration: 0.3 })
-              },
             },
           },
+        )
+      }
+
+      // Master 1:1 Scroll Scrubbed Journey Timeline
+      const path = mainPathRef.current
+      if (!path) return
+
+      const pathLength = path.getTotalLength()
+      gsap.set(path, {
+        strokeDasharray: pathLength,
+        strokeDashoffset: pathLength,
+      })
+
+      // Main scrubbed timeline linked directly to mouse wheel / scroll progress
+      const journeyTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 45%',
+          end: 'bottom 80%',
+          scrub: 0.4,
+        },
+      })
+
+      // 1. Line draws continuously from start to finish
+      journeyTl.to(path, {
+        strokeDashoffset: 0,
+        ease: 'none',
+        duration: 1,
+      }, 0)
+
+      // 2. Node thresholds mapped across 1:1 timeline duration [0, 1]
+      const nodeProgresses = [0.08, 0.25, 0.44, 0.62, 0.80, 0.95]
+
+      nodesRef.current.forEach((node, idx) => {
+        if (!node) return
+        const card = node.querySelector(`.${styles.nodeContent}`)
+        const marker = node.querySelector(`.${styles.nodeMarker}`)
+        const t = nodeProgresses[idx] ?? (idx / 5)
+
+        // Marker activation scale
+        if (marker) {
+          journeyTl.fromTo(
+            marker,
+            { scale: 1.0 },
+            { scale: 1.4, duration: 0.08, ease: 'power2.out' },
+            t,
+          )
+        }
+
+        // Card activation lift & scale
+        if (card) {
+          journeyTl.fromTo(
+            card,
+            { opacity: 0.45, y: 25, scale: 0.96 },
+            { opacity: 1.0, y: 0, scale: 1.0, duration: 0.1, ease: 'power2.out' },
+            t,
+          )
+        }
+
+        // Active attribute toggle for CSS lighting shift
+        journeyTl.to(
+          node,
+          {
+            onStart: () => node.setAttribute('data-active', 'true'),
+            onReverseComplete: () => node.removeAttribute('data-active'),
+          },
+          t,
         )
       })
     }, sectionRef)

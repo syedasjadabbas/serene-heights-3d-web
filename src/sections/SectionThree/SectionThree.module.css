@@ -171,23 +171,47 @@
 /* --- Node Content Styling --- */
 
 .nodeContent {
-  background: rgba(16, 26, 22, 0.45);
+  background: linear-gradient(
+    165deg,
+    rgba(20, 32, 26, 0.52) 0%,
+    rgba(12, 20, 16, 0.62) 100%
+  );
   border: 1px solid rgba(244, 239, 228, 0.12);
   border-radius: var(--radius-lg);
   padding: clamp(28px, 3.5vw, 42px);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 20px 48px -18px rgba(0, 0, 0, 0.65);
-  will-change: transform, opacity;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 20px 48px -18px rgba(0, 0, 0, 0.65);
+  will-change: transform, opacity, box-shadow;
   transition:
-    transform 0.4s var(--ease-out-soft),
-    border-color 0.4s var(--ease-out-soft),
-    background-color 0.4s var(--ease-out-soft);
+    transform 0.45s var(--ease-out-soft),
+    border-color 0.45s var(--ease-out-soft),
+    box-shadow 0.45s var(--ease-out-soft),
+    background-color 0.45s var(--ease-out-soft);
+}
+
+.rowLeft .nodeContent {
+  transform-origin: center right;
+}
+
+.rowRight .nodeContent {
+  transform-origin: center left;
 }
 
 .nodeRow[data-active='true'] .nodeContent {
-  border-color: rgba(206, 162, 92, 0.38);
-  box-shadow: 0 28px 60px -16px rgba(0, 0, 0, 0.65);
+  border-color: rgba(206, 162, 92, 0.48);
+  background: linear-gradient(
+    165deg,
+    rgba(24, 38, 30, 0.72) 0%,
+    rgba(16, 26, 21, 0.82) 100%
+  );
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 28px 60px -16px rgba(206, 162, 92, 0.22),
+    0 20px 48px -18px rgba(0, 0, 0, 0.75);
 }
 
 .nodeMeta {
