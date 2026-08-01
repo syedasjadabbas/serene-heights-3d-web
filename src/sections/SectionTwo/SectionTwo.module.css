@@ -1,10 +1,9 @@
 .section {
   position: relative;
   z-index: 2;
-  background: rgba(14, 24, 20, 0.78);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  padding-block: clamp(140px, 18vh, 200px) clamp(100px, 14vh, 160px);
+  background: transparent;
+  padding-block: clamp(120px, 16vh, 180px) clamp(100px, 14vh, 160px);
+  transform: translateZ(0);
 }
 
 .inner {
@@ -12,51 +11,148 @@
   flex-direction: column;
 }
 
-.statement {
-  max-width: 900px;
+.header {
+  max-width: 960px;
+  margin-bottom: clamp(56px, 8vh, 96px);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
   font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3.25rem);
-  line-height: 1.15;
-  letter-spacing: var(--tracking-tight);
+  font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 228, 0.88);
+  margin-bottom: var(--space-4);
+}
+
+.eyebrowNum {
+  color: var(--color-accent-gold);
+}
+
+.eyebrowDivider {
+  color: rgba(244, 239, 228, 0.35);
+}
+
+.statement {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 1.8rem + 3vw, 4.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
   color: var(--color-cream);
-  margin-bottom: clamp(64px, 9vh, 112px);
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.6);
+  margin-bottom: var(--space-4);
+}
+
+.subcopy {
+  max-width: 58ch;
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(244, 239, 228, 0.82);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-5);
+  gap: var(--space-7);
   align-items: stretch;
 }
+
+/* --- Architectural Editorial Panels (Replacing Identical Cards) --- */
 
 .column {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: rgb(244 239 228 / 4%);
-  border: 1px solid var(--color-border-on-dark);
-  border-radius: var(--radius-lg);
-  padding: var(--space-7) var(--space-6) var(--space-9);
+  background: rgba(16, 26, 22, 0.15);
+  border-left: 2px solid rgba(244, 239, 228, 0.14);
+  border-top: 1px solid rgba(244, 239, 228, 0.08);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  padding: var(--space-6) var(--space-5) var(--space-8);
+  will-change: transform;
+  transition:
+    transform 0.4s var(--ease-out-soft),
+    border-color 0.4s var(--ease-out-soft),
+    background-color 0.4s var(--ease-out-soft);
+}
+
+.column:nth-child(1) {
+  border-left-color: var(--color-accent-gold);
+}
+
+.column:nth-child(2) {
+  border-left-color: var(--color-accent-sage);
+  margin-top: var(--space-5);
+}
+
+.column:nth-child(3) {
+  border-left-color: var(--color-accent-mist);
+}
+
+.column:hover {
+  transform: translateY(-4px);
+  background: rgba(16, 26, 22, 0.3);
+}
+
+.columnTagWrap {
+  margin-bottom: var(--space-3);
+}
+
+.columnTag {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.tagGold {
+  background: rgba(206, 162, 92, 0.16);
+  color: var(--color-accent-gold);
+  border: 1px solid rgba(206, 162, 92, 0.35);
+}
+
+.tagSage {
+  background: rgba(100, 160, 120, 0.16);
+  color: var(--color-accent-sage);
+  border: 1px solid rgba(100, 160, 120, 0.35);
+}
+
+.tagMist {
+  background: rgba(142, 163, 191, 0.16);
+  color: var(--color-accent-mist);
+  border: 1px solid rgba(142, 163, 191, 0.35);
 }
 
 .heading {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 1.4rem + 1vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
   margin-bottom: var(--space-4);
 }
 
 .headingGold {
-  color: var(--color-accent-gold);
+  color: var(--color-cream);
 }
 
 .headingSage {
-  color: var(--color-accent-sage);
+  color: var(--color-cream);
 }
 
 .headingMist {
-  color: var(--color-accent-mist);
+  color: var(--color-cream);
 }
 
 .description {
@@ -66,7 +162,7 @@
   margin-bottom: var(--space-7);
 }
 
-/* --- Residences: stacked factual cards (Blocks-column structural echo) --- */
+/* --- Residences: stacked factual cards --- */
 
 .factStack {
   display: flex;
@@ -78,10 +174,15 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  background: var(--color-cream);
+  background: rgba(244, 239, 228, 0.95);
   border-radius: var(--radius-md);
   padding: var(--space-4) var(--space-5);
-  box-shadow: 0 12px 24px -16px rgb(0 0 0 / 45%);
+  box-shadow: 0 12px 24px -16px rgba(0, 0, 0, 0.45);
+  transition: transform 0.3s var(--ease-out-soft);
+}
+
+.factCard:hover {
+  transform: translateX(4px);
 }
 
 .factIcon {
@@ -112,7 +213,7 @@
   color: var(--color-text-on-light-muted);
 }
 
-/* --- Payment Plan: fanned rotated cards (Mortgage-column structural echo) --- */
+/* --- Payment Plan: fanned rotated cards --- */
 
 .paymentFan {
   position: relative;
@@ -123,7 +224,7 @@
 .paymentCard {
   position: absolute;
   left: 50%;
-  width: 82%;
+  width: 84%;
   height: 112px;
   display: flex;
   flex-direction: column;
@@ -133,7 +234,14 @@
   padding: var(--space-5);
   border-radius: var(--radius-md);
   color: var(--color-cream);
-  box-shadow: 0 20px 32px -18px rgb(0 0 0 / 55%);
+  box-shadow: 0 20px 32px -18px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.35s var(--ease-out-soft);
+}
+
+.paymentCard:hover {
+  transform: translateX(-50%) scale(1.03) rotate(0deg) !important;
+  z-index: 10 !important;
 }
 
 .paymentCardA {
@@ -170,7 +278,7 @@
   color: var(--color-text-on-dark-muted);
 }
 
-/* --- Smart Property Unit: single rotated focal card (Mint-column structural echo) --- */
+/* --- Smart Property Unit: single focal card --- */
 
 .unitCardWrap {
   display: flex;
@@ -180,13 +288,18 @@
 
 .unitCard {
   width: 100%;
-  max-width: 280px;
+  max-width: 290px;
   padding: var(--space-6) var(--space-5);
-  background: linear-gradient(160deg, rgb(142 163 191 / 20%), var(--color-forest-950) 70%);
-  border: 1px solid rgb(142 163 191 / 35%);
+  background: linear-gradient(160deg, rgba(142, 163, 191, 0.22), var(--color-forest-950) 75%);
+  border: 1px solid rgba(142, 163, 191, 0.38);
   border-radius: var(--radius-lg);
-  transform: rotate(6deg);
-  box-shadow: 0 28px 48px -20px rgb(0 0 0 / 60%);
+  transform: rotate(5deg);
+  box-shadow: 0 28px 48px -20px rgba(0, 0, 0, 0.65);
+  transition: transform 0.4s var(--ease-out-soft);
+}
+
+.unitCard:hover {
+  transform: rotate(0deg) scale(1.02);
 }
 
 .unitHeader {
@@ -206,7 +319,7 @@
 .unitHeaderTag {
   font-size: var(--text-small);
   color: var(--color-accent-mist);
-  border: 1px solid rgb(142 163 191 / 45%);
+  border: 1px solid rgba(142, 163, 191, 0.45);
   border-radius: var(--radius-pill);
   padding: 2px 10px;
 }
@@ -220,7 +333,7 @@
 .unitRoiValue {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(2rem, 1.7rem + 1vw, 2.5rem);
+  font-size: clamp(2.2rem, 1.8rem + 1.2vw, 2.8rem);
   color: var(--color-cream);
   letter-spacing: var(--tracking-tight);
 }
@@ -232,7 +345,7 @@
 
 .unitDivider {
   height: 1px;
-  background: rgb(244 239 228 / 14%);
+  background: rgba(244, 239, 228, 0.14);
   margin-bottom: var(--space-5);
 }
 
@@ -269,7 +382,7 @@
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--color-text-on-dark-muted);
-  border: 1px solid rgb(244 239 228 / 14%);
+  border: 1px solid rgba(244, 239, 228, 0.14);
   border-radius: var(--radius-pill);
   padding: 4px 10px;
 }
@@ -282,7 +395,7 @@
   margin-bottom: var(--space-6);
 }
 
-/* --- Shared CTA: circular arrow button, bottom-right of each column --- */
+/* --- Shared CTA: circular arrow button --- */
 
 .cta {
   position: absolute;
@@ -301,7 +414,7 @@
 }
 
 .cta:hover {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 .ctaGold {
@@ -326,3 +439,4 @@
     padding-bottom: var(--space-8);
   }
 }
+

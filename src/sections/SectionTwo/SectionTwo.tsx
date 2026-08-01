@@ -1,4 +1,7 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react'
+import { gsap } from 'gsap'
+import { registerScrollTrigger } from '../../motion/scrollTrigger'
+import { prefersReducedMotion } from '../../motion/reducedMotion'
 import styles from './SectionTwo.module.css'
 
 function IconBuilding() {
@@ -91,43 +94,113 @@ const PAYMENT_FACTS: Array<{ value: string; label: string; tone: string; rotate:
 ]
 
 export default function SectionTwo() {
-  return (
-    <section className={styles.section}>
-      <div className={`container ${styles.inner}`}>
-        <p className={styles.statement}>
-          Own your place in the mountains,
-          <br />
-          or start with a share of it.
-        </p>
+  const sectionRef = useRef<HTMLElement>(null)
+  const eyebrowRef = useRef<HTMLParagraphElement>(null)
+  const statementRef = useRef<HTMLHeadingElement>(null)
+  const subcopyRef = useRef<HTMLParagraphElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
 
-        <div className={styles.grid}>
-          {/* Residences — structural reference: PRYPCO's Blocks column */}
+  useLayoutEffect(() => {
+    if (prefersReducedMotion()) return
+
+    const ctx = gsap.context(() => {
+      registerScrollTrigger()
+
+      // Header reveal
+      gsap.fromTo(
+        [eyebrowRef.current, statementRef.current, subcopyRef.current],
+        { opacity: 0, y: 32 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+          },
+        },
+      )
+
+      // Columns staggered entrance
+      if (gridRef.current) {
+        const columns = Array.from(gridRef.current.children)
+        gsap.fromTo(
+          columns,
+          { opacity: 0, y: 48, scale: 0.97 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.0,
+            stagger: 0.16,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          },
+        )
+      }
+    }, sectionRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <section ref={sectionRef} id="overview" className={styles.section}>
+      <div className={`container ${styles.inner}`}>
+        <div className={styles.header}>
+          <p ref={eyebrowRef} className={styles.eyebrow}>
+            <span className={styles.eyebrowNum}>02</span>
+            <span className={styles.eyebrowDivider}>/</span>
+            <span>OWNERSHIP & INVESTMENT</span>
+          </p>
+          <h2 ref={statementRef} className={styles.statement}>
+            Own your place in the mountains,
+            <br />
+            or start with a share of it.
+          </h2>
+          <p ref={subcopyRef} className={styles.subcopy}>
+            Flexible investment structures tailored for Pakistan’s premier winter resort, backed by complete hospitality management.
+          </p>
+        </div>
+
+        <div ref={gridRef} className={styles.grid}>
+          {/* Residences Column */}
           <div className={styles.column}>
-            <h3 className={`${styles.heading} ${styles.headingGold}`}>Residences</h3>
+            <div className={styles.columnTagWrap}>
+              <span className={`${styles.columnTag} ${styles.tagGold}`}>RESIDENCES</span>
+            </div>
+            <h3 className={`${styles.heading} ${styles.headingGold}`}>Luxury Apartments</h3>
             <p className={styles.description}>
-              150+ fully managed hotel apartments across 3 towers — 1, 2 and 3-bedroom residences, with zero
-              maintenance fees for owners.
+              150+ fully managed hotel apartments across 3 towers — 1, 2 and 3-bedroom residences with zero maintenance fees for owners.
             </p>
             <div className={styles.factStack}>
               {RESIDENCE_FACTS.map((fact) => (
                 <div key={fact.headline} className={styles.factCard}>
                   <span className={`${styles.factIcon} ${styles.factIconGold}`}>{fact.icon}</span>
-                  <span>
+                  <div>
                     <span className={styles.factHeadline}>{fact.headline}</span>
                     <span className={styles.factCaption}>{fact.caption}</span>
-                  </span>
+                  </div>
                 </div>
               ))}
             </div>
             <CardCta href="#residences" tone="gold" />
           </div>
 
-          {/* Payment Plan — structural reference: PRYPCO's Mortgage column */}
+          {/* Payment Plan Column */}
           <div className={styles.column}>
+            <div className={styles.columnTagWrap}>
+              <span className={`${styles.columnTag} ${styles.tagSage}`}>STRUCTURE</span>
+            </div>
             <h3 className={`${styles.heading} ${styles.headingSage}`}>Payment Plan</h3>
             <p className={styles.description}>
-              A straightforward path to ownership: PKR 37,000 per sq ft, booking from 30%, and 36 monthly
-              installments.
+              A straightforward path to ownership: PKR 37,000 per sq ft, booking from 30%, and 36 monthly installments.
             </p>
             <div className={styles.paymentFan}>
               {PAYMENT_FACTS.map((fact) => (
@@ -144,16 +217,14 @@ export default function SectionTwo() {
             <CardCta href="#payment-plan" tone="sage" />
           </div>
 
-          {/* Smart Property Unit — structural reference: PRYPCO's Mint column.
-              PRYPCO uses a phone mockup because Mint is a trading app; Serene
-              Heights has no equivalent app, so this occupies the same tall
-              rotated focal-object role with an ownership/investment-summary
-              card instead of a fabricated product. */}
+          {/* Smart Property Unit Column */}
           <div className={styles.column}>
+            <div className={styles.columnTagWrap}>
+              <span className={`${styles.columnTag} ${styles.tagMist}`}>FRACTIONAL</span>
+            </div>
             <h3 className={`${styles.heading} ${styles.headingMist}`}>Smart Property Unit</h3>
             <p className={styles.description}>
-              A smaller way in — own a 50 sq ft Smart Property Unit, managed and rented on your behalf by DM
-              Consortium.
+              A smaller way in — own a 50 sq ft Smart Property Unit, managed and rented on your behalf by DM Consortium.
             </p>
             <div className={styles.unitCardWrap}>
               <div className={styles.unitCard}>
@@ -194,7 +265,7 @@ export default function SectionTwo() {
                 </div>
               </div>
             </div>
-            <p className={styles.disclaimer}>*Projected figures provided by the developer, not guaranteed returns.</p>
+            <p className={styles.disclaimer}>*Projected figures provided by developer, not guaranteed returns.</p>
             <CardCta href="#smart-property-unit" tone="mist" />
           </div>
         </div>
@@ -202,3 +273,4 @@ export default function SectionTwo() {
     </section>
   )
 }
+
