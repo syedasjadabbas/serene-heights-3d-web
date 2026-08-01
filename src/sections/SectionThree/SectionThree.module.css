@@ -2,8 +2,18 @@
   position: relative;
   z-index: 2;
   background: transparent;
-  padding-block: clamp(120px, 16vh, 200px);
+  width: 100%;
   transform: translateZ(0);
+}
+
+.pinWrap {
+  position: relative;
+  width: 100%;
+  padding-block: clamp(60px, 8vh, 120px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .inner {
@@ -64,7 +74,7 @@
   color: rgba(244, 239, 228, 0.78);
 }
 
-/* --- Journey Wrap & Architectural Grid --- */
+/* --- Journey Wrap & Dominant Architectural Line Backbone --- */
 
 .journeyWrap {
   position: relative;
@@ -110,18 +120,29 @@
 
 .svgGuidePath {
   fill: none;
-  stroke: rgba(244, 239, 228, 0.12);
-  stroke-width: 2;
-  stroke-dasharray: 6 6;
+  stroke: rgba(244, 239, 228, 0.1);
+  stroke-width: 2.5;
+  stroke-dasharray: 8 8;
 }
 
+/* Visually commanding primary journey line */
 .svgMainPath {
   fill: none;
-  stroke: var(--color-accent-gold);
-  stroke-width: 4.5;
+  stroke: #f3d498;
+  stroke-width: 6.5;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 20px rgba(206, 162, 92, 0.8));
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 18px rgba(243, 212, 152, 0.95)) drop-shadow(0 0 36px rgba(206, 162, 92, 0.75));
   will-change: stroke-dashoffset;
+}
+
+/* Leading laser pulse head indicator on drawn path tip */
+.svgPathHead {
+  fill: #ffffff;
+  stroke: var(--color-accent-gold);
+  stroke-width: 4;
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 1)) drop-shadow(0 0 32px rgba(243, 212, 152, 1));
+  will-change: cx, cy;
 }
 
 /* --- Nodes Layout --- */
@@ -131,13 +152,13 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: clamp(80px, 12vh, 140px);
+  gap: clamp(100px, 14vh, 160px);
 }
 
 .nodeRow {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 60px 1fr;
+  grid-template-columns: 1fr 80px 1fr;
   align-items: center;
   gap: clamp(16px, 3vw, 40px);
 }
@@ -168,28 +189,35 @@
   grid-column: 2;
 }
 
-/* --- Node Content Styling --- */
+/* --- Node Content (Cards DO NOT activate on hover alone - Quieter when inactive) --- */
 
 .nodeContent {
+  position: relative;
   background: linear-gradient(
     165deg,
-    rgba(20, 32, 26, 0.52) 0%,
-    rgba(12, 20, 16, 0.62) 100%
+    rgba(16, 26, 21, 0.45) 0%,
+    rgba(10, 16, 13, 0.55) 100%
   );
-  border: 1px solid rgba(244, 239, 228, 0.12);
+  border: 1px solid rgba(244, 239, 228, 0.08);
   border-radius: var(--radius-lg);
   padding: clamp(28px, 3.5vw, 42px);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 20px 48px -18px rgba(0, 0, 0, 0.65);
-  will-change: transform, opacity, box-shadow;
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 16px 36px -16px rgba(0, 0, 0, 0.5);
+  opacity: 0.35;
+  filter: grayscale(25%);
+  transform: scale(0.95);
+  will-change: transform, opacity, box-shadow, filter;
   transition:
-    transform 0.45s var(--ease-out-soft),
-    border-color 0.45s var(--ease-out-soft),
-    box-shadow 0.45s var(--ease-out-soft),
-    background-color 0.45s var(--ease-out-soft);
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
 }
 
 .rowLeft .nodeContent {
@@ -200,18 +228,51 @@
   transform-origin: center left;
 }
 
+/* Light sheen element inside active card */
+.activeSheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ACTIVE DESTINATION STATE: Activated strictly by journey progression */
 .nodeRow[data-active='true'] .nodeContent {
-  border-color: rgba(206, 162, 92, 0.48);
+  opacity: 1;
+  filter: none;
+  border-color: rgba(230, 198, 135, 0.65);
   background: linear-gradient(
     165deg,
-    rgba(24, 38, 30, 0.72) 0%,
-    rgba(16, 26, 21, 0.82) 100%
+    rgba(26, 42, 34, 0.85) 0%,
+    rgba(16, 26, 21, 0.92) 100%
   );
-  transform: translateY(-8px) scale(1.02);
+  transform: translateY(-12px) scale(1.03) rotate(0.6deg);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 28px 60px -16px rgba(206, 162, 92, 0.22),
-    0 20px 48px -18px rgba(0, 0, 0, 0.75);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 32px 72px -16px rgba(206, 162, 92, 0.28),
+    0 24px 60px -12px rgba(0, 0, 0, 0.85);
+}
+
+.nodeRow[data-active='true'] .activeSheen {
+  opacity: 1;
+  animation: sheenSweep 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes sheenSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .nodeMeta {
@@ -297,47 +358,76 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
 }
 
 .nodeMarker {
   position: relative;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 1px solid var(--color-accent-gold);
-  background: rgba(16, 26, 22, 0.85);
+  border: 1.5px solid rgba(206, 162, 92, 0.6);
+  background: rgba(12, 20, 16, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 16px rgba(206, 162, 92, 0.5);
-  transition: transform 0.35s var(--ease-out-soft);
+  box-shadow: 0 0 16px rgba(206, 162, 92, 0.3);
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .markerCenterDot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--color-accent-gold);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease;
 }
 
 .markerCrosshairH {
   position: absolute;
-  width: 32px;
+  width: 42px;
   height: 1px;
-  background: rgba(206, 162, 92, 0.4);
+  background: rgba(206, 162, 92, 0.35);
 }
 
 .markerCrosshairV {
   position: absolute;
   width: 1px;
-  height: 32px;
-  background: rgba(206, 162, 92, 0.4);
+  height: 42px;
+  background: rgba(206, 162, 92, 0.35);
+}
+
+.nodeRow[data-active='true'] .nodeMarker {
+  transform: scale(1.4);
+  border-color: #ffffff;
+  background: var(--color-accent-gold);
+  box-shadow:
+    0 0 24px rgba(230, 198, 135, 1),
+    0 0 48px rgba(206, 162, 92, 0.85);
+}
+
+.nodeRow[data-active='true'] .markerCenterDot {
+  background: #080f0c;
+  transform: scale(1.2);
 }
 
 .nodePointerLine {
-  display: none;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(206, 162, 92, 0.2), transparent);
+  width: 100%;
+  opacity: 0.3;
+  transition: opacity 0.4s ease, background 0.4s ease;
+}
+
+.nodeRow[data-active='true'] .nodePointerLine {
+  opacity: 1;
+  height: 2px;
+  background: linear-gradient(90deg, #e6c687, transparent);
 }
 
 /* Responsive adjustments */
@@ -355,10 +445,14 @@
   .rowRight .nodeContent,
   .rowLeft .nodeContent {
     grid-column: 1;
+    opacity: 1;
+    filter: none;
+    transform: none;
   }
 
   .nodeMarkerWrap {
     display: none;
   }
 }
+
 

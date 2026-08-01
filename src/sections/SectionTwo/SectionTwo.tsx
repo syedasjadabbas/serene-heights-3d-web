@@ -18,27 +18,6 @@ function IconBuilding() {
   )
 }
 
-function IconBed() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
-      <path
-        d="M3 18v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M3 18v2M21 18v2M3 11V8a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v3"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 function IconShield() {
   return (
     <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
@@ -81,16 +60,41 @@ function CardCta({ href, tone }: { href: string; tone: keyof typeof CTA_TONE_CLA
   )
 }
 
+function IconBalcony() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+      <path
+        d="M3 10h18M4 10v9M20 10v9M8 10v9M12 10v9M16 10v9M3 19h18"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M6 6l6-3 6 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function IconConcierge() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+      <path d="M12 4a8 8 0 0 0-8 8v4h16v-4a8 8 0 0 0-8-8z" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M2 16h20M12 2v2M12 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 const RESIDENCE_FACTS: Array<{ icon: ReactNode; headline: string; caption: string }> = [
-  { icon: <IconBuilding />, headline: '150+ apartments', caption: 'Across 3 towers' },
-  { icon: <IconBed />, headline: '1, 2 & 3 bedrooms', caption: 'Fully furnished residences' },
-  { icon: <IconShield />, headline: 'Zero owner fees', caption: 'No maintenance costs' },
+  { icon: <IconBuilding />, headline: '150+ Hotel Apartments', caption: 'Across 3 signature alpine towers' },
+  { icon: <IconBalcony />, headline: 'Mountain-Facing Balconies', caption: '180° pristine pine forest vistas' },
+  { icon: <IconConcierge />, headline: '24/7 Concierge Services', caption: 'Turnkey DM Consortium management' },
+  { icon: <IconShield />, headline: 'Zero Owner Maintenance', caption: 'No operational fees or owner hassle' },
 ]
 
 const PAYMENT_FACTS: Array<{ value: string; label: string; tone: string; rotate: number }> = [
-  { value: 'PKR 37,000', label: 'Per sq ft', tone: styles.paymentCardA, rotate: -6 },
-  { value: '30%', label: 'Booking from', tone: styles.paymentCardB, rotate: 4 },
-  { value: '36', label: 'Monthly installments', tone: styles.paymentCardC, rotate: -3 },
+  { value: 'PKR 37,000', label: 'Per sq ft base valuation', tone: styles.paymentCardA, rotate: -6 },
+  { value: '30%', label: 'Booking initial allocation', tone: styles.paymentCardB, rotate: 4 },
+  { value: '36 Months', label: '0% Interest installment timeline', tone: styles.paymentCardC, rotate: -3 },
 ]
 
 export default function SectionTwo() {
@@ -150,6 +154,65 @@ export default function SectionTwo() {
     return () => ctx.revert()
   }, [])
 
+  const rectCacheRef = useRef<Map<HTMLDivElement, DOMRect>>(new Map())
+  const rafIdRef = useRef<number | null>(null)
+
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const slab = e.currentTarget
+    rectCacheRef.current.set(slab, slab.getBoundingClientRect())
+  }
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const slab = e.currentTarget
+    let rect = rectCacheRef.current.get(slab)
+    if (!rect) {
+      rect = slab.getBoundingClientRect()
+      rectCacheRef.current.set(slab, rect)
+    }
+
+    const clientX = e.clientX
+    const clientY = e.clientY
+
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+
+    rafIdRef.current = requestAnimationFrame(() => {
+      const px = (clientX - rect.left) / rect.width
+      const py = (clientY - rect.top) / rect.height
+      const rotateX = (0.5 - py) * 10
+      const rotateY = (px - 0.5) * 10
+      const shadowX = (0.5 - px) * 16
+      const shadowY = (py - 0.5) * 16 + 32
+      const parallaxX = (px - 0.5) * 8
+      const parallaxY = (py - 0.5) * 8
+
+      slab.style.setProperty('--rotate-x', `${rotateX}deg`)
+      slab.style.setProperty('--rotate-y', `${rotateY}deg`)
+      slab.style.setProperty('--translate-z', '12px')
+      slab.style.setProperty('--light-x', `${px * 100}%`)
+      slab.style.setProperty('--light-y', `${py * 100}%`)
+      slab.style.setProperty('--shadow-x', `${shadowX}px`)
+      slab.style.setProperty('--shadow-y', `${shadowY}px`)
+      slab.style.setProperty('--parallax-x', `${parallaxX}px`)
+      slab.style.setProperty('--parallax-y', `${parallaxY}px`)
+      slab.classList.add(styles.columnHovered)
+    })
+  }
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const slab = e.currentTarget
+    rectCacheRef.current.delete(slab)
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+
+    slab.style.setProperty('--rotate-x', '0deg')
+    slab.style.setProperty('--rotate-y', '0deg')
+    slab.style.setProperty('--translate-z', '0px')
+    slab.style.setProperty('--shadow-x', '0px')
+    slab.style.setProperty('--shadow-y', '30px')
+    slab.style.setProperty('--parallax-x', '0px')
+    slab.style.setProperty('--parallax-y', '0px')
+    slab.classList.remove(styles.columnHovered)
+  }
+
   return (
     <section ref={sectionRef} id="overview" className={styles.section}>
       <div className={`container ${styles.inner}`}>
@@ -171,7 +234,14 @@ export default function SectionTwo() {
 
         <div ref={gridRef} className={styles.grid}>
           {/* Residences Column */}
-          <div className={styles.column}>
+          <div
+            className={styles.column}
+            onMouseEnter={handleMouseEnter}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className={styles.slabLight} aria-hidden="true" />
+            <span className={styles.slabWatermark}>SPEC 01 · TOWER</span>
             <div className={styles.columnTagWrap}>
               <span className={`${styles.columnTag} ${styles.tagGold}`}>RESIDENCES</span>
             </div>
@@ -194,7 +264,14 @@ export default function SectionTwo() {
           </div>
 
           {/* Payment Plan Column */}
-          <div className={styles.column}>
+          <div
+            className={styles.column}
+            onMouseEnter={handleMouseEnter}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className={styles.slabLight} aria-hidden="true" />
+            <span className={styles.slabWatermark}>SPEC 02 · FINANCES</span>
             <div className={styles.columnTagWrap}>
               <span className={`${styles.columnTag} ${styles.tagSage}`}>STRUCTURE</span>
             </div>
@@ -218,7 +295,14 @@ export default function SectionTwo() {
           </div>
 
           {/* Smart Property Unit Column */}
-          <div className={styles.column}>
+          <div
+            className={styles.column}
+            onMouseEnter={handleMouseEnter}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className={styles.slabLight} aria-hidden="true" />
+            <span className={styles.slabWatermark}>SPEC 03 · FRACTIONAL</span>
             <div className={styles.columnTagWrap}>
               <span className={`${styles.columnTag} ${styles.tagMist}`}>FRACTIONAL</span>
             </div>
@@ -273,4 +357,5 @@ export default function SectionTwo() {
     </section>
   )
 }
+
 

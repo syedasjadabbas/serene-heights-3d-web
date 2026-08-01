@@ -1,8 +1,23 @@
 .section {
   position: relative;
   z-index: 2;
-  background: #0a130f;
+  background: #080f0c;
   padding-block: clamp(120px, 16vh, 220px);
+  overflow: hidden;
+}
+
+/* Background Architectural Construction Grid (Enriched Whitespace) */
+.blueprintBgGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(206, 162, 92, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(206, 162, 92, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.85), transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.85), transparent 75%);
+  z-index: 0;
 }
 
 .header {
@@ -90,12 +105,12 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   align-items: center;
-  gap: clamp(24px, 4vw, 56px);
+  gap: clamp(24px, 3vw, 48px);
   width: 100%;
 }
 
 .numberColumn {
-  grid-column: span 5;
+  grid-column: span 3;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -104,11 +119,11 @@
 .giantNumber {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(6rem, 4rem + 8vw, 13rem);
+  font-size: clamp(5.5rem, 3.8rem + 6.5vw, 11rem);
   line-height: 0.85;
   letter-spacing: -0.04em;
   color: var(--color-accent-gold);
-  text-shadow: 0 0 40px rgba(206, 162, 92, 0.3);
+  text-shadow: 0 0 40px rgba(206, 162, 92, 0.35);
   will-change: transform, opacity;
 }
 
@@ -118,14 +133,58 @@
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(206, 162, 92, 0.75);
+  color: rgba(206, 162, 92, 0.8);
   margin-top: var(--space-3);
   padding-top: var(--space-2);
   border-top: 1px dashed rgba(206, 162, 92, 0.35);
 }
 
+/* --- Architectural Blueprint Wireframe Diagram Box (Whitespace Enrichment) --- */
+
+.diagramColumn {
+  grid-column: 4 / span 4;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    145deg,
+    rgba(16, 26, 21, 0.7) 0%,
+    rgba(10, 16, 13, 0.85) 100%
+  );
+  border: 1px solid rgba(206, 162, 92, 0.22);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow:
+    inset 0 0 24px rgba(206, 162, 92, 0.06),
+    0 20px 48px -18px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+.diagramCanvas {
+  width: 100%;
+  height: 220px;
+}
+
+.diagramLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid rgba(244, 239, 228, 0.1);
+  font-family: var(--font-sans);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(206, 162, 92, 0.7);
+}
+
 .textWrap {
-  grid-column: 6 / span 7;
+  grid-column: 8 / span 5;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -150,7 +209,7 @@
 .stageHeadline {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.4rem, 1.8rem + 2.5vw, 4rem);
+  font-size: clamp(2.2rem, 1.6rem + 2.2vw, 3.6rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: var(--color-cream);
@@ -159,7 +218,7 @@
 
 .highlightBadge {
   font-family: var(--font-sans);
-  font-size: clamp(0.9rem, 0.85rem + 0.3vw, 1.1rem);
+  font-size: clamp(0.85rem, 0.8rem + 0.3vw, 1.05rem);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -169,19 +228,20 @@
 
 .stageDescription {
   font-family: var(--font-sans);
-  font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.25rem);
+  font-size: clamp(1rem, 0.94rem + 0.35vw, 1.18rem);
   line-height: 1.6;
   color: rgba(244, 239, 228, 0.82);
   max-width: 48ch;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   .stageInner {
     grid-template-columns: 1fr;
-    gap: var(--space-4);
+    gap: var(--space-5);
   }
 
   .numberColumn,
+  .diagramColumn,
   .textWrap {
     grid-column: span 1;
   }
@@ -190,3 +250,4 @@
     display: none;
   }
 }
+
