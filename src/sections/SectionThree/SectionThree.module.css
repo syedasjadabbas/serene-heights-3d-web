@@ -1,29 +1,53 @@
 .section {
   position: relative;
   z-index: 2;
-  background: transparent;
-  width: 100%;
+  background: rgba(8, 15, 12, 0.3);
+  padding-block: clamp(120px, 16vh, 220px);
+  overflow: hidden;
   transform: translateZ(0);
 }
 
-.pinWrap {
-  position: relative;
-  width: 100%;
-  padding-block: clamp(60px, 8vh, 120px);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+/* Background Architectural Construction Grid & Ambient Gradient Mesh */
+.blueprintBgGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(206, 162, 92, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(206, 162, 92, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.85), transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.85), transparent 75%);
+  z-index: 0;
+}
+
+.ambientGradient {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1200px;
+  height: 60%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(206, 162, 92, 0.06),
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .inner {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
 }
 
 .header {
   max-width: 920px;
-  margin-bottom: clamp(64px, 10vh, 120px);
+  margin-bottom: clamp(72px, 11vh, 130px);
   text-align: center;
   margin-inline: auto;
 }
@@ -37,12 +61,13 @@
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(244, 239, 228, 0.85);
+  color: rgba(244, 239, 228, 0.88);
   margin-bottom: var(--space-4);
-  background: rgba(16, 26, 22, 0.5);
-  border: 1px solid rgba(244, 239, 228, 0.15);
-  padding: 6px 16px;
+  background: rgba(16, 26, 22, 0.6);
+  border: 1px solid rgba(206, 162, 92, 0.25);
+  padding: 6px 18px;
   border-radius: var(--radius-pill);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
 }
 
 .badgeNum {
@@ -60,222 +85,142 @@
   line-height: 1.05;
   letter-spacing: -0.025em;
   color: var(--color-cream);
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
   margin-bottom: var(--space-4);
 }
 
 .subcopy {
-  max-width: 56ch;
+  max-width: 58ch;
   margin-inline: auto;
   font-family: var(--font-sans);
   font-size: clamp(1rem, 0.95rem + 0.35vw, 1.18rem);
   font-weight: 400;
   line-height: 1.55;
-  color: rgba(244, 239, 228, 0.78);
+  color: rgba(244, 239, 228, 0.82);
 }
 
-/* --- Journey Wrap & Dominant Architectural Line Backbone --- */
+/* --- Editorial Grid Layout (PRYPCO / FINDD Inspiration) --- */
 
-.journeyWrap {
-  position: relative;
-  width: 100%;
-  padding-block: var(--space-6);
-}
-
-.blueprintGrid {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 1200px;
-  pointer-events: none;
-  z-index: 1;
+.editorialGrid {
   display: flex;
-  justify-content: space-between;
-  padding-inline: var(--space-4);
+  flex-direction: column;
+  gap: clamp(80px, 12vh, 140px);
+  perspective: 1200px;
 }
 
-.gridCalloutLeft,
-.gridCalloutRight {
-  font-family: var(--font-sans);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  color: rgba(206, 162, 92, 0.6);
-  text-transform: uppercase;
-  writing-mode: vertical-lr;
+.editorialRow {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 56px);
 }
 
-.svgCanvas {
+.rowLeft .card {
+  grid-column: 1 / span 7;
+}
+
+.rowLeft .editorialSideMeta {
+  grid-column: 9 / span 4;
+}
+
+.rowRight .card {
+  grid-column: 6 / span 7;
+}
+
+.rowRight .editorialSideMeta {
+  grid-column: 1 / span 4;
+  text-align: right;
+}
+
+/* --- PRYPCO/FINDD Luxury Presentation Slab Card --- */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    155deg,
+    rgba(20, 32, 26, 0.94) 0%,
+    rgba(12, 19, 15, 0.97) 50%,
+    rgba(6, 11, 9, 0.98) 100%
+  );
+  border-left: 4px solid var(--color-accent-gold);
+  border-top: 1px solid rgba(244, 239, 228, 0.22);
+  border-right: 1px solid rgba(244, 239, 228, 0.12);
+  border-bottom: 1px solid rgba(244, 239, 228, 0.08);
+  border-radius: var(--radius-lg);
+  padding: clamp(32px, 4vw, 48px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 1px 0 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+    var(--shadow-x, 0px) var(--shadow-y, 30px) 60px -15px rgba(0, 0, 0, 0.88);
+  will-change: transform, box-shadow;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateZ(var(--translate-z, 0px));
+  transition:
+    transform 0.1s cubic-bezier(0.1, 0.8, 0.3, 1),
+    box-shadow 0.1s cubic-bezier(0.1, 0.8, 0.3, 1),
+    border-color 0.4s var(--ease-out-soft);
+  overflow: hidden;
+}
+
+.rowRight .card {
+  border-left-color: var(--color-accent-sage);
+}
+
+/* Soft lighting sweep radial overlay */
+.cardLight {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    650px circle at var(--light-x, 50%) var(--light-y, 50%),
+    rgba(255, 255, 255, 0.09),
+    transparent 55%
+  );
   z-index: 1;
+  opacity: var(--light-opacity, 0);
+  transition: opacity 0.3s ease;
 }
 
-.svgGuidePath {
-  fill: none;
-  stroke: rgba(244, 239, 228, 0.1);
-  stroke-width: 2.5;
-  stroke-dasharray: 8 8;
+.cardHovered .cardLight {
+  opacity: 1;
 }
 
-/* Visually commanding primary journey line */
-.svgMainPath {
-  fill: none;
-  stroke: #f3d498;
-  stroke-width: 6.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 0 18px rgba(243, 212, 152, 0.95)) drop-shadow(0 0 36px rgba(206, 162, 92, 0.75));
-  will-change: stroke-dashoffset;
+.cardHovered {
+  border-top-color: rgba(244, 239, 228, 0.4);
+  border-right-color: rgba(206, 162, 92, 0.35);
 }
 
-/* Leading laser pulse head indicator on drawn path tip */
-.svgPathHead {
-  fill: #ffffff;
-  stroke: var(--color-accent-gold);
-  stroke-width: 4;
-  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 1)) drop-shadow(0 0 32px rgba(243, 212, 152, 1));
-  will-change: cx, cy;
+.cardWatermark {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+  font-family: var(--font-sans);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: rgba(244, 239, 228, 0.16);
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
 }
 
-/* --- Nodes Layout --- */
-
-.nodesList {
+/* Parallax Inner Content Container */
+.cardInner {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: clamp(100px, 14vh, 160px);
+  transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 14px);
+  transition: transform 0.1s cubic-bezier(0.1, 0.8, 0.3, 1);
 }
 
-.nodeRow {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 80px 1fr;
-  align-items: center;
-  gap: clamp(16px, 3vw, 40px);
-}
-
-.rowLeft .nodeContent {
-  grid-column: 1;
-}
-
-.rowLeft .nodePointerLine {
-  grid-column: 1;
-  justify-self: end;
-}
-
-.rowLeft .nodeMarkerWrap {
-  grid-column: 2;
-}
-
-.rowRight .nodeContent {
-  grid-column: 3;
-}
-
-.rowRight .nodePointerLine {
-  grid-column: 3;
-  justify-self: start;
-}
-
-.rowRight .nodeMarkerWrap {
-  grid-column: 2;
-}
-
-/* --- Node Content (Cards DO NOT activate on hover alone - Quieter when inactive) --- */
-
-.nodeContent {
-  position: relative;
-  background: linear-gradient(
-    165deg,
-    rgba(16, 26, 21, 0.45) 0%,
-    rgba(10, 16, 13, 0.55) 100%
-  );
-  border: 1px solid rgba(244, 239, 228, 0.08);
-  border-radius: var(--radius-lg);
-  padding: clamp(28px, 3.5vw, 42px);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 16px 36px -16px rgba(0, 0, 0, 0.5);
-  opacity: 0.35;
-  filter: grayscale(25%);
-  transform: scale(0.95);
-  will-change: transform, opacity, box-shadow, filter;
-  transition:
-    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    filter 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    background 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
-}
-
-.rowLeft .nodeContent {
-  transform-origin: center right;
-}
-
-.rowRight .nodeContent {
-  transform-origin: center left;
-}
-
-/* Light sheen element inside active card */
-.activeSheen {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.12) 50%,
-    transparent 100%
-  );
-  transform: translateX(-100%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 10;
-}
-
-/* ACTIVE DESTINATION STATE: Activated strictly by journey progression */
-.nodeRow[data-active='true'] .nodeContent {
-  opacity: 1;
-  filter: none;
-  border-color: rgba(230, 198, 135, 0.65);
-  background: linear-gradient(
-    165deg,
-    rgba(26, 42, 34, 0.85) 0%,
-    rgba(16, 26, 21, 0.92) 100%
-  );
-  transform: translateY(-12px) scale(1.03) rotate(0.6deg);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 32px 72px -16px rgba(206, 162, 92, 0.28),
-    0 24px 60px -12px rgba(0, 0, 0, 0.85);
-}
-
-.nodeRow[data-active='true'] .activeSheen {
-  opacity: 1;
-  animation: sheenSweep 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes sheenSweep {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.nodeMeta {
+.cardMetaRow {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -283,176 +228,132 @@
   margin-bottom: var(--space-3);
 }
 
-.nodeNumber {
+.cardNum {
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: var(--color-accent-gold);
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
 }
 
-.nodeCategory {
+.cardCategory {
   font-family: var(--font-sans);
   font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(244, 239, 228, 0.85);
+  color: rgba(244, 239, 228, 0.88);
   background: rgba(244, 239, 228, 0.08);
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: var(--radius-pill);
+  border: 1px solid rgba(244, 239, 228, 0.12);
 }
 
-.nodeCoords {
+.cardCoords {
   font-family: var(--font-sans);
   font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  color: rgba(206, 162, 92, 0.75);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: rgba(206, 162, 92, 0.8);
 }
 
-.nodeTitle {
+.cardTitle {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.8rem, 1.4rem + 1.2vw, 2.5rem);
+  font-size: clamp(2rem, 1.6rem + 1.5vw, 2.8rem);
   line-height: 1.08;
   letter-spacing: -0.015em;
   color: var(--color-cream);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
 }
 
-.nodeDescription {
-  font-size: var(--text-body);
-  line-height: var(--leading-normal);
-  color: var(--color-text-on-dark-muted);
-  margin-bottom: var(--space-5);
+.cardDescription {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  line-height: 1.65;
+  color: rgba(244, 239, 228, 0.88);
+  margin-bottom: var(--space-6);
+  max-width: 52ch;
 }
 
-.nodeFooter {
+.cardFooter {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-top: var(--space-4);
-  border-top: 1px solid rgba(244, 239, 228, 0.1);
+  border-top: 1px solid rgba(244, 239, 228, 0.12);
 }
 
 .statLabel {
+  font-family: var(--font-sans);
   font-size: var(--text-small);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: rgba(244, 239, 228, 0.55);
+  letter-spacing: 0.16em;
+  color: rgba(244, 239, 228, 0.6);
 }
 
 .statValue {
   font-family: var(--font-sans);
   font-size: var(--text-small);
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   color: var(--color-accent-gold);
 }
 
-/* --- Node Blueprint Marker --- */
+/* --- Editorial Side Meta Specs (PRYPCO Column) --- */
 
-.nodeMarkerWrap {
-  position: relative;
+.editorialSideMeta {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
 }
 
-.nodeMarker {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(206, 162, 92, 0.6);
-  background: rgba(12, 20, 16, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 16px rgba(206, 162, 92, 0.3);
-  transition:
-    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+.sideMetaTitle {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-accent-gold);
 }
 
-.markerCenterDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-accent-gold);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease;
-}
-
-.markerCrosshairH {
-  position: absolute;
-  width: 42px;
+.sideMetaDivider {
   height: 1px;
-  background: rgba(206, 162, 92, 0.35);
+  background: rgba(206, 162, 92, 0.3);
+  width: 60px;
 }
 
-.markerCrosshairV {
-  position: absolute;
-  width: 1px;
-  height: 42px;
-  background: rgba(206, 162, 92, 0.35);
+.rowRight .sideMetaDivider {
+  margin-left: auto;
 }
 
-.nodeRow[data-active='true'] .nodeMarker {
-  transform: scale(1.4);
-  border-color: #ffffff;
-  background: var(--color-accent-gold);
-  box-shadow:
-    0 0 24px rgba(230, 198, 135, 1),
-    0 0 48px rgba(206, 162, 92, 0.85);
+.sideMetaSub {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: rgba(244, 239, 228, 0.75);
 }
 
-.nodeRow[data-active='true'] .markerCenterDot {
-  background: #080f0c;
-  transform: scale(1.2);
-}
-
-.nodePointerLine {
-  height: 1px;
-  background: linear-gradient(90deg, rgba(206, 162, 92, 0.2), transparent);
-  width: 100%;
-  opacity: 0.3;
-  transition: opacity 0.4s ease, background 0.4s ease;
-}
-
-.nodeRow[data-active='true'] .nodePointerLine {
-  opacity: 1;
-  height: 2px;
-  background: linear-gradient(90deg, #e6c687, transparent);
-}
-
-/* Responsive adjustments */
-@media (max-width: 900px) {
-  .svgCanvas,
-  .blueprintGrid {
-    display: none;
-  }
-
-  .nodeRow {
+@media (max-width: 960px) {
+  .editorialRow {
     grid-template-columns: 1fr;
     gap: var(--space-4);
   }
 
-  .rowRight .nodeContent,
-  .rowLeft .nodeContent {
-    grid-column: 1;
-    opacity: 1;
-    filter: none;
-    transform: none;
+  .rowLeft .card,
+  .rowRight .card,
+  .rowLeft .editorialSideMeta,
+  .rowRight .editorialSideMeta {
+    grid-column: span 1;
+    text-align: left;
   }
 
-  .nodeMarkerWrap {
-    display: none;
+  .rowRight .sideMetaDivider {
+    margin-left: 0;
   }
 }
+
 
 
