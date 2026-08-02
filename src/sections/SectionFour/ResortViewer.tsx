@@ -11,6 +11,8 @@ export default function ResortViewer() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [shouldInitialize, setShouldInitialize] = useState(false)
 
+  const [canvasReady, setCanvasReady] = useState(false)
+
   // Lazy Initialization: Only mount Three.js Canvas when Section 4 approaches viewport
   useEffect(() => {
     const el = containerRef.current
@@ -43,30 +45,39 @@ export default function ResortViewer() {
       <ResortLoader />
 
       {shouldInitialize && (
-        <Canvas
-          camera={{
-            position: CAMERA_CONFIG.defaultPosition,
-            fov: CAMERA_CONFIG.fov,
-          }}
-          dpr={[1, 2]}
-          gl={{
-            antialias: true,
-            alpha: true,
-            powerPreference: 'high-performance',
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            opacity: canvasReady ? 1 : 0,
+            transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
-          <color attach="background" args={['#0b1410']} />
-          <fog attach="fog" args={['#0b1410', 14, 38]} />
+          <Canvas
+            camera={{
+              position: CAMERA_CONFIG.defaultPosition,
+              fov: CAMERA_CONFIG.fov,
+            }}
+            dpr={[1, 2]}
+            gl={{
+              antialias: true,
+              alpha: true,
+              powerPreference: 'high-performance',
+            }}
+            onCreated={() => setCanvasReady(true)}
+          >
+            <fog attach="fog" args={['#0b1410', 16, 42]} />
 
-          <ResortLighting />
+            <ResortLighting />
 
-          <Suspense fallback={null}>
-            <ResortModel />
-            <ResortHotspots />
-          </Suspense>
+            <Suspense fallback={null}>
+              <ResortModel />
+              <ResortHotspots />
+            </Suspense>
 
-          <ResortCameraControls />
-        </Canvas>
+            <ResortCameraControls />
+          </Canvas>
+        </div>
       )}
     </div>
   )
