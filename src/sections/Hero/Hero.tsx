@@ -33,23 +33,18 @@ const FOREGROUND_BREAKPOINTS: Array<[number, number]> = [
 ]
 const OVERLAY_BREAKPOINTS: Array<[number, number]> = [
   [0, 0],
-  [1, 0],
-]
-const WORDMARK_OPACITY_BREAKPOINTS: Array<[number, number]> = [
-  [0, 0],
-  [0.73, 0],
-  [0.77, 1],
-  [0.96, 1],
-  [1, 0],
+  [0.84, 0],
+  [0.98, 1],
+  [1, 1],
 ]
 
 const CHAPTER_TIMINGS = [
   { start: 0.14, end: 0.31 },
   { start: 0.34, end: 0.51 },
-  { start: 0.54, end: 0.71 },
+  { start: 0.54, end: 0.84 }, // Extended across two segments for centered brand reveal + ceremonial hold
 ]
 
-function getChapterState(p: number, start: number, end: number, fadeIn = 0.035, fadeOut = 0.035) {
+function getChapterState(p: number, start: number, end: number, fadeIn = 0.04, fadeOut = 0.04) {
   if (p < start || p > end) {
     return { opacity: 0, y: 20 }
   }
@@ -77,7 +72,6 @@ export default function Hero() {
   const supportingRef = useRef<HTMLParagraphElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
   const scrollCueRef = useRef<HTMLDivElement>(null)
-  const wordmarkRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
 
   const ch01Ref = useRef<HTMLDivElement>(null)
@@ -160,14 +154,6 @@ export default function Hero() {
             })
             gsap.set(scrollCueRef.current, { opacity: 1 - clamp01(p / 0.05) })
 
-            const wordmarkOpacity = mapBreakpoints(p, WORDMARK_OPACITY_BREAKPOINTS)
-            const wordmarkT = clamp01((p - 0.64) / (0.72 - 0.64))
-            gsap.set(wordmarkRef.current, {
-              opacity: wordmarkOpacity,
-              scale: 0.98 + 0.02 * wordmarkT,
-              y: 10 * (1 - wordmarkT),
-            })
-
             gsap.set(foregroundRef.current, { opacity: mapBreakpoints(p, FOREGROUND_BREAKPOINTS) })
             gsap.set(overlayRef.current, { opacity: mapBreakpoints(p, OVERLAY_BREAKPOINTS) })
 
@@ -191,9 +177,9 @@ export default function Hero() {
                 x = 28 * (1 - opacity)
                 scale = 0.97 + 0.03 * opacity
               } else {
-                // Chapter 3: Clean Centered Brand Reveal
+                // Chapter 3: Centered Brand Reveal + Calm Hold across 2 scroll segments
                 x = 0
-                scale = 0.95 + 0.05 * opacity
+                scale = 0.96 + 0.04 * opacity
               }
 
               gsap.set(el, {
@@ -204,12 +190,12 @@ export default function Hero() {
               })
             })
 
-            const indicatorOpacity = clamp01((p - 0.14) / 0.04) * (1 - clamp01((p - 0.71) / 0.04))
+            const indicatorOpacity = clamp01((p - 0.14) / 0.04) * (1 - clamp01((p - 0.84) / 0.04))
             if (indicatorRef.current) {
               gsap.set(indicatorRef.current, { opacity: indicatorOpacity })
             }
 
-            const indicatorT = clamp01((p - 0.14) / (0.71 - 0.14))
+            const indicatorT = clamp01((p - 0.14) / (0.84 - 0.14))
             const isMobileViewport = typeof window !== 'undefined' && window.innerWidth <= 640
             if (indicatorFillRef.current) {
               gsap.set(indicatorFillRef.current, {
@@ -346,7 +332,7 @@ export default function Hero() {
             </h2>
           </div>
 
-          {/* Scene 3: Clean Centered Brand Reveal */}
+          {/* Scene 3: Clean Centered Brand Reveal (Extended Ceremonial Hold) */}
           <div ref={ch03Ref} className={`${styles.chapterItem} ${styles.chapterItemCenterBrand}`}>
             <Logo markOnly className={styles.brandRevealLogoMark} />
             <h2 className={styles.brandRevealWordmark}>SERENE HEIGHTS</h2>
@@ -373,10 +359,6 @@ export default function Hero() {
           <span ref={mobileCounterRef} className={styles.mobileChapterCounter}>
             01 / 03
           </span>
-        </div>
-
-        <div ref={wordmarkRef} className={styles.wordmark} aria-hidden="true">
-          <span>Serene Heights</span>
         </div>
 
         <div ref={foregroundRef} className={styles.foreground} />
