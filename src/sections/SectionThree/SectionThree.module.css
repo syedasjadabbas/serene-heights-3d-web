@@ -111,25 +111,25 @@
   perspective: 1200px;
 }
 
-/* Cinematic Travelling Architectural Light Spotlight (No Graphic Lines) */
+/* Cinematic Travelling Architectural Environmental Lighting (No Graphic Beams or Lines) */
 .travelingLightBeam {
   position: absolute;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 120%;
-  max-width: 960px;
-  height: 480px;
+  width: 140%;
+  max-width: 1200px;
+  height: 650px;
   background: radial-gradient(
-    ellipse 65% 55% at 50% 50%,
-    rgba(243, 212, 152, 0.14) 0%,
-    rgba(206, 162, 92, 0.05) 45%,
-    transparent 70%
+    ellipse 75% 65% at 50% 50%,
+    rgba(243, 212, 152, 0.07) 0%,
+    rgba(200, 162, 100, 0.025) 50%,
+    transparent 80%
   );
   pointer-events: none;
   z-index: 1;
-  filter: blur(16px);
+  filter: blur(48px);
   will-change: top, opacity;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.6s ease;
 }
 
 .editorialRow {

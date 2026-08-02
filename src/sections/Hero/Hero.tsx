@@ -197,7 +197,8 @@ export default function Hero() {
                 x = -18 * (1 - opacity)
                 scale = 0.96 + 0.04 * opacity
               } else {
-                // Chapter 4: Full reveal scale
+                // Chapter 4: Left slide-in + reveal scale
+                x = -24 * (1 - opacity)
                 scale = 0.96 + 0.04 * opacity
               }
 
@@ -368,8 +369,8 @@ export default function Hero() {
             </h2>
           </div>
 
-          {/* Scene 4: Final Architectural Reveal Hold */}
-          <div ref={ch04Ref} className={`${styles.chapterItem} ${styles.chapterItemCenter}`}>
+          {/* Scene 4: Final Architectural Reveal Editorial Hold */}
+          <div ref={ch04Ref} className={`${styles.chapterItem} ${styles.chapterItemLeft}`}>
             <p className={styles.chapterLabel}>
               <span className={styles.chapterNum}>04</span>
               <span className={styles.chapterDivider}>/</span>

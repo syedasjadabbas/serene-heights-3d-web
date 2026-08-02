@@ -24,7 +24,15 @@ function App() {
 
     if (new URLSearchParams(window.location.search).has('noLenis')) return
     const { destroy } = initLenis()
-    return destroy
+
+    const timer = setTimeout(() => {
+      window.scrollTo(0, 0)
+    }, 50)
+
+    return () => {
+      clearTimeout(timer)
+      destroy()
+    }
   }, [])
 
   return (
