@@ -206,12 +206,8 @@ export default function SectionEight() {
         }
       }
 
-      // Initial indicator positioning
-      const firstNavBtn = navItemsRef.current[0]
-      if (firstNavBtn && indicatorRef.current) {
-        indicatorRef.current.style.left = `${firstNavBtn.offsetLeft}px`
-        indicatorRef.current.style.width = `${firstNavBtn.offsetWidth}px`
-      }
+      // Initial state
+      updateSeasonState(0)
 
       return () => st.kill()
     }, sectionRef)

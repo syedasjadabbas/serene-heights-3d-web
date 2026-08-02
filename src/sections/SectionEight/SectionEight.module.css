@@ -247,8 +247,6 @@
   margin-inline: auto;
   margin-bottom: clamp(36px, 6vh, 64px);
   text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
-  opacity: 0;
-  transform: translateY(20px);
   will-change: opacity, transform;
 }
 
@@ -265,8 +263,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     0 32px 80px -20px rgba(0, 0, 0, 0.92),
     0 0 30px rgba(206, 162, 92, 0.08);
-  opacity: 0;
-  transform: translateY(20px);
   will-change: opacity, transform;
 }
 

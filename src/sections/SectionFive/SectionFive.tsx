@@ -206,7 +206,7 @@ export default function SectionFive() {
   }
 
   return (
-    <section ref={sectionRef} id="investment" className={styles.section}>
+    <section ref={sectionRef} id="residences-suites" className={styles.section}>
       {/* 3D Exhibition Canvas Stage */}
       <SectionFiveCanvas />
 

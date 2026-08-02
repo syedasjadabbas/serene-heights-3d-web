@@ -132,7 +132,7 @@ export default function SectionNine() {
   }, [])
 
   return (
-    <section ref={sectionRef} id="gallery" className={styles.section}>
+    <section ref={sectionRef} id="curated-exhibits" className={styles.section}>
       {/* Section Header */}
       <div className={`container ${styles.header}`}>
         <p className={styles.eyebrow}>
