@@ -101,18 +101,44 @@
 
 /* --- Editorial Grid Layout (PRYPCO / FINDD Inspiration) --- */
 
+/* --- Editorial Grid Layout (PRYPCO / FINDD Inspiration) --- */
+
 .editorialGrid {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: clamp(80px, 12vh, 140px);
+  gap: clamp(24px, 4.5vh, 52px);
   perspective: 1200px;
 }
 
+/* Cinematic Travelling Architectural Light Spotlight (No Graphic Lines) */
+.travelingLightBeam {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  max-width: 960px;
+  height: 480px;
+  background: radial-gradient(
+    ellipse 65% 55% at 50% 50%,
+    rgba(243, 212, 152, 0.14) 0%,
+    rgba(206, 162, 92, 0.05) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 1;
+  filter: blur(16px);
+  will-change: top, opacity;
+  transition: opacity 0.5s ease;
+}
+
 .editorialRow {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   align-items: center;
-  gap: clamp(24px, 4vw, 56px);
+  gap: clamp(20px, 3.5vw, 48px);
+  z-index: 2;
 }
 
 .rowLeft .card {
@@ -140,23 +166,23 @@
   flex-direction: column;
   background: linear-gradient(
     155deg,
-    rgba(20, 32, 26, 0.94) 0%,
-    rgba(12, 19, 15, 0.97) 50%,
-    rgba(6, 11, 9, 0.98) 100%
+    rgba(18, 30, 24, 0.95) 0%,
+    rgba(10, 17, 13, 0.98) 50%,
+    rgba(5, 9, 7, 0.99) 100%
   );
   border-left: 4px solid var(--color-accent-gold);
   border-top: 1px solid rgba(244, 239, 228, 0.22);
   border-right: 1px solid rgba(244, 239, 228, 0.12);
   border-bottom: 1px solid rgba(244, 239, 228, 0.08);
   border-radius: var(--radius-lg);
-  padding: clamp(32px, 4vw, 48px);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  padding: clamp(28px, 3.5vw, 44px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 1px 0 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
-    var(--shadow-x, 0px) var(--shadow-y, 30px) 60px -15px rgba(0, 0, 0, 0.88);
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.85),
+    var(--shadow-x, 0px) var(--shadow-y, 30px) 60px -15px rgba(0, 0, 0, 0.92);
   will-change: transform, box-shadow;
   transform-style: preserve-3d;
   transform: perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateZ(var(--translate-z, 0px));
@@ -165,6 +191,34 @@
     box-shadow 0.1s cubic-bezier(0.1, 0.8, 0.3, 1),
     border-color 0.4s var(--ease-out-soft);
   overflow: hidden;
+}
+
+/* Feature Hero Milestone (Cards 01 & 04 - Visual Anchors) */
+.heroFeatureCard {
+  border-left-width: 5px;
+  border-left-color: #f3d498 !important;
+  border-top-color: rgba(243, 212, 152, 0.5) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(243, 212, 152, 0.35),
+    0 32px 80px -20px rgba(206, 162, 92, 0.25),
+    0 0 36px rgba(243, 212, 152, 0.14) !important;
+  padding: clamp(34px, 4.2vw, 52px);
+}
+
+/* Active Milestone Card Highlight (Scrolled into Focus) */
+.activeMilestoneCard {
+  border-left-color: #f3d498 !important;
+  border-top-color: rgba(243, 212, 152, 0.45) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(243, 212, 152, 0.3),
+    0 32px 80px -20px rgba(206, 162, 92, 0.28),
+    0 0 40px rgba(243, 212, 152, 0.16) !important;
+}
+
+/* Supporting Milestones (Cards 02, 03, 05, 06) */
+.supportingCard {
+  opacity: 0.95;
+  padding: clamp(24px, 3vw, 38px);
 }
 
 .rowRight .card {

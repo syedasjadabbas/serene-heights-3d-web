@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
+import SectionThreeCanvas from './SectionThreeCanvas'
 import styles from './SectionThree.module.css'
 
 interface EditorialStage {
@@ -13,12 +14,13 @@ interface EditorialStage {
   stats: { label: string; value: string }
   specCallout: string
   side: 'left' | 'right'
+  isFeature?: boolean
 }
 
 const EDITORIAL_STAGES: EditorialStage[] = [
   {
     number: '01',
-    category: 'MOUNTAIN LIVING',
+    category: 'MOUNTAIN LIVING · FEATURED HERO',
     title: 'Sanctuary in Nathia Gali',
     description:
       'Set high in the Galyat range at 7,906 ft, offering pristine pine forest vistas, clean alpine air, and winter snowfall.',
@@ -26,6 +28,7 @@ const EDITORIAL_STAGES: EditorialStage[] = [
     stats: { label: 'ALTITUDE', value: '7,906 FT' },
     specCallout: 'LOCATION SPEC · GALYAT RANGE',
     side: 'left',
+    isFeature: true,
   },
   {
     number: '02',
@@ -51,7 +54,7 @@ const EDITORIAL_STAGES: EditorialStage[] = [
   },
   {
     number: '04',
-    category: 'MANAGED HOSPITALITY',
+    category: 'MANAGED HOSPITALITY · FEATURED HERO',
     title: 'Turnkey Suite Operations',
     description:
       'Every apartment is professionally managed and rented on your behalf by DM Consortium, providing 5-star hotel services and owner peace of mind.',
@@ -59,6 +62,7 @@ const EDITORIAL_STAGES: EditorialStage[] = [
     stats: { label: 'OPERATOR', value: 'DM CONSORTIUM' },
     specCallout: '5-STAR HOTEL OPERATIONS',
     side: 'right',
+    isFeature: true,
   },
   {
     number: '05',
@@ -87,6 +91,8 @@ const EDITORIAL_STAGES: EditorialStage[] = [
 export default function SectionThree() {
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const lightBeamRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<(HTMLDivElement | null)[]>([])
   const rectCacheRef = useRef<Map<HTMLDivElement, DOMRect>>(new Map())
   const rafIdRef = useRef<number | null>(null)
@@ -116,26 +122,47 @@ export default function SectionThree() {
         )
       }
 
-      // Independent Viewport Card Entrance Reveals
+      // Traveling Architectural Light Spotlight Beam (Follows Scroll Progress)
+      if (gridRef.current && lightBeamRef.current) {
+        gsap.fromTo(
+          lightBeamRef.current,
+          { top: '0%' },
+          {
+            top: '100%',
+            ease: 'none',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 65%',
+              end: 'bottom 45%',
+              scrub: true,
+            },
+          },
+        )
+      }
+
+      // Independent Viewport Card Entrance Reveals & Active Focus State
       cardsRef.current.forEach((card, idx) => {
         if (!card) return
         const side = EDITORIAL_STAGES[idx]?.side
-        const rotateStart = side === 'left' ? -2 : 2
+        const rotateStart = side === 'left' ? -2.5 : 2.5
 
         gsap.fromTo(
           card,
-          { opacity: 0, y: 50, scale: 0.95, rotate: rotateStart },
+          { opacity: 0, y: 60, scale: 0.94, rotate: rotateStart },
           {
             opacity: 1,
             y: 0,
             scale: 1,
             rotate: 0,
-            duration: 0.95,
+            duration: 1.0,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: card,
               start: 'top 80%',
-              toggleActions: 'play none none reverse',
+              onEnter: () => card.classList.add(styles.activeMilestoneCard),
+              onLeave: () => card.classList.remove(styles.activeMilestoneCard),
+              onEnterBack: () => card.classList.add(styles.activeMilestoneCard),
+              onLeaveBack: () => card.classList.remove(styles.activeMilestoneCard),
             },
           },
         )
@@ -203,6 +230,9 @@ export default function SectionThree() {
 
   return (
     <section ref={sectionRef} id="experience" className={styles.section}>
+      {/* 3D Exhibition Canvas Stage */}
+      <SectionThreeCanvas />
+
       {/* Background Architectural Construction Grid & Ambient Mesh */}
       <div className={styles.blueprintBgGrid} aria-hidden="true" />
       <div className={styles.ambientGradient} aria-hidden="true" />
@@ -226,7 +256,10 @@ export default function SectionThree() {
         </div>
 
         {/* PRYPCO / FINDD Architectural Editorial Cards Grid */}
-        <div className={styles.editorialGrid}>
+        <div ref={gridRef} className={styles.editorialGrid}>
+          {/* Traveling Architectural Light Spotlight Beam (No Graphic Lines) */}
+          <div ref={lightBeamRef} className={styles.travelingLightBeam} aria-hidden="true" />
+
           {EDITORIAL_STAGES.map((item, index) => (
             <div
               key={item.number}
@@ -242,7 +275,7 @@ export default function SectionThree() {
               {/* Presentation Slab Card */}
               <div
                 ref={(el) => { cardsRef.current[index] = el }}
-                className={styles.card}
+                className={`${styles.card} ${item.isFeature ? styles.heroFeatureCard : styles.supportingCard}`}
                 onMouseEnter={handleMouseEnter}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}

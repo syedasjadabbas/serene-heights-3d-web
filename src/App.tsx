@@ -15,9 +15,13 @@ import { initLenis } from './motion/lenis'
 
 function App() {
   useEffect(() => {
-    // TEMP DEBUG: ?noLenis=1 skips Lenis entirely so native browser scroll
-    // can be A/B tested against Lenis-smoothed scroll for the Hero zoom.
-    // Remove this branch once Lenis is cleared or fixed.
+    if (typeof window !== 'undefined') {
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual'
+      }
+      window.scrollTo(0, 0)
+    }
+
     if (new URLSearchParams(window.location.search).has('noLenis')) return
     const { destroy } = initLenis()
     return destroy
