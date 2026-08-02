@@ -44,10 +44,9 @@ const WORDMARK_OPACITY_BREAKPOINTS: Array<[number, number]> = [
 ]
 
 const CHAPTER_TIMINGS = [
-  { start: 0.14, end: 0.26 },
-  { start: 0.29, end: 0.41 },
-  { start: 0.44, end: 0.56 },
-  { start: 0.59, end: 0.71 },
+  { start: 0.14, end: 0.31 },
+  { start: 0.34, end: 0.51 },
+  { start: 0.54, end: 0.71 },
 ]
 
 function getChapterState(p: number, start: number, end: number, fadeIn = 0.035, fadeOut = 0.035) {
@@ -84,14 +83,12 @@ export default function Hero() {
   const ch01Ref = useRef<HTMLDivElement>(null)
   const ch02Ref = useRef<HTMLDivElement>(null)
   const ch03Ref = useRef<HTMLDivElement>(null)
-  const ch04Ref = useRef<HTMLDivElement>(null)
 
   const indicatorRef = useRef<HTMLDivElement>(null)
   const indicatorFillRef = useRef<HTMLDivElement>(null)
   const node0Ref = useRef<HTMLDivElement>(null)
   const node1Ref = useRef<HTMLDivElement>(null)
   const node2Ref = useRef<HTMLDivElement>(null)
-  const node3Ref = useRef<HTMLDivElement>(null)
   const mobileCounterRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
@@ -175,7 +172,7 @@ export default function Hero() {
             gsap.set(overlayRef.current, { opacity: mapBreakpoints(p, OVERLAY_BREAKPOINTS) })
 
             let activeIdx = -1
-            const chRefs = [ch01Ref, ch02Ref, ch03Ref, ch04Ref]
+            const chRefs = [ch01Ref, ch02Ref, ch03Ref]
             CHAPTER_TIMINGS.forEach((ch, idx) => {
               const el = chRefs[idx].current
               if (!el) return
@@ -193,14 +190,10 @@ export default function Hero() {
                 // Chapter 2: Right slide-in + depth
                 x = 28 * (1 - opacity)
                 scale = 0.97 + 0.03 * opacity
-              } else if (idx === 2) {
-                // Chapter 3: Left Alt slide-in + depth
-                x = -18 * (1 - opacity)
-                scale = 0.96 + 0.04 * opacity
               } else {
-                // Chapter 4: Left slide-in + reveal scale
-                x = -24 * (1 - opacity)
-                scale = 0.96 + 0.04 * opacity
+                // Chapter 3: Clean Centered Brand Reveal
+                x = 0
+                scale = 0.95 + 0.05 * opacity
               }
 
               gsap.set(el, {
@@ -225,7 +218,7 @@ export default function Hero() {
               })
             }
 
-            const nodeRefs = [node0Ref, node1Ref, node2Ref, node3Ref]
+            const nodeRefs = [node0Ref, node1Ref, node2Ref]
             CHAPTER_TIMINGS.forEach((ch, idx) => {
               const node = nodeRefs[idx].current
               if (!node) return
@@ -239,7 +232,7 @@ export default function Hero() {
 
             if (mobileCounterRef.current) {
               const num = activeIdx >= 0 ? `0${activeIdx + 1}` : '01'
-              mobileCounterRef.current.textContent = `${num} / 04`
+              mobileCounterRef.current.textContent = `${num} / 03`
             }
           }
 
@@ -325,7 +318,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Chapter Storytelling Overlay Layer */}
+        {/* Chapter Storytelling Overlay Layer (3 Chapters) */}
         <div className={styles.chapterLayer}>
           {/* Scene 1: Left Aligned Identity */}
           <div ref={ch01Ref} className={`${styles.chapterItem} ${styles.chapterItemLeft}`}>
@@ -340,60 +333,24 @@ export default function Hero() {
             </h2>
           </div>
 
-          {/* Scene 2: Right Aligned Architectural Spec Matrix */}
+          {/* Scene 2: Right Aligned Concise Value Proposition */}
           <div ref={ch02Ref} className={`${styles.chapterItem} ${styles.chapterItemRight}`}>
             <p className={styles.chapterLabel}>
               <span className={styles.chapterNum}>02</span>
               <span className={styles.chapterDivider}>/</span>
-              <span>SPECIFICATIONS</span>
+              <span>THE OPPORTUNITY</span>
             </p>
             <h2 className={styles.chapterHeadline}>
-              Built at 7,906 ft elevation.
-            </h2>
-            <div className={styles.specPanelGrid}>
-              <div className={styles.specPanelCard}>
-                <span className={styles.specPanelLabel}>Altitude</span>
-                <span className={styles.specPanelValue}>7,906 FT</span>
-              </div>
-              <div className={styles.specPanelCard}>
-                <span className={styles.specPanelLabel}>Towers</span>
-                <span className={styles.specPanelValue}>3 Signature Slabs</span>
-              </div>
-              <div className={styles.specPanelCard}>
-                <span className={styles.specPanelLabel}>Suites</span>
-                <span className={styles.specPanelValue}>150+ Hotel Units</span>
-              </div>
-              <div className={styles.specPanelCard}>
-                <span className={styles.specPanelLabel}>Operator</span>
-                <span className={styles.specPanelValue}>DM Consortium</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Scene 3: Left Aligned Alt Single Emotional Statement */}
-          <div ref={ch03Ref} className={`${styles.chapterItem} ${styles.chapterItemLeftAlt}`}>
-            <p className={styles.chapterLabel}>
-              <span className={styles.chapterNum}>03</span>
-              <span className={styles.chapterDivider}>/</span>
-              <span>THE VISION</span>
-            </p>
-            <h2 className={styles.chapterHeadline}>
-              Designed to disappear<br />
-              into the landscape.
+              Pakistan’s premier high-altitude<br />
+              winter resort &amp; managed residences.
             </h2>
           </div>
 
-          {/* Scene 4: Final Architectural Reveal Editorial Hold */}
-          <div ref={ch04Ref} className={`${styles.chapterItem} ${styles.chapterItemLeft}`}>
-            <p className={styles.chapterLabel}>
-              <span className={styles.chapterNum}>04</span>
-              <span className={styles.chapterDivider}>/</span>
-              <span>SERENE HEIGHTS</span>
-            </p>
-            <h2 className={styles.chapterHeadline}>
-              Pakistan’s premier<br />
-              alpine resort.
-            </h2>
+          {/* Scene 3: Clean Centered Brand Reveal */}
+          <div ref={ch03Ref} className={`${styles.chapterItem} ${styles.chapterItemCenterBrand}`}>
+            <Logo markOnly className={styles.brandRevealLogoMark} />
+            <h2 className={styles.brandRevealWordmark}>SERENE HEIGHTS</h2>
+            <p className={styles.brandRevealSub}>NATHIA GALI</p>
           </div>
         </div>
 
@@ -412,12 +369,9 @@ export default function Hero() {
             <div ref={node2Ref} className={styles.indicatorNode}>
               <span className={styles.nodeNumber}>03</span>
             </div>
-            <div ref={node3Ref} className={styles.indicatorNode}>
-              <span className={styles.nodeNumber}>04</span>
-            </div>
           </div>
           <span ref={mobileCounterRef} className={styles.mobileChapterCounter}>
-            01 / 04
+            01 / 03
           </span>
         </div>
 
