@@ -7,12 +7,12 @@ import styles from './Navigation.module.css'
 
 const NAV_ITEMS = [
   { label: 'ABOUT', href: '#about' },
+  { label: 'LIFESTYLE', href: '#lifestyle' },
   { label: 'AMENITIES', href: '#amenities' },
-  { label: 'PAYMENT PLAN', href: '#payment-plan' },
   { label: 'FLOOR PLANS', href: '#floor-plans' },
+  { label: 'SMART UNIT', href: '#smart-unit', extra: true },
+  { label: 'PAYMENT PLAN', href: '#payment-plan' },
   { label: 'PROGRESS', href: '#progress' },
-  { label: 'BLOG', href: '#blog' },
-  { label: 'SMART PROPERTY UNIT', href: '#smart-unit', extra: true },
 ]
 
 export default function Navigation() {

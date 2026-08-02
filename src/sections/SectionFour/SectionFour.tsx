@@ -43,7 +43,7 @@ export default function SectionFour() {
   }, [])
 
   return (
-    <section ref={sectionRef} id="architecture-3d" className={styles.section}>
+    <section ref={sectionRef} id="amenities" data-alias="architecture-3d" className={styles.section}>
       {/* 3D Scene Canvas Container */}
       <div className={styles.canvasContainer}>
         <ResortViewer />

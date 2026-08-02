@@ -137,7 +137,7 @@ export default function SectionTwo() {
     const ctx = gsap.context(() => {
       registerScrollTrigger()
 
-      // Header reveal
+      // Header reveal — softly emerges at ~p=0.85 as Section 2 enters viewport bottom
       gsap.fromTo(
         [eyebrowRef.current, statementRef.current, subcopyRef.current],
         { opacity: 0, y: 32 },
@@ -149,13 +149,13 @@ export default function SectionTwo() {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top 80%',
+            start: 'top 98%',
             toggleActions: 'play none none reverse',
           },
         },
       )
 
-      // Columns staggered entrance
+      // Columns staggered entrance — cascades in as Section 2 rises (around p=0.95)
       if (gridRef.current) {
         const columns = Array.from(gridRef.current.children)
         gsap.fromTo(
@@ -241,7 +241,7 @@ export default function SectionTwo() {
   }
 
   return (
-    <section ref={sectionRef} id="overview" className={styles.section}>
+    <section ref={sectionRef} id="about" data-alias="overview" className={styles.section}>
       <div className={`container ${styles.inner}`}>
         <div className={styles.header}>
           <p ref={eyebrowRef} className={styles.eyebrow}>
@@ -287,7 +287,7 @@ export default function SectionTwo() {
                 </div>
               ))}
             </div>
-            <CardCta href="#residences" tone="gold" />
+            <CardCta href="#floor-plans" tone="gold" />
           </div>
 
           {/* Payment Plan Column */}
@@ -419,7 +419,7 @@ export default function SectionTwo() {
             </div>
 
             <p className={styles.disclaimer}>*Projected figures provided by developer, not guaranteed returns.</p>
-            <CardCta href="#smart-property-unit" tone="mist" />
+            <CardCta href="#smart-unit" tone="mist" />
           </div>
         </div>
       </div>

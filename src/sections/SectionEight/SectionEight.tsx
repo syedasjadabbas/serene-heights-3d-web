@@ -274,7 +274,7 @@ export default function SectionEight() {
   }
 
   return (
-    <section ref={sectionRef} id="seasons" className={styles.section}>
+    <section ref={sectionRef} id="progress" data-alias="seasons" className={styles.section}>
       {/* 3D Seasonal Canvas particles */}
       <SectionEightCanvas activeSeason={activeSeason} />
 

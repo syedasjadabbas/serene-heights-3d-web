@@ -27,21 +27,18 @@ function mapBreakpoints(progress: number, points: Array<[number, number]>): numb
 const FOREGROUND_BREAKPOINTS: Array<[number, number]> = [
   [0, 0],
   [0.65, 0],
-  [0.84, 0.35],
-  [0.91, 0.35],
-  [1, 1],
+  [0.80, 0.25],
+  [1, 0.35],
 ]
+// Overlay remains 0 to keep the 3D resort stage continuous into Section 2
 const OVERLAY_BREAKPOINTS: Array<[number, number]> = [
   [0, 0],
-  [0.84, 0],
-  [0.98, 1],
-  [1, 1],
+  [1, 0],
 ]
 
 const CHAPTER_TIMINGS = [
-  { start: 0.14, end: 0.31 },
-  { start: 0.34, end: 0.51 },
-  { start: 0.54, end: 0.84 }, // Extended across two segments for centered brand reveal + ceremonial hold
+  { start: 0.12, end: 0.48 }, // 1st scroll: Story Chapter (Left-aligned)
+  { start: 0.50, end: 1.00 }, // 2nd scroll: Centered SERENE HEIGHTS Brand Reveal (Generous Hold)
 ]
 
 function getChapterState(p: number, start: number, end: number, fadeIn = 0.04, fadeOut = 0.04) {
@@ -62,6 +59,29 @@ function getChapterState(p: number, start: number, end: number, fadeIn = 0.04, f
   return { opacity, y }
 }
 
+function getBrandRevealState(p: number) {
+  if (p < 0.50) {
+    return { opacity: 0, y: 20, scale: 0.96 }
+  }
+  if (p <= 0.85) {
+    // Generous, steady hold at centered SERENE HEIGHTS logo mark + wordmark
+    const fadeInP = clamp01((p - 0.50) / 0.06)
+    return {
+      opacity: fadeInP,
+      y: 20 * (1 - fadeInP),
+      scale: 0.96 + 0.04 * fadeInP,
+    }
+  }
+  // From p = 0.85 to 1.00: Lockup travels upward as a visual header bridge into Section 2
+  const bridgeT = clamp01((p - 0.85) / 0.13)
+  const fadeOutP = 1 - clamp01((p - 0.93) / 0.06)
+  return {
+    opacity: fadeOutP,
+    y: -75 * bridgeT,
+    scale: 1.0 - 0.04 * bridgeT,
+  }
+}
+
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null)
   const backgroundRef = useRef<HTMLDivElement>(null)
@@ -76,14 +96,11 @@ export default function Hero() {
 
   const ch01Ref = useRef<HTMLDivElement>(null)
   const ch02Ref = useRef<HTMLDivElement>(null)
-  const ch03Ref = useRef<HTMLDivElement>(null)
-  const ch3EnteredTimeRef = useRef<number | null>(null)
 
   const indicatorRef = useRef<HTMLDivElement>(null)
   const indicatorFillRef = useRef<HTMLDivElement>(null)
   const node0Ref = useRef<HTMLDivElement>(null)
   const node1Ref = useRef<HTMLDivElement>(null)
-  const node2Ref = useRef<HTMLDivElement>(null)
   const mobileCounterRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
@@ -142,7 +159,8 @@ export default function Hero() {
             isTablet: boolean
             isDesktop: boolean
           }
-          const runwayVh = conditions.isMobile ? 450 : conditions.isTablet ? 550 : 650
+          // Shortened runwayVh by ~30% for refined, crisp luxury pacing
+          const runwayVh = conditions.isMobile ? 320 : conditions.isTablet ? 380 : 450
 
           const applyProgress = (p: number) => {
             gsap.set(backgroundRef.current, { yPercent: p * 10 })
@@ -155,54 +173,36 @@ export default function Hero() {
             })
             gsap.set(scrollCueRef.current, { opacity: 1 - clamp01(p / 0.05) })
 
-            // Time-based 2.5s minimum hold for Chapter 3 centered brand reveal
-            const now = Date.now()
-            if (p >= 0.54) {
-              if (ch3EnteredTimeRef.current === null) {
-                ch3EnteredTimeRef.current = now
-              }
-            } else {
-              ch3EnteredTimeRef.current = null
-            }
-
-            const ch3Elapsed = ch3EnteredTimeRef.current ? now - ch3EnteredTimeRef.current : 0
-            const isHoldActive = ch3Elapsed < 2500 && p >= 0.54 && p <= 0.88
-
-            const targetOverlayOpacity = isHoldActive ? 0 : mapBreakpoints(p, OVERLAY_BREAKPOINTS)
+            const targetOverlayOpacity = mapBreakpoints(p, OVERLAY_BREAKPOINTS)
 
             gsap.set(foregroundRef.current, { opacity: mapBreakpoints(p, FOREGROUND_BREAKPOINTS) })
             gsap.set(overlayRef.current, { opacity: targetOverlayOpacity })
 
             let activeIdx = -1
-            const chRefs = [ch01Ref, ch02Ref, ch03Ref]
+            const chRefs = [ch01Ref, ch02Ref]
             CHAPTER_TIMINGS.forEach((ch, idx) => {
               const el = chRefs[idx].current
               if (!el) return
-              let { opacity, y } = getChapterState(p, ch.start, ch.end)
 
-              if (idx === 2 && isHoldActive) {
-                opacity = 1.0
-                y = 0
-              }
-
-              if (opacity > 0.4) activeIdx = idx
-
+              let opacity = 0
+              let y = 0
               let x = 0
               let scale = 1
 
-              if (idx === 0) {
-                // Chapter 1: Left slide-in + depth
+              if (idx === 1) {
+                const state = getBrandRevealState(p)
+                opacity = state.opacity
+                y = state.y
+                scale = state.scale
+              } else {
+                const state = getChapterState(p, ch.start, ch.end)
+                opacity = state.opacity
+                y = state.y
                 x = -28 * (1 - opacity)
                 scale = 0.97 + 0.03 * opacity
-              } else if (idx === 1) {
-                // Chapter 2: Right slide-in + depth
-                x = 28 * (1 - opacity)
-                scale = 0.97 + 0.03 * opacity
-              } else {
-                // Chapter 3: Centered Brand Reveal + Time-Based 2.5s Hold
-                x = 0
-                scale = 0.96 + 0.04 * opacity
               }
+
+              if (opacity > 0.4) activeIdx = idx
 
               gsap.set(el, {
                 opacity,
@@ -212,12 +212,12 @@ export default function Hero() {
               })
             })
 
-            const indicatorOpacity = clamp01((p - 0.14) / 0.04) * (1 - clamp01((p - 0.84) / 0.04))
+            const indicatorOpacity = clamp01((p - 0.12) / 0.04) * (1 - clamp01((p - 0.85) / 0.04))
             if (indicatorRef.current) {
               gsap.set(indicatorRef.current, { opacity: indicatorOpacity })
             }
 
-            const indicatorT = clamp01((p - 0.14) / (0.84 - 0.14))
+            const indicatorT = clamp01((p - 0.12) / (0.85 - 0.12))
             const isMobileViewport = typeof window !== 'undefined' && window.innerWidth <= 640
             if (indicatorFillRef.current) {
               gsap.set(indicatorFillRef.current, {
@@ -226,7 +226,7 @@ export default function Hero() {
               })
             }
 
-            const nodeRefs = [node0Ref, node1Ref, node2Ref]
+            const nodeRefs = [node0Ref, node1Ref]
             CHAPTER_TIMINGS.forEach((ch, idx) => {
               const node = nodeRefs[idx].current
               if (!node) return
@@ -240,7 +240,7 @@ export default function Hero() {
 
             if (mobileCounterRef.current) {
               const num = activeIdx >= 0 ? `0${activeIdx + 1}` : '01'
-              mobileCounterRef.current.textContent = `${num} / 03`
+              mobileCounterRef.current.textContent = `${num} / 02`
             }
           }
 
@@ -249,7 +249,10 @@ export default function Hero() {
             ScrollTrigger.create({
               trigger: heroRef.current,
               start: 'top top',
-              end: () => `+=${(window.innerHeight * runwayVh) / 100}`,
+              end: () => {
+                const heroH = heroRef.current?.offsetHeight ?? window.innerHeight
+                return `+=${(window.innerHeight * runwayVh) / 100 - heroH}`
+              },
               scrub: true,
               pin: true,
               anticipatePin: 1,
@@ -264,7 +267,10 @@ export default function Hero() {
           const st = ScrollTrigger.create({
             trigger: heroRef.current,
             start: 'top top',
-            end: () => `+=${(window.innerHeight * runwayVh) / 100}`,
+            end: () => {
+              const heroH = heroRef.current?.offsetHeight ?? window.innerHeight
+              return `+=${(window.innerHeight * runwayVh) / 100 - heroH}`
+            },
             scrub: true,
             pin: true,
             anticipatePin: 1,
@@ -326,9 +332,9 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Chapter Storytelling Overlay Layer (3 Chapters) */}
+        {/* Chapter Storytelling Overlay Layer (2 Streamlined Chapters) */}
         <div className={styles.chapterLayer}>
-          {/* Scene 1: Left Aligned Identity */}
+          {/* Scene 1: Story Chapter */}
           <div ref={ch01Ref} className={`${styles.chapterItem} ${styles.chapterItemLeft}`}>
             <p className={styles.chapterLabel}>
               <span className={styles.chapterNum}>01</span>
@@ -336,26 +342,13 @@ export default function Hero() {
               <span>NATHIA GALI · PAKISTAN</span>
             </p>
             <h2 className={styles.chapterHeadline}>
-              Where pine forests<br />
-              meet luxury living.
+              Where pine forests meet luxury living.<br />
+              <span className={styles.chapterSubtext}>Pakistan’s premier high-altitude winter resort &amp; managed residences.</span>
             </h2>
           </div>
 
-          {/* Scene 2: Right Aligned Concise Value Proposition */}
-          <div ref={ch02Ref} className={`${styles.chapterItem} ${styles.chapterItemRight}`}>
-            <p className={styles.chapterLabel}>
-              <span className={styles.chapterNum}>02</span>
-              <span className={styles.chapterDivider}>/</span>
-              <span>THE OPPORTUNITY</span>
-            </p>
-            <h2 className={styles.chapterHeadline}>
-              Pakistan’s premier high-altitude<br />
-              winter resort &amp; managed residences.
-            </h2>
-          </div>
-
-          {/* Scene 3: Clean Centered Brand Reveal (Extended Ceremonial Hold) */}
-          <div ref={ch03Ref} className={`${styles.chapterItem} ${styles.chapterItemCenterBrand}`}>
+          {/* Scene 2: Centered SERENE HEIGHTS Brand Reveal (Generous Hold) */}
+          <div ref={ch02Ref} className={`${styles.chapterItem} ${styles.chapterItemCenterBrand}`}>
             <Logo markOnly className={styles.brandRevealLogoMark} />
             <h2 className={styles.brandRevealWordmark}>SERENE HEIGHTS</h2>
             <p className={styles.brandRevealSub}>NATHIA GALI</p>
@@ -374,12 +367,9 @@ export default function Hero() {
             <div ref={node1Ref} className={styles.indicatorNode}>
               <span className={styles.nodeNumber}>02</span>
             </div>
-            <div ref={node2Ref} className={styles.indicatorNode}>
-              <span className={styles.nodeNumber}>03</span>
-            </div>
           </div>
           <span ref={mobileCounterRef} className={styles.mobileChapterCounter}>
-            01 / 03
+            01 / 02
           </span>
         </div>
 

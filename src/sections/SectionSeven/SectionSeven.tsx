@@ -210,7 +210,7 @@ export default function SectionSeven() {
   }, [])
 
   return (
-    <section ref={sectionRef} id="investment" className={styles.section}>
+    <section ref={sectionRef} id="payment-plan" data-alias="investment" className={styles.section}>
       {/* 3D Blueprint Canvas Stage */}
       <SectionSevenCanvas />
 

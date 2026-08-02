@@ -109,10 +109,10 @@ export default function SectionSix() {
         const updateCardFocus = () => {
           const viewportCenter = window.innerWidth / 2
           const maxDistance = window.innerWidth * 0.48
+          const trackX = (gsap.getProperty(track, 'x') as number) || 0
 
           cards.forEach((card) => {
-            const rect = card.getBoundingClientRect()
-            const cardCenter = rect.left + rect.width / 2
+            const cardCenter = trackX + card.offsetLeft + card.offsetWidth / 2
             const dist = Math.abs(cardCenter - viewportCenter)
             const normDist = dist / maxDistance
 
@@ -248,7 +248,7 @@ export default function SectionSix() {
   }
 
   return (
-    <section ref={sectionRef} id="gallery" className={styles.section}>
+    <section ref={sectionRef} id="smart-unit" data-alias="gallery" className={styles.section}>
       {/* 3D Exhibition Canvas Stage */}
       <SectionSixCanvas />
 

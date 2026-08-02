@@ -45,9 +45,25 @@ export default function MasterVisualStage() {
   useLayoutEffect(() => {
     const frameIndexRef = { current: 0 }
     const lastDrawnIndexRef = { current: -1 }
+    let cachedMaxScroll = 1
 
     const loader = createSequenceLoader(() => redraw())
     let resizeObserver: ResizeObserver | null = null
+
+    function updateMaxScroll() {
+      const docEl = document.documentElement
+      const body = document.body
+      const scrollHeight = Math.max(
+        body.scrollHeight,
+        docEl.scrollHeight,
+        body.offsetHeight,
+        docEl.offsetHeight,
+        body.clientHeight,
+        docEl.clientHeight,
+      )
+      const clientHeight = window.innerHeight || docEl.clientHeight
+      cachedMaxScroll = Math.max(1, scrollHeight - clientHeight)
+    }
 
     function redraw(force = false) {
       const canvas = canvasRef.current
@@ -66,6 +82,7 @@ export default function MasterVisualStage() {
     function resizeCanvas() {
       const canvas = canvasRef.current
       if (!canvas) return
+      updateMaxScroll()
       const rect = canvas.getBoundingClientRect()
       if (rect.width === 0 || rect.height === 0) return
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -89,24 +106,13 @@ export default function MasterVisualStage() {
       resizeObserver = new ResizeObserver(() => resizeCanvas())
       resizeObserver.observe(canvasRef.current)
     }
+    window.addEventListener('resize', updateMaxScroll, { passive: true })
     window.addEventListener('orientationchange', resizeCanvas)
     resizeCanvas()
 
     const updateFrameFromScroll = () => {
-      const docEl = document.documentElement
-      const body = document.body
-      const scrollTop = window.scrollY || docEl.scrollTop || body.scrollTop || 0
-      const scrollHeight = Math.max(
-        body.scrollHeight,
-        docEl.scrollHeight,
-        body.offsetHeight,
-        docEl.offsetHeight,
-        body.clientHeight,
-        docEl.clientHeight,
-      )
-      const clientHeight = window.innerHeight || docEl.clientHeight
-      const maxScroll = Math.max(1, scrollHeight - clientHeight)
-      const pageProgress = Math.min(1, Math.max(0, scrollTop / maxScroll))
+      const scrollTop = window.scrollY || document.documentElement.scrollTop || 0
+      const pageProgress = Math.min(1, Math.max(0, scrollTop / cachedMaxScroll))
 
       const targetFrame = mapProgressToFrame(pageProgress)
       if (targetFrame !== frameIndexRef.current) {
@@ -137,6 +143,7 @@ export default function MasterVisualStage() {
     return () => {
       st.kill()
       window.removeEventListener('scroll', updateFrameFromScroll)
+      window.removeEventListener('resize', updateMaxScroll)
       gsap.ticker.remove(updateFrameFromScroll)
       loader.destroy()
       resizeObserver?.disconnect()
@@ -146,12 +153,7 @@ export default function MasterVisualStage() {
 
   return (
     <div ref={stageRef} className={styles.stage} aria-hidden="true">
-      <canvas
-        ref={canvasRef}
-        className={styles.canvas}
-        role="img"
-        aria-label="Serene Heights visual sequence"
-      />
+      <canvas ref={canvasRef} className={styles.canvas} />
     </div>
   )
 }

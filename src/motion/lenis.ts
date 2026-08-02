@@ -25,6 +25,21 @@ export function initLenis(): { lenis: Lenis; destroy: () => void } {
   gsap.ticker.add(onTick)
   gsap.ticker.lagSmoothing(0)
 
+  const handleAnchorClick = (e: MouseEvent) => {
+    const target = e.target as HTMLElement | null
+    const anchor = target?.closest('a[href^="#"]') as HTMLAnchorElement | null
+    if (!anchor) return
+    const href = anchor.getAttribute('href')
+    if (href && href.length > 1) {
+      const el = document.querySelector(href)
+      if (el) {
+        e.preventDefault()
+        lenis.scrollTo(el as HTMLElement, { duration: 1.2 })
+      }
+    }
+  }
+  document.addEventListener('click', handleAnchorClick)
+
   if (import.meta.env.DEV) {
     // Debug-only exposure so live scroll state can be inspected from outside the module
     // graph (e.g. via Playwright/devtools) — not used by the app itself.
@@ -34,6 +49,7 @@ export function initLenis(): { lenis: Lenis; destroy: () => void } {
   }
 
   const destroy = () => {
+    document.removeEventListener('click', handleAnchorClick)
     gsap.ticker.remove(onTick)
     lenis.destroy()
   }

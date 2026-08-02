@@ -24,8 +24,8 @@ class GLBErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState>
     return { hasError: true }
   }
 
-  componentDidCatch(error: unknown) {
-    console.warn('GLB Model asset unavailable. Rendering architectural placeholder.', error)
+  componentDidCatch() {
+    // Fallback gracefully to architectural placeholder
   }
 
   render() {
@@ -118,6 +118,10 @@ function ResortGLBModel({ url }: { url: string }) {
 }
 
 export default function ResortModel() {
+  if (!RESORT_MODEL_URL) {
+    return <ResortPlaceholderModel />
+  }
+
   return (
     <GLBErrorBoundary fallback={<ResortPlaceholderModel />}>
       <ResortGLBModel url={RESORT_MODEL_URL} />

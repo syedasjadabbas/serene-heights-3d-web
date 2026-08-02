@@ -229,7 +229,7 @@ export default function SectionThree() {
   }
 
   return (
-    <section ref={sectionRef} id="experience" className={styles.section}>
+    <section ref={sectionRef} id="lifestyle" data-alias="experience" className={styles.section}>
       {/* 3D Exhibition Canvas Stage */}
       <SectionThreeCanvas />
 

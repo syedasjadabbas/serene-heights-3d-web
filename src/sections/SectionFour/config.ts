@@ -3,7 +3,8 @@
  * Single source of truth for GLB model path, camera targets, lighting presets, and hotspots.
  */
 
-export const RESORT_MODEL_URL = '/models/resort.glb'
+// Set to '/models/resort.glb' when real GLB model file is placed in public/models/resort.glb
+export const RESORT_MODEL_URL = ''
 
 export const CAMERA_CONFIG = {
   defaultPosition: [0, 4.5, 15] as [number, number, number],
