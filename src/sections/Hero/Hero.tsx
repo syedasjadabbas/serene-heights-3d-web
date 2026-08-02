@@ -36,17 +36,17 @@ const OVERLAY_BREAKPOINTS: Array<[number, number]> = [
 ]
 const WORDMARK_OPACITY_BREAKPOINTS: Array<[number, number]> = [
   [0, 0],
-  [0.64, 0],
-  [0.68, 1],
+  [0.73, 0],
+  [0.77, 1],
   [0.96, 1],
   [1, 0],
 ]
 
 const CHAPTER_TIMINGS = [
-  { start: 0.14, end: 0.28 },
-  { start: 0.32, end: 0.46 },
-  { start: 0.50, end: 0.64 },
-  { start: 0.68, end: 0.96 },
+  { start: 0.14, end: 0.26 },
+  { start: 0.29, end: 0.41 },
+  { start: 0.44, end: 0.56 },
+  { start: 0.59, end: 0.71 },
 ]
 
 function getChapterState(p: number, start: number, end: number, fadeIn = 0.035, fadeOut = 0.035) {
@@ -210,12 +210,12 @@ export default function Hero() {
               })
             })
 
-            const indicatorOpacity = clamp01((p - 0.14) / 0.04) * (1 - clamp01((p - 0.78) / 0.04))
+            const indicatorOpacity = clamp01((p - 0.14) / 0.04) * (1 - clamp01((p - 0.71) / 0.04))
             if (indicatorRef.current) {
               gsap.set(indicatorRef.current, { opacity: indicatorOpacity })
             }
 
-            const indicatorT = clamp01((p - 0.18) / (0.80 - 0.18))
+            const indicatorT = clamp01((p - 0.14) / (0.71 - 0.14))
             const isMobileViewport = typeof window !== 'undefined' && window.innerWidth <= 640
             if (indicatorFillRef.current) {
               gsap.set(indicatorFillRef.current, {

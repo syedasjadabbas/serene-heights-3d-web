@@ -25,6 +25,14 @@ export function initLenis(): { lenis: Lenis; destroy: () => void } {
   gsap.ticker.add(onTick)
   gsap.ticker.lagSmoothing(0)
 
+  if (import.meta.env.DEV) {
+    // Debug-only exposure so live scroll state can be inspected from outside the module
+    // graph (e.g. via Playwright/devtools) — not used by the app itself.
+    ;(window as unknown as Record<string, unknown>).__debugLenis = lenis
+    ;(window as unknown as Record<string, unknown>).__debugGsap = gsap
+    ;(window as unknown as Record<string, unknown>).__debugScrollTrigger = ScrollTrigger
+  }
+
   const destroy = () => {
     gsap.ticker.remove(onTick)
     lenis.destroy()
