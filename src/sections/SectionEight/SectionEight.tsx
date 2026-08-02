@@ -90,6 +90,8 @@ export default function SectionEight() {
   const indicatorRef = useRef<HTMLDivElement>(null)
   const conclusionRef = useRef<HTMLHeadingElement>(null)
   const metricsRef = useRef<HTMLDivElement>(null)
+  const metricValRefs = useRef<(HTMLDivElement | null)[]>([])
+  const metricsAnimatedRef = useRef(false)
 
   const [activeSeason, setActiveSeason] = useState(0)
   const activeSeasonRef = useRef(0)
@@ -194,6 +196,40 @@ export default function SectionEight() {
         onRefresh: (self) => updateSeasonProgress(self.progress),
       })
 
+      // Staggered One-Time Animated Metrics Counter
+      if (metricsRef.current) {
+        ScrollTrigger.create({
+          trigger: metricsRef.current,
+          start: 'top 85%',
+          onEnter: () => {
+            if (metricsAnimatedRef.current) return
+            metricsAnimatedRef.current = true
+
+            const counterConfigs = [
+              { end: 7906, format: (val: number) => `${Math.round(val).toLocaleString()} FT` },
+              { end: 4, format: (val: number) => (val >= 3.8 ? 'FOUR' : `${Math.round(val)}`) },
+              { end: 365, format: (val: number) => `${Math.round(val)} DAYS` },
+              { end: 15, format: (val: number) => `13–${Math.round(val)}%` },
+            ]
+
+            counterConfigs.forEach((cfg, idx) => {
+              const el = metricValRefs.current[idx]
+              if (!el) return
+              const obj = { val: 0 }
+              gsap.to(obj, {
+                val: cfg.end,
+                duration: 1.8,
+                delay: idx * 0.16,
+                ease: 'power2.out',
+                onUpdate: () => {
+                  el.textContent = cfg.format(obj.val)
+                },
+              })
+            })
+          },
+        })
+      }
+
       // Initial state
       updateSeasonProgress(0)
 
@@ -275,19 +311,19 @@ export default function SectionEight() {
 
         <div ref={metricsRef} className={styles.metricsGrid}>
           <div className={styles.metricItem}>
-            <div className={styles.metricVal}>7,906 FT</div>
+            <div ref={(el) => { metricValRefs.current[0] = el }} className={styles.metricVal}>0 FT</div>
             <div className={styles.metricLabel}>ELEVATION</div>
           </div>
           <div className={styles.metricItem}>
-            <div className={styles.metricVal}>FOUR</div>
+            <div ref={(el) => { metricValRefs.current[1] = el }} className={styles.metricVal}>0</div>
             <div className={styles.metricLabel}>SEASONS</div>
           </div>
           <div className={styles.metricItem}>
-            <div className={styles.metricVal}>365 DAYS</div>
+            <div ref={(el) => { metricValRefs.current[2] = el }} className={styles.metricVal}>0 DAYS</div>
             <div className={styles.metricLabel}>YEAR-ROUND APPEAL</div>
           </div>
           <div className={styles.metricItem}>
-            <div className={styles.metricVal}>13–15%</div>
+            <div ref={(el) => { metricValRefs.current[3] = el }} className={styles.metricVal}>0%</div>
             <div className={styles.metricLabel}>PROJECTED ROI</div>
           </div>
         </div>

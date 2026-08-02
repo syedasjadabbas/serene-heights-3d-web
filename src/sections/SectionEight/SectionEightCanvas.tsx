@@ -7,32 +7,32 @@ interface SectionEightCanvasProps {
 }
 
 function SeasonalParticles({ activeSeason }: { activeSeason: number }) {
-  const count = 48
+  const count = 64
   const pointsRef = useRef<THREE.Points>(null)
 
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3)
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 18
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 12
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 6
+      pos[i * 3] = (Math.random() - 0.5) * 24
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 16
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 8
     }
     return pos
   }, [count])
 
-  // Color & Size depending on season
+  // Color, size & opacity tailored to season atmosphere
   const { color, size, opacity } = useMemo(() => {
     switch (activeSeason) {
       case 0:
-        return { color: new THREE.Color('#dceef5'), size: 0.045, opacity: 0.18 } // Winter cool snow dust
+        return { color: new THREE.Color('#e2f2f8'), size: 0.05, opacity: 0.22 } // Winter cool drifting snow
       case 1:
-        return { color: new THREE.Color('#7aa885'), size: 0.038, opacity: 0.15 } // Spring alpine sage mist
+        return { color: new THREE.Color('#88bfa0'), size: 0.042, opacity: 0.18 } // Spring alpine petal mist
       case 2:
-        return { color: new THREE.Color('#f3d498'), size: 0.052, opacity: 0.20 } // Summer warm sunbeams
+        return { color: new THREE.Color('#f6d89b'), size: 0.058, opacity: 0.24 } // Summer warm sunbeams
       case 3:
-        return { color: new THREE.Color('#d88a42'), size: 0.042, opacity: 0.18 } // Autumn amber embers
+        return { color: new THREE.Color('#e09448'), size: 0.046, opacity: 0.20 } // Autumn copper amber embers
       default:
-        return { color: new THREE.Color('#f3d498'), size: 0.045, opacity: 0.18 }
+        return { color: new THREE.Color('#f6d89b'), size: 0.05, opacity: 0.20 }
     }
   }, [activeSeason])
 
@@ -41,21 +41,21 @@ function SeasonalParticles({ activeSeason }: { activeSeason: number }) {
     const t = state.clock.getElapsedTime()
 
     if (activeSeason === 0) {
-      // Winter: Gentle downward snow drift
-      pointsRef.current.rotation.y = Math.sin(t * 0.05) * 0.05
-      pointsRef.current.position.y = -((t * 0.15) % 3)
+      // Winter: Soft downward snowfall drift
+      pointsRef.current.rotation.y = Math.sin(t * 0.06) * 0.06
+      pointsRef.current.position.y = -((t * 0.18) % 3.5)
     } else if (activeSeason === 1) {
-      // Spring: Swirling mist haze
-      pointsRef.current.rotation.y = t * 0.015
-      pointsRef.current.rotation.z = Math.sin(t * 0.04) * 0.03
+      // Spring: Swirling petal mist haze
+      pointsRef.current.rotation.y = t * 0.018
+      pointsRef.current.rotation.z = Math.sin(t * 0.05) * 0.04
     } else if (activeSeason === 2) {
       // Summer: Shimmering sunbeam float
-      pointsRef.current.rotation.y = t * 0.02
-      pointsRef.current.position.y = Math.sin(t * 0.25) * 0.12
+      pointsRef.current.rotation.y = t * 0.022
+      pointsRef.current.position.y = Math.sin(t * 0.28) * 0.14
     } else {
-      // Autumn: Gentle amber embers sway
-      pointsRef.current.rotation.y = Math.cos(t * 0.08) * 0.08
-      pointsRef.current.position.x = Math.sin(t * 0.12) * 0.15
+      // Autumn: Slow drifting amber embers
+      pointsRef.current.rotation.y = Math.cos(t * 0.09) * 0.09
+      pointsRef.current.position.x = Math.sin(t * 0.14) * 0.18
     }
   })
 
@@ -91,9 +91,9 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
         gl={{ alpha: true, antialias: true }}
         dpr={[1, 1.5]}
       >
-        <ambientLight intensity={0.35} />
+        <ambientLight intensity={0.38} />
         <SeasonalParticles activeSeason={activeSeason} />
-        <fog attach="fog" args={['#0a1410', 5, 18]} />
+        <fog attach="fog" args={['#0a1410', 4, 20]} />
       </Canvas>
     </div>
   )
