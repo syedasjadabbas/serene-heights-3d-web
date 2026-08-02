@@ -81,6 +81,7 @@ export default function SectionEight() {
   const metricsRef = useRef<HTMLDivElement>(null)
 
   const [activeSeason, setActiveSeason] = useState(0)
+  const activeSeasonRef = useRef(0)
 
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
@@ -91,6 +92,7 @@ export default function SectionEight() {
       if (!sectionRef.current) return
 
       const updateSeasonState = (index: number) => {
+        activeSeasonRef.current = index
         setActiveSeason(index)
 
         // 1. Ambient Glow Transition
@@ -148,7 +150,7 @@ export default function SectionEight() {
         onUpdate: (self) => {
           const seasonProgress = Math.min(0.99, self.progress * 1.25)
           const currentIdx = Math.min(3, Math.floor(seasonProgress * 4))
-          if (currentIdx !== activeSeason) {
+          if (currentIdx !== activeSeasonRef.current) {
             updateSeasonState(currentIdx)
           }
         },
@@ -204,14 +206,18 @@ export default function SectionEight() {
         }
       }
 
-      // Initial state
-      updateSeasonState(0)
+      // Initial indicator positioning
+      const firstNavBtn = navItemsRef.current[0]
+      if (firstNavBtn && indicatorRef.current) {
+        indicatorRef.current.style.left = `${firstNavBtn.offsetLeft}px`
+        indicatorRef.current.style.width = `${firstNavBtn.offsetWidth}px`
+      }
 
       return () => st.kill()
     }, sectionRef)
 
     return () => ctx.revert()
-  }, [activeSeason])
+  }, [])
 
   const handleNavClick = (idx: number) => {
     setActiveSeason(idx)
