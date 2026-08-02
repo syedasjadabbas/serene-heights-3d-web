@@ -6,7 +6,7 @@
  */
 export function mapProgressToFrame(progress: number): number {
   const p = Math.min(1, Math.max(0, progress))
-  const HERO_EXIT_PROGRESS = 0.75
+  const HERO_EXIT_PROGRESS = 0.88
 
   const MAX_FRAME = 68 // ~28% overall motion reduction (68 vs 95 frames)
 
