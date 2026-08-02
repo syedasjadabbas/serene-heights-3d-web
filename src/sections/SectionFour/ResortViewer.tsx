@@ -66,8 +66,6 @@ export default function ResortViewer() {
             }}
             onCreated={() => setCanvasReady(true)}
           >
-            <fog attach="fog" args={['#0b1410', 16, 42]} />
-
             <ResortLighting />
 
             <Suspense fallback={null}>
