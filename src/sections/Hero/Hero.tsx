@@ -77,6 +77,7 @@ export default function Hero() {
   const ch01Ref = useRef<HTMLDivElement>(null)
   const ch02Ref = useRef<HTMLDivElement>(null)
   const ch03Ref = useRef<HTMLDivElement>(null)
+  const ch3EnteredTimeRef = useRef<number | null>(null)
 
   const indicatorRef = useRef<HTMLDivElement>(null)
   const indicatorFillRef = useRef<HTMLDivElement>(null)
@@ -154,15 +155,36 @@ export default function Hero() {
             })
             gsap.set(scrollCueRef.current, { opacity: 1 - clamp01(p / 0.05) })
 
+            // Time-based 2.5s minimum hold for Chapter 3 centered brand reveal
+            const now = Date.now()
+            if (p >= 0.54) {
+              if (ch3EnteredTimeRef.current === null) {
+                ch3EnteredTimeRef.current = now
+              }
+            } else {
+              ch3EnteredTimeRef.current = null
+            }
+
+            const ch3Elapsed = ch3EnteredTimeRef.current ? now - ch3EnteredTimeRef.current : 0
+            const isHoldActive = ch3Elapsed < 2500 && p >= 0.54 && p <= 0.88
+
+            const targetOverlayOpacity = isHoldActive ? 0 : mapBreakpoints(p, OVERLAY_BREAKPOINTS)
+
             gsap.set(foregroundRef.current, { opacity: mapBreakpoints(p, FOREGROUND_BREAKPOINTS) })
-            gsap.set(overlayRef.current, { opacity: mapBreakpoints(p, OVERLAY_BREAKPOINTS) })
+            gsap.set(overlayRef.current, { opacity: targetOverlayOpacity })
 
             let activeIdx = -1
             const chRefs = [ch01Ref, ch02Ref, ch03Ref]
             CHAPTER_TIMINGS.forEach((ch, idx) => {
               const el = chRefs[idx].current
               if (!el) return
-              const { opacity, y } = getChapterState(p, ch.start, ch.end)
+              let { opacity, y } = getChapterState(p, ch.start, ch.end)
+
+              if (idx === 2 && isHoldActive) {
+                opacity = 1.0
+                y = 0
+              }
+
               if (opacity > 0.4) activeIdx = idx
 
               let x = 0
@@ -177,7 +199,7 @@ export default function Hero() {
                 x = 28 * (1 - opacity)
                 scale = 0.97 + 0.03 * opacity
               } else {
-                // Chapter 3: Centered Brand Reveal + Calm Hold across 2 scroll segments
+                // Chapter 3: Centered Brand Reveal + Time-Based 2.5s Hold
                 x = 0
                 scale = 0.96 + 0.04 * opacity
               }
