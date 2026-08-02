@@ -3,7 +3,7 @@ import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
 import Button from '../../components/ui/Button'
-import ResortModelStage from './ResortModelStage'
+import ResortViewer from './ResortViewer'
 import styles from './SectionFour.module.css'
 
 export default function SectionFour() {
@@ -46,7 +46,7 @@ export default function SectionFour() {
     <section ref={sectionRef} id="architecture-3d" className={styles.section}>
       {/* 3D Scene Canvas Container */}
       <div className={styles.canvasContainer}>
-        <ResortModelStage />
+        <ResortViewer />
       </div>
 
       {/* Dark Gradient Vignette Overlay for Readability */}
