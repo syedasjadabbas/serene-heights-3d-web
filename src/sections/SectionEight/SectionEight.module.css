@@ -1,30 +1,55 @@
 .section {
   position: relative;
   z-index: 2;
-  background: #09120e;
-  padding-block: clamp(120px, 16vh, 220px);
+  width: 100%;
+  min-height: 100vh;
+  background: transparent;
+  padding-block: clamp(80px, 10vh, 140px);
+  overflow: hidden;
 }
 
+.blueprintBgGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(244, 239, 228, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 239, 228, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambientGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: background 0.8s var(--ease-out-soft);
+}
+
+/* Header */
 .header {
-  margin-bottom: clamp(80px, 12vh, 140px);
   text-align: center;
+  max-width: 860px;
+  margin-inline: auto;
+  margin-bottom: clamp(24px, 3vh, 40px);
+  position: relative;
+  z-index: 2;
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.6em;
   font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: rgba(244, 239, 228, 0.85);
-  margin-bottom: var(--space-4);
-  background: rgba(16, 26, 22, 0.5);
-  border: 1px solid rgba(244, 239, 228, 0.15);
-  padding: 6px 16px;
-  border-radius: var(--radius-pill);
+  margin-bottom: 4px;
 }
 
 .eyebrowNum {
@@ -38,156 +63,248 @@
 .headerTitle {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.8rem, 2.2rem + 3.8vw, 5.2rem);
-  line-height: 1.04;
+  font-size: clamp(2.0rem, 1.5rem + 2.5vw, 3.6rem);
+  line-height: 1.06;
   color: var(--color-cream);
-}
-
-/* --- Chapters List --- */
-
-.chaptersList {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(120px, 16vh, 200px);
-  max-width: 1380px;
+  max-width: 24ch;
   margin-inline: auto;
-  padding-inline: var(--space-4);
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.6);
 }
 
-.chapterSpread {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
+/* Minimalist Editorial Season Selector Bar */
+.seasonNav {
+  display: flex;
+  justify-content: center;
+  gap: clamp(20px, 3.5vw, 48px);
+  margin-bottom: clamp(24px, 3vh, 44px);
   align-items: center;
-  gap: clamp(32px, 5vw, 72px);
-  min-height: clamp(520px, 70vh, 750px);
+  border-bottom: 1px solid rgba(244, 239, 228, 0.12);
+  padding-bottom: 16px;
+  position: relative;
+  max-width: 680px;
+  margin-inline: auto;
+  z-index: 2;
 }
 
-.layoutLeft .imageColumn {
-  grid-column: span 7;
+.seasonNavItem {
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: clamp(0.72rem, 0.68rem + 0.2vw, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 228, 0.45);
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.4s ease;
 }
 
-.layoutLeft .contentColumn {
-  grid-column: span 5;
+.seasonNavItem:hover {
+  color: rgba(244, 239, 228, 0.85);
 }
 
-.layoutRight .imageColumn {
-  grid-column: 6 / span 7;
+.seasonNavItemActive {
+  color: var(--color-accent-gold) !important;
+  font-weight: 700;
 }
 
-.layoutRight .contentColumn {
-  grid-column: 1 / span 5;
-  grid-row: 1;
+.seasonIndicator {
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  background: var(--color-accent-gold);
+  transition: left 0.4s var(--ease-out-soft), width 0.4s var(--ease-out-soft);
 }
 
-.imageFrame {
+/* Seasonal Visual & Story Stage Frame */
+.stageFrame {
   position: relative;
   width: 100%;
-  height: clamp(460px, 62vh, 680px);
+  max-width: 1120px;
+  height: clamp(420px, 60vh, 620px);
+  margin-inline: auto;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid rgba(244, 239, 228, 0.14);
-  box-shadow: 0 28px 60px -20px rgba(0, 0, 0, 0.75);
+  background: linear-gradient(
+    155deg,
+    rgba(18, 30, 24, 0.96) 0%,
+    rgba(10, 17, 13, 0.98) 50%,
+    rgba(5, 9, 7, 0.99) 100%
+  );
+  border-left: 4px solid var(--color-accent-gold);
+  border-top: 1px solid rgba(243, 212, 152, 0.28);
+  border-right: 1px solid rgba(244, 239, 228, 0.14);
+  border-bottom: 1px solid rgba(244, 239, 228, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 36px 90px -20px rgba(0, 0, 0, 0.95),
+    0 0 35px rgba(206, 162, 92, 0.08);
+  margin-bottom: clamp(56px, 8vh, 100px);
+  z-index: 2;
 }
 
-.chapterImage {
+.seasonScene {
   position: absolute;
-  inset: -10%;
-  background-size: cover;
-  background-position: center;
-  will-change: transform;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity, transform;
 }
 
-.imageOverlay {
+.sceneActive {
+  opacity: 1 !important;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.sceneImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.82);
+  will-change: filter, transform;
+}
+
+.sceneOverlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(9, 18, 14, 0.25) 0%,
-    rgba(9, 18, 14, 0.65) 100%
+    rgba(10, 17, 13, 0.1) 0%,
+    rgba(10, 17, 13, 0.50) 65%,
+    rgba(10, 17, 13, 0.95) 100%
   );
 }
 
-.textWrap {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.sceneContent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: clamp(28px, 4vw, 48px);
+  z-index: 3;
 }
 
-.chapterMeta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
-}
-
-.chapterNum {
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--color-accent-gold);
-  letter-spacing: 0.18em;
-}
-
-.tagBadge {
-  font-family: var(--font-sans);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(244, 239, 228, 0.85);
-  background: rgba(244, 239, 228, 0.08);
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-}
-
-.chapterTitle {
+.sceneHeadline {
   font-family: var(--font-display);
+  font-size: clamp(1.8rem, 1.3rem + 1.8vw, 3.2rem);
   font-weight: 400;
-  font-size: clamp(2.4rem, 1.8rem + 2.2vw, 3.8rem);
-  line-height: 1.05;
-  letter-spacing: -0.015em;
+  line-height: 1.1;
   color: var(--color-cream);
-  margin-bottom: var(--space-4);
+  margin-bottom: 8px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
 }
 
-.chapterDescription {
+.sceneStory {
   font-family: var(--font-sans);
-  font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.25rem);
-  line-height: 1.6;
-  color: rgba(244, 239, 228, 0.82);
-  margin-bottom: var(--space-6);
+  font-size: clamp(0.84375rem, 0.8rem + 0.18vw, 1.0rem);
+  line-height: 1.48;
+  color: rgba(244, 239, 228, 0.85);
+  max-width: 48ch;
+  margin-bottom: 14px;
 }
 
-.blueprintFooter {
-  padding-top: var(--space-3);
-  border-top: 1px dashed rgba(206, 162, 92, 0.3);
-  width: 100%;
-}
-
-.blueprintText {
+.sceneStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 6px 14px;
+  background: rgba(206, 162, 92, 0.12);
+  border-left: 3px solid var(--color-accent-gold);
   font-family: var(--font-sans);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
+  font-size: clamp(0.65rem, 0.62rem + 0.14vw, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-accent-gold);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
-@media (max-width: 960px) {
-  .chapterSpread {
+/* Conclusion Statement & Ceremonial Metrics Strip */
+.conclusionContainer {
+  position: relative;
+  z-index: 2;
+  max-width: 1080px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 40px);
+  padding-top: clamp(24px, 4vh, 48px);
+  border-top: 1px solid rgba(243, 212, 152, 0.15);
+}
+
+.conclusionStatement {
+  font-family: var(--font-display);
+  font-size: clamp(2.0rem, 1.5rem + 2.4vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1.12;
+  color: var(--color-cream);
+  text-align: center;
+  max-width: 24ch;
+  margin-inline: auto;
+  margin-bottom: clamp(36px, 6vh, 64px);
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  transform: translateY(20px);
+  will-change: opacity, transform;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(16px, 2.5vw, 32px);
+  padding: clamp(24px, 3.5vw, 40px);
+  background: rgba(16, 26, 22, 0.75);
+  border: 1px solid rgba(243, 212, 152, 0.22);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 32px 80px -20px rgba(0, 0, 0, 0.92),
+    0 0 30px rgba(206, 162, 92, 0.08);
+  opacity: 0;
+  transform: translateY(20px);
+  will-change: opacity, transform;
+}
+
+.metricItem {
+  text-align: center;
+}
+
+.metricVal {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 1.4rem + 1.2vw, 2.6rem);
+  font-weight: 400;
+  color: var(--color-accent-gold);
+  line-height: 1.0;
+  margin-bottom: 6px;
+}
+
+.metricLabel {
+  font-family: var(--font-sans);
+  font-size: clamp(0.625rem, 0.6rem + 0.1vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 228, 0.75);
+}
+
+@media (max-width: 900px) {
+  .stageFrame {
+    height: 380px;
+  }
+
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 540px) {
+  .metricsGrid {
     grid-template-columns: 1fr;
-    min-height: auto;
-  }
-
-  .layoutLeft .imageColumn,
-  .layoutLeft .contentColumn,
-  .layoutRight .imageColumn,
-  .layoutRight .contentColumn {
-    grid-column: span 1;
-    grid-row: auto;
-  }
-
-  .imageFrame {
-    height: 360px;
   }
 }

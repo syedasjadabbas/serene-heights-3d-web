@@ -1,86 +1,86 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
+import SectionEightCanvas from './SectionEightCanvas'
 import styles from './SectionEight.module.css'
 
-interface StoryChapter {
+interface SeasonData {
   id: string
-  chapterNum: string
-  tag: string
+  num: string
+  label: string
   title: string
-  description: string
-  blueprintNote: string
+  story: string
+  stat: string
   imageUrl: string
-  layout: 'left' | 'right'
+  glowGradient: string
 }
 
-const STORY_CHAPTERS: StoryChapter[] = [
+const SEASONS: SeasonData[] = [
   {
-    id: 'vision',
-    chapterNum: '01',
-    tag: 'THE VISION',
-    title: 'Conceived at 7,906 feet.',
-    description:
-      'Serene Heights was born from a singular architectural vision: to create a high-elevation luxury sanctuary where natural mountain stillness and master-crafted hospitality exist in perfect unity.',
-    blueprintNote: 'SITE ELEVATION · 7,906 FT · NATHIA GALI',
-    imageUrl:
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop',
-    layout: 'left',
-  },
-  {
-    id: 'mountains',
-    chapterNum: '02',
-    tag: 'THE MOUNTAINS',
-    title: 'Carved into pine ridgelines.',
-    description:
-      'Built upon pristine Himalayan topography, the structure steps fluidly along the natural cliff gradient, preserving surrounding virgin pine forests and unobstructed horizon vistas.',
-    blueprintNote: 'TOPOGRAPHY MATRIX · CONTOUR SLOPE 34°',
+    id: 'winter',
+    num: '01',
+    label: 'WINTER',
+    title: 'Snowfall & Fireside Retreats.',
+    story:
+      'Snow-draped pine forests, private fireside dining, and heated indoor infinity pools 7,906 feet above the valley.',
+    stat: 'PEAK SKI & HEATED FIRESIDE SANCTUARY',
     imageUrl:
       'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop',
-    layout: 'right',
+    glowGradient:
+      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(232, 244, 248, 0.06) 0%, rgba(10, 17, 13, 0.96) 75%)',
   },
   {
-    id: 'architecture',
-    chapterNum: '03',
-    tag: 'THE ARCHITECTURE',
-    title: 'Cantilevered glass & stone.',
-    description:
-      'Expansive triple-glazed panoramic walls cantilever outward over mist-filled valleys, inviting morning sunlight and evening sunsets directly into every residential suite.',
-    blueprintNote: 'TRIPLE GLAZING · CANTILEVER SPEC A4',
-    imageUrl:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop',
-    layout: 'left',
-  },
-  {
-    id: 'craftsmanship',
-    chapterNum: '04',
-    tag: 'THE CRAFTSMANSHIP',
-    title: 'Alpine granite & cedar.',
-    description:
-      'Every stone facade, heated hearth, and timber detail is crafted using local alpine granite and treated mountain cedar, engineered to endure decades of mountain winter snows.',
-    blueprintNote: 'THERMAL INTEGRITY · ALPINE STONE CORE',
-    imageUrl:
-      'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
-    layout: 'right',
-  },
-  {
-    id: 'future',
-    chapterNum: '05',
-    tag: 'THE FUTURE',
-    title: 'An enduring legacy.',
-    description:
-      'Executed by DM Consortium, Serene Heights represents an unyielding commitment to timeless real estate value, elevated living, and architectural excellence for generations to come.',
-    blueprintNote: 'DM CONSORTIUM · MASTER DEVELOPER',
+    id: 'spring',
+    num: '02',
+    label: 'SPRING',
+    title: 'Pine Bloom & Alpine Wellness.',
+    story:
+      'Crisp mountain air, blossoming forest trails, and holistic spa treatments designed for physical renewal.',
+    stat: 'ALPINE SPA & FOREST RENEWAL',
     imageUrl:
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600&auto=format&fit=crop',
-    layout: 'left',
+    glowGradient:
+      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(122, 168, 133, 0.08) 0%, rgba(10, 17, 13, 0.96) 75%)',
+  },
+  {
+    id: 'summer',
+    num: '03',
+    label: 'SUMMER',
+    title: 'The Cool Mountain Escape.',
+    story:
+      'Escape the 42°C city heat for 22°C alpine breezes, infinity pool leisure, and exclusive family vacations.',
+    stat: '22°C ALPINE REFUGE · 100% SUMMER OCCUPANCY',
+    imageUrl:
+      'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
+    glowGradient:
+      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(243, 212, 152, 0.09) 0%, rgba(10, 17, 13, 0.96) 75%)',
+  },
+  {
+    id: 'autumn',
+    num: '04',
+    label: 'AUTUMN',
+    title: 'Golden Canopy & Private Solitude.',
+    story:
+      'Golden foliage across the Galyat range, executive retreats, and peaceful mountain solitude.',
+    stat: 'GOLDEN RIDGE & PRIVATE EXECUTIVE SOLITUDE',
+    imageUrl:
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop',
+    glowGradient:
+      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(198, 125, 56, 0.08) 0%, rgba(10, 17, 13, 0.96) 75%)',
   },
 ]
 
 export default function SectionEight() {
   const sectionRef = useRef<HTMLElement>(null)
-  const chaptersRef = useRef<(HTMLDivElement | null)[]>([])
+  const ambientGlowRef = useRef<HTMLDivElement>(null)
+  const scenesRef = useRef<(HTMLDivElement | null)[]>([])
+  const navItemsRef = useRef<(HTMLButtonElement | null)[]>([])
+  const indicatorRef = useRef<HTMLDivElement>(null)
+  const conclusionRef = useRef<HTMLHeadingElement>(null)
+  const metricsRef = useRef<HTMLDivElement>(null)
+
+  const [activeSeason, setActiveSeason] = useState(0)
 
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
@@ -88,103 +88,220 @@ export default function SectionEight() {
     const ctx = gsap.context(() => {
       registerScrollTrigger()
 
-      chaptersRef.current.forEach((chapter) => {
-        if (!chapter) return
-        const img = chapter.querySelector(`.${styles.chapterImage}`)
-        const text = chapter.querySelector(`.${styles.textWrap}`)
+      if (!sectionRef.current) return
 
-        // Subtle image parallax and scale
-        if (img) {
-          gsap.fromTo(
-            img,
-            { y: -45, scale: 1.08 },
-            {
-              y: 45,
-              scale: 1.0,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: chapter,
-                start: 'top bottom',
-                end: 'bottom top',
-                scrub: true,
-              },
-            },
-          )
+      const updateSeasonState = (index: number) => {
+        setActiveSeason(index)
+
+        // 1. Ambient Glow Transition
+        if (ambientGlowRef.current) {
+          ambientGlowRef.current.style.background = SEASONS[index].glowGradient
         }
 
-        // Text reveal animation
-        if (text) {
+        // 2. Staggered Scene Transition (25-30% slower for unhurried presentation)
+        scenesRef.current.forEach((scene, idx) => {
+          if (!scene) return
+          const isCurrent = idx === index
+          const img = scene.querySelector(`.${styles.sceneImage}`) as HTMLElement | null
+          const headline = scene.querySelector(`.${styles.sceneHeadline}`) as HTMLElement | null
+          const story = scene.querySelector(`.${styles.sceneStory}`) as HTMLElement | null
+          const stat = scene.querySelector(`.${styles.sceneStat}`) as HTMLElement | null
+
+          if (isCurrent) {
+            scene.classList.add(styles.sceneActive)
+            gsap.fromTo(scene, { opacity: 0 }, { opacity: 1, duration: 0.75, ease: 'power2.out' })
+
+            if (img) {
+              gsap.fromTo(img, { scale: 1.05 }, { scale: 1.0, duration: 0.95, ease: 'power2.out' })
+            }
+
+            if (headline) {
+              gsap.fromTo(headline, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.75, delay: 0.12, ease: 'power2.out' })
+            }
+
+            if (story) {
+              gsap.fromTo(story, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.75, delay: 0.22, ease: 'power2.out' })
+            }
+
+            if (stat) {
+              gsap.fromTo(stat, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.32, ease: 'power2.out' })
+            }
+          } else {
+            scene.classList.remove(styles.sceneActive)
+            gsap.set(scene, { opacity: 0 })
+          }
+        })
+
+        // 3. Update Indicator Underline Position
+        const activeNavBtn = navItemsRef.current[index]
+        if (activeNavBtn && indicatorRef.current) {
+          indicatorRef.current.style.left = `${activeNavBtn.offsetLeft}px`
+          indicatorRef.current.style.width = `${activeNavBtn.offsetWidth}px`
+        }
+      }
+
+      // ScrollTrigger for Season Scrubbing across the section
+      const st = ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top 60%',
+        end: 'bottom 40%',
+        onUpdate: (self) => {
+          const seasonProgress = Math.min(0.99, self.progress * 1.25)
+          const currentIdx = Math.min(3, Math.floor(seasonProgress * 4))
+          if (currentIdx !== activeSeason) {
+            updateSeasonState(currentIdx)
+          }
+        },
+      })
+
+      // ScrollTrigger for Ceremonial Conclusion & Metric Items Stagger Reveal
+      if (conclusionRef.current) {
+        gsap.to(conclusionRef.current, {
+          opacity: 1,
+          y: 0,
+          duration: 1.0,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: conclusionRef.current,
+            start: 'top 82%',
+            toggleActions: 'play none none reverse',
+          },
+        })
+      }
+
+      if (metricsRef.current) {
+        const metricItems = metricsRef.current.querySelectorAll(`.${styles.metricItem}`)
+
+        gsap.to(metricsRef.current, {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: metricsRef.current,
+            start: 'top 84%',
+            toggleActions: 'play none none reverse',
+          },
+        })
+
+        if (metricItems.length > 0) {
           gsap.fromTo(
-            text,
-            { opacity: 0, y: 40 },
+            metricItems,
+            { opacity: 0, y: 16 },
             {
               opacity: 1,
               y: 0,
-              duration: 0.95,
-              ease: 'power3.out',
+              duration: 0.7,
+              stagger: 0.14,
+              ease: 'power2.out',
               scrollTrigger: {
-                trigger: chapter,
-                start: 'top 75%',
+                trigger: metricsRef.current,
+                start: 'top 84%',
                 toggleActions: 'play none none reverse',
               },
             },
           )
         }
-      })
+      }
+
+      // Initial state
+      updateSeasonState(0)
+
+      return () => st.kill()
     }, sectionRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [activeSeason])
+
+  const handleNavClick = (idx: number) => {
+    setActiveSeason(idx)
+    const activeNavBtn = navItemsRef.current[idx]
+    if (activeNavBtn && indicatorRef.current) {
+      indicatorRef.current.style.left = `${activeNavBtn.offsetLeft}px`
+      indicatorRef.current.style.width = `${activeNavBtn.offsetWidth}px`
+    }
+  }
 
   return (
-    <section ref={sectionRef} id="story" className={styles.section}>
+    <section ref={sectionRef} id="seasons" className={styles.section}>
+      {/* 3D Seasonal Canvas particles */}
+      <SectionEightCanvas activeSeason={activeSeason} />
+
+      {/* Blueprint Grid & Dynamic Ambient Glow */}
+      <div className={styles.blueprintBgGrid} aria-hidden="true" />
+      <div ref={ambientGlowRef} className={styles.ambientGlow} aria-hidden="true" />
+
       {/* Section Header */}
-      <div className={`container ${styles.header}`}>
+      <div className={styles.header}>
         <p className={styles.eyebrow}>
           <span className={styles.eyebrowNum}>08</span>
           <span className={styles.eyebrowDivider}>/</span>
-          <span>THE STORY OF SERENE HEIGHTS</span>
+          <span>THE SEASONAL EXPERIENCE</span>
         </p>
-        <h2 className={styles.headerTitle}>Architectural narrative & vision.</h2>
+        <h2 className={styles.headerTitle}>A Sanctuary for Every Season.</h2>
       </div>
 
-      {/* Chapters Container */}
-      <div className={styles.chaptersList}>
-        {STORY_CHAPTERS.map((ch, idx) => (
-          <div
-            key={ch.id}
-            ref={(el) => { chaptersRef.current[idx] = el }}
-            className={`${styles.chapterSpread} ${ch.layout === 'right' ? styles.layoutRight : styles.layoutLeft}`}
+      {/* Minimalist Editorial Season Selector */}
+      <div className={styles.seasonNav} role="tablist">
+        {SEASONS.map((s, idx) => (
+          <button
+            key={s.id}
+            ref={(el) => { navItemsRef.current[idx] = el }}
+            role="tab"
+            aria-selected={activeSeason === idx}
+            className={`${styles.seasonNavItem} ${activeSeason === idx ? styles.seasonNavItemActive : ''}`}
+            onClick={() => handleNavClick(idx)}
           >
-            {/* Image Frame */}
-            <div className={styles.imageColumn}>
-              <div className={styles.imageFrame}>
-                <div
-                  className={styles.chapterImage}
-                  style={{ backgroundImage: `url(${ch.imageUrl})` }}
-                />
-                <div className={styles.imageOverlay} aria-hidden="true" />
-              </div>
-            </div>
+            {s.num} {s.label}
+          </button>
+        ))}
+        <div ref={indicatorRef} className={styles.seasonIndicator} aria-hidden="true" />
+      </div>
 
-            {/* Content Column */}
-            <div className={styles.contentColumn}>
-              <div className={styles.textWrap}>
-                <div className={styles.chapterMeta}>
-                  <span className={styles.chapterNum}>{ch.chapterNum}</span>
-                  <span className={styles.tagBadge}>{ch.tag}</span>
-                </div>
-                <h3 className={styles.chapterTitle}>{ch.title}</h3>
-                <p className={styles.chapterDescription}>{ch.description}</p>
-                <div className={styles.blueprintFooter}>
-                  <span className={styles.blueprintText}>{ch.blueprintNote}</span>
-                </div>
-              </div>
+      {/* Seasonal Image & Story Stage */}
+      <div className={styles.stageFrame}>
+        {SEASONS.map((s, idx) => (
+          <div
+            key={s.id}
+            ref={(el) => { scenesRef.current[idx] = el }}
+            className={`${styles.seasonScene} ${activeSeason === idx ? styles.sceneActive : ''}`}
+          >
+            <img src={s.imageUrl} alt={s.title} className={styles.sceneImage} />
+            <div className={styles.sceneOverlay} aria-hidden="true" />
+            <div className={styles.sceneContent}>
+              <h3 className={styles.sceneHeadline}>{s.title}</h3>
+              <p className={styles.sceneStory}>{s.story}</p>
+              <div className={styles.sceneStat}>{s.stat}</div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Staggered Conclusion & Metrics Strip */}
+      <div className={styles.conclusionContainer}>
+        <h3 ref={conclusionRef} className={styles.conclusionStatement}>
+          365 Days. One Destination. Endless Reasons To Return.
+        </h3>
+
+        <div ref={metricsRef} className={styles.metricsGrid}>
+          <div className={styles.metricItem}>
+            <div className={styles.metricVal}>7,906 FT</div>
+            <div className={styles.metricLabel}>ELEVATION</div>
+          </div>
+          <div className={styles.metricItem}>
+            <div className={styles.metricVal}>FOUR</div>
+            <div className={styles.metricLabel}>SEASONS</div>
+          </div>
+          <div className={styles.metricItem}>
+            <div className={styles.metricVal}>365 DAYS</div>
+            <div className={styles.metricLabel}>YEAR-ROUND APPEAL</div>
+          </div>
+          <div className={styles.metricItem}>
+            <div className={styles.metricVal}>13–15%</div>
+            <div className={styles.metricLabel}>PROJECTED ROI</div>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }
-

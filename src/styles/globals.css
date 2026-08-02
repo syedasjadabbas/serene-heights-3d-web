@@ -23,7 +23,7 @@
   --color-border-on-dark: rgb(244 239 228 / 16%);
   --color-border-on-light: rgb(11 12 10 / 12%);
 
-  --color-bg: var(--color-forest-900);
+  --color-bg: #0a1410;
   --color-fg: var(--color-cream);
 
   /* Type */
