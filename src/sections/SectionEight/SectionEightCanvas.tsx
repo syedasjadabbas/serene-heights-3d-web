@@ -7,17 +7,29 @@ interface SectionEightCanvasProps {
 }
 
 function SeasonalParticles({ activeSeason }: { activeSeason: number }) {
-  const count = 64
+  const count = 68
   const pointsRef = useRef<THREE.Points>(null)
   const matRef = useRef<THREE.PointsMaterial>(null)
   const currentColor = useRef(new THREE.Color('#e2f2f8'))
 
+  // 70% edge distribution / 30% center cross to keep readable center focus
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3)
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 24
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 16
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 8
+      const isEdgeParticle = i < Math.floor(count * 0.7)
+      if (isEdgeParticle) {
+        // Peripheral edge region (|x| > 3.8, |y| > 2.2)
+        const sideX = Math.random() > 0.5 ? 1 : -1
+        const sideY = Math.random() > 0.5 ? 1 : -1
+        pos[i * 3] = (3.8 + Math.random() * 8.5) * sideX
+        pos[i * 3 + 1] = (2.2 + Math.random() * 5.5) * sideY
+        pos[i * 3 + 2] = (Math.random() - 0.5) * 6
+      } else {
+        // Central region crossers
+        pos[i * 3] = (Math.random() - 0.5) * 7.5
+        pos[i * 3 + 1] = (Math.random() - 0.5) * 5.5
+        pos[i * 3 + 2] = (Math.random() - 0.5) * 4
+      }
     }
     return pos
   }, [count])
@@ -44,9 +56,10 @@ function SeasonalParticles({ activeSeason }: { activeSeason: number }) {
     matRef.current.size = THREE.MathUtils.lerp(matRef.current.size, target.size, delta * 3.2)
 
     if (activeSeason === 0) {
-      // Winter: Gentle falling snow across the viewport
+      // Winter: Falling snow drifting continuously from top with wind sway
       pointsRef.current.rotation.y = Math.sin(t * 0.05) * 0.08
       pointsRef.current.position.y = -((t * 0.22) % 4)
+      pointsRef.current.position.x = Math.sin(t * 0.08) * 0.15
     } else if (activeSeason === 1) {
       // Spring: Slow drifting flower petals & soft breeze movement
       pointsRef.current.rotation.y = t * 0.02
@@ -57,8 +70,9 @@ function SeasonalParticles({ activeSeason }: { activeSeason: number }) {
       pointsRef.current.rotation.y = t * 0.025
       pointsRef.current.position.y = Math.sin(t * 0.3) * 0.16
     } else {
-      // Autumn: Slow drifting amber leaves & copper haze
-      pointsRef.current.rotation.y = Math.cos(t * 0.08) * 0.1
+      // Autumn: Slow drifting amber leaves & copper haze with gentle rotation
+      pointsRef.current.rotation.y = Math.cos(t * 0.08) * 0.12
+      pointsRef.current.rotation.z = Math.sin(t * 0.05) * 0.06
       pointsRef.current.position.x = Math.sin(t * 0.15) * 0.22
     }
   })
