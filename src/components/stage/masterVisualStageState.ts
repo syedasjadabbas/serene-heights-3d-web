@@ -8,7 +8,7 @@
  */
 export function mapProgressToFrame(progress: number): number {
   const p = Math.min(1, Math.max(0, progress))
-  const HERO_EXIT_PROGRESS = 0.80
+  const HERO_EXIT_PROGRESS = 0.68
 
   if (p <= 0) return 0
   if (p >= HERO_EXIT_PROGRESS) return 95

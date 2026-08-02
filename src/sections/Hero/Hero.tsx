@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
@@ -36,17 +36,17 @@ const OVERLAY_BREAKPOINTS: Array<[number, number]> = [
 ]
 const WORDMARK_OPACITY_BREAKPOINTS: Array<[number, number]> = [
   [0, 0],
-  [0.74, 0],
-  [0.84, 1],
-  [0.91, 1],
+  [0.64, 0],
+  [0.68, 1],
+  [0.96, 1],
   [1, 0],
 ]
 
 const CHAPTER_TIMINGS = [
-  { start: 0.18, end: 0.32 },
-  { start: 0.35, end: 0.49 },
-  { start: 0.52, end: 0.66 },
-  { start: 0.68, end: 0.80 },
+  { start: 0.14, end: 0.28 },
+  { start: 0.32, end: 0.46 },
+  { start: 0.50, end: 0.64 },
+  { start: 0.68, end: 0.96 },
 ]
 
 function getChapterState(p: number, start: number, end: number, fadeIn = 0.035, fadeOut = 0.035) {
@@ -92,6 +92,15 @@ export default function Hero() {
   const node2Ref = useRef<HTMLDivElement>(null)
   const node3Ref = useRef<HTMLDivElement>(null)
   const mobileCounterRef = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual'
+      }
+      window.scrollTo(0, 0)
+    }
+  }, [])
 
   useLayoutEffect(() => {
     const reduced = prefersReducedMotion()
@@ -140,7 +149,7 @@ export default function Hero() {
             isTablet: boolean
             isDesktop: boolean
           }
-          const runwayVh = conditions.isMobile ? 350 : conditions.isTablet ? 420 : 500
+          const runwayVh = conditions.isMobile ? 450 : conditions.isTablet ? 550 : 650
 
           const applyProgress = (p: number) => {
             gsap.set(backgroundRef.current, { yPercent: p * 10 })
@@ -154,7 +163,7 @@ export default function Hero() {
             gsap.set(scrollCueRef.current, { opacity: 1 - clamp01(p / 0.05) })
 
             const wordmarkOpacity = mapBreakpoints(p, WORDMARK_OPACITY_BREAKPOINTS)
-            const wordmarkT = clamp01((p - 0.74) / (0.84 - 0.74))
+            const wordmarkT = clamp01((p - 0.64) / (0.72 - 0.64))
             gsap.set(wordmarkRef.current, {
               opacity: wordmarkOpacity,
               scale: 0.98 + 0.02 * wordmarkT,
@@ -171,9 +180,32 @@ export default function Hero() {
               if (!el) return
               const { opacity, y } = getChapterState(p, ch.start, ch.end)
               if (opacity > 0.4) activeIdx = idx
+
+              let x = 0
+              let scale = 1
+
+              if (idx === 0) {
+                // Chapter 1: Left slide-in + depth
+                x = -28 * (1 - opacity)
+                scale = 0.97 + 0.03 * opacity
+              } else if (idx === 1) {
+                // Chapter 2: Right slide-in + depth
+                x = 28 * (1 - opacity)
+                scale = 0.97 + 0.03 * opacity
+              } else if (idx === 2) {
+                // Chapter 3: Left Alt slide-in + depth
+                x = -18 * (1 - opacity)
+                scale = 0.96 + 0.04 * opacity
+              } else {
+                // Chapter 4: Full reveal scale
+                scale = 0.96 + 0.04 * opacity
+              }
+
               gsap.set(el, {
                 opacity,
+                x: reduced ? 0 : x,
                 y: reduced ? 0 : y,
+                scale: reduced ? 1 : scale,
               })
             })
 
@@ -280,51 +312,72 @@ export default function Hero() {
 
         {/* Chapter Storytelling Overlay Layer */}
         <div className={styles.chapterLayer}>
-          <div ref={ch01Ref} className={styles.chapterItem}>
+          {/* Scene 1: Left Aligned Identity */}
+          <div ref={ch01Ref} className={`${styles.chapterItem} ${styles.chapterItemLeft}`}>
             <p className={styles.chapterLabel}>
               <span className={styles.chapterNum}>01</span>
               <span className={styles.chapterDivider}>/</span>
-              <span>THE RESORT</span>
+              <span>NATHIA GALI · PAKISTAN</span>
             </p>
             <h2 className={styles.chapterHeadline}>
-              Architecture shaped<br />
-              for the mountains.
+              Where pine forests<br />
+              meet luxury living.
             </h2>
           </div>
 
-          <div ref={ch02Ref} className={styles.chapterItem}>
+          {/* Scene 2: Right Aligned Architectural Spec Matrix */}
+          <div ref={ch02Ref} className={`${styles.chapterItem} ${styles.chapterItemRight}`}>
             <p className={styles.chapterLabel}>
               <span className={styles.chapterNum}>02</span>
               <span className={styles.chapterDivider}>/</span>
-              <span>THE RESIDENCES</span>
+              <span>SPECIFICATIONS</span>
             </p>
             <h2 className={styles.chapterHeadline}>
-              Elevated living<br />
-              at 7,906 ft.
+              Built at 7,906 ft elevation.
             </h2>
+            <div className={styles.specPanelGrid}>
+              <div className={styles.specPanelCard}>
+                <span className={styles.specPanelLabel}>Altitude</span>
+                <span className={styles.specPanelValue}>7,906 FT</span>
+              </div>
+              <div className={styles.specPanelCard}>
+                <span className={styles.specPanelLabel}>Towers</span>
+                <span className={styles.specPanelValue}>3 Signature Slabs</span>
+              </div>
+              <div className={styles.specPanelCard}>
+                <span className={styles.specPanelLabel}>Suites</span>
+                <span className={styles.specPanelValue}>150+ Hotel Units</span>
+              </div>
+              <div className={styles.specPanelCard}>
+                <span className={styles.specPanelLabel}>Operator</span>
+                <span className={styles.specPanelValue}>DM Consortium</span>
+              </div>
+            </div>
           </div>
 
-          <div ref={ch03Ref} className={styles.chapterItem}>
+          {/* Scene 3: Left Aligned Alt Single Emotional Statement */}
+          <div ref={ch03Ref} className={`${styles.chapterItem} ${styles.chapterItemLeftAlt}`}>
             <p className={styles.chapterLabel}>
               <span className={styles.chapterNum}>03</span>
               <span className={styles.chapterDivider}>/</span>
-              <span>THE EXPERIENCE</span>
+              <span>THE VISION</span>
             </p>
             <h2 className={styles.chapterHeadline}>
-              50+ amenities.<br />
-              One mountain destination.
+              Designed to disappear<br />
+              into the landscape.
             </h2>
           </div>
 
-          <div ref={ch04Ref} className={styles.chapterItem}>
+          {/* Scene 4: Final Architectural Reveal Hold */}
+          <div ref={ch04Ref} className={`${styles.chapterItem} ${styles.chapterItemCenter}`}>
             <p className={styles.chapterLabel}>
               <span className={styles.chapterNum}>04</span>
               <span className={styles.chapterDivider}>/</span>
               <span>SERENE HEIGHTS</span>
             </p>
             <h2 className={styles.chapterHeadline}>
-              A complete mountain<br />
-              destination.
+              Pakistan’s premier<br />
+              alpine resort.
             </h2>
           </div>
         </div>

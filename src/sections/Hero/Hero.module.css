@@ -198,12 +198,45 @@
 
 .chapterItem {
   position: absolute;
-  top: clamp(140px, 25vh, 250px);
-  left: var(--container-pad);
-  max-width: min(600px, 52vw);
   opacity: 0;
   will-change: opacity, transform;
   pointer-events: none;
+}
+
+.chapterItemLeft {
+  top: clamp(150px, 26vh, 260px);
+  left: clamp(24px, 6vw, 96px);
+  max-width: min(580px, 48vw);
+  text-align: left;
+}
+
+.chapterItemLeftAlt {
+  top: clamp(190px, 32vh, 310px);
+  left: clamp(32px, 8vw, 120px);
+  max-width: min(560px, 48vw);
+  text-align: left;
+}
+
+.chapterItemRight {
+  top: clamp(160px, 28vh, 280px);
+  right: clamp(24px, 6vw, 96px);
+  left: auto;
+  max-width: min(580px, 48vw);
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.chapterItemCenter {
+  top: clamp(140px, 24vh, 240px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(680px, 85vw);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .chapterLabel {
@@ -241,6 +274,48 @@
   text-shadow:
     0 2px 12px rgba(0, 0, 0, 0.88),
     0 6px 30px rgba(10, 18, 15, 0.8);
+}
+
+/* --- Scene 2 Architectural Spec Matrix Panel --- */
+.specPanelGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.specPanelCard {
+  background: rgba(14, 24, 19, 0.55);
+  border: 1px solid rgba(244, 239, 228, 0.16);
+  border-left: 2px solid var(--color-accent-gold);
+  border-radius: 8px;
+  padding: 12px 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  text-align: left;
+  box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.6);
+}
+
+.specPanelLabel {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent-gold);
+  margin-bottom: 4px;
+}
+
+.specPanelValue {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--color-cream);
+  letter-spacing: -0.01em;
 }
 
 /* --- Progress Indicator --- */
