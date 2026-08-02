@@ -84,6 +84,8 @@ const SEASONS: SeasonData[] = [
 export default function SectionEight() {
   const sectionRef = useRef<HTMLElement>(null)
   const ambientGlowRef = useRef<HTMLDivElement>(null)
+  const sunbeamRef = useRef<HTMLDivElement>(null)
+  const frostHazeRef = useRef<HTMLDivElement>(null)
   const stageFrameRef = useRef<HTMLDivElement>(null)
   const scenesRef = useRef<(HTMLDivElement | null)[]>([])
   const navItemsRef = useRef<(HTMLButtonElement | null)[]>([])
@@ -168,6 +170,30 @@ export default function SectionEight() {
 
           if (ambientGlowRef.current) {
             ambientGlowRef.current.style.background = SEASONS[activeIdx].glowGradient
+          }
+
+          if (sunbeamRef.current) {
+            if (activeIdx === 2) {
+              sunbeamRef.current.style.opacity = '0.65'
+              sunbeamRef.current.style.background = 'linear-gradient(135deg, rgba(243, 212, 152, 0.18) 0%, transparent 65%)'
+            } else if (activeIdx === 3) {
+              sunbeamRef.current.style.opacity = '0.48'
+              sunbeamRef.current.style.background = 'linear-gradient(135deg, rgba(216, 138, 66, 0.15) 0%, transparent 65%)'
+            } else {
+              sunbeamRef.current.style.opacity = '0'
+            }
+          }
+
+          if (frostHazeRef.current) {
+            if (activeIdx === 0) {
+              frostHazeRef.current.style.opacity = '0.75'
+              frostHazeRef.current.style.boxShadow = 'inset 0 0 110px rgba(220, 238, 245, 0.12)'
+            } else if (activeIdx === 1) {
+              frostHazeRef.current.style.opacity = '0.55'
+              frostHazeRef.current.style.boxShadow = 'inset 0 0 110px rgba(122, 168, 133, 0.10)'
+            } else {
+              frostHazeRef.current.style.opacity = '0'
+            }
           }
 
           if (stageFrameRef.current) {
@@ -256,6 +282,8 @@ export default function SectionEight() {
       {/* Blueprint Grid & Dynamic Ambient Glow */}
       <div className={styles.blueprintBgGrid} aria-hidden="true" />
       <div ref={ambientGlowRef} className={styles.ambientGlow} aria-hidden="true" />
+      <div ref={sunbeamRef} className={styles.sunbeamOverlay} aria-hidden="true" />
+      <div ref={frostHazeRef} className={styles.frostHazeOverlay} aria-hidden="true" />
 
       {/* Section Header */}
       <div className={styles.header}>

@@ -9,6 +9,8 @@ interface SectionEightCanvasProps {
 function SeasonalParticles({ activeSeason }: { activeSeason: number }) {
   const count = 64
   const pointsRef = useRef<THREE.Points>(null)
+  const matRef = useRef<THREE.PointsMaterial>(null)
+  const currentColor = useRef(new THREE.Color('#e2f2f8'))
 
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3)
@@ -20,42 +22,44 @@ function SeasonalParticles({ activeSeason }: { activeSeason: number }) {
     return pos
   }, [count])
 
-  // Color, size & opacity tailored to season atmosphere
-  const { color, size, opacity } = useMemo(() => {
-    switch (activeSeason) {
-      case 0:
-        return { color: new THREE.Color('#e2f2f8'), size: 0.05, opacity: 0.22 } // Winter cool drifting snow
-      case 1:
-        return { color: new THREE.Color('#88bfa0'), size: 0.042, opacity: 0.18 } // Spring alpine petal mist
-      case 2:
-        return { color: new THREE.Color('#f6d89b'), size: 0.058, opacity: 0.24 } // Summer warm sunbeams
-      case 3:
-        return { color: new THREE.Color('#e09448'), size: 0.046, opacity: 0.20 } // Autumn copper amber embers
-      default:
-        return { color: new THREE.Color('#f6d89b'), size: 0.05, opacity: 0.20 }
-    }
-  }, [activeSeason])
+  // Color, size & opacity parameters per season
+  const seasonParams = useMemo(() => {
+    return [
+      { color: new THREE.Color('#e2f2f8'), size: 0.052, opacity: 0.24 }, // 0: Winter (cool snow)
+      { color: new THREE.Color('#88bfa0'), size: 0.044, opacity: 0.20 }, // 1: Spring (alpine petal mist)
+      { color: new THREE.Color('#f6d89b'), size: 0.062, opacity: 0.26 }, // 2: Summer (golden sunbeams)
+      { color: new THREE.Color('#e09448'), size: 0.048, opacity: 0.22 }, // 3: Autumn (copper embers)
+    ]
+  }, [])
 
-  useFrame((state) => {
-    if (!pointsRef.current) return
+  useFrame((state, delta) => {
+    if (!pointsRef.current || !matRef.current) return
     const t = state.clock.getElapsedTime()
+    const target = seasonParams[activeSeason] || seasonParams[0]
+
+    // Smooth 0.9s environmental blending across seasons
+    currentColor.current.lerp(target.color, delta * 3.2)
+    matRef.current.color.copy(currentColor.current)
+    matRef.current.opacity = THREE.MathUtils.lerp(matRef.current.opacity, target.opacity, delta * 3.2)
+    matRef.current.size = THREE.MathUtils.lerp(matRef.current.size, target.size, delta * 3.2)
 
     if (activeSeason === 0) {
-      // Winter: Soft downward snowfall drift
-      pointsRef.current.rotation.y = Math.sin(t * 0.06) * 0.06
-      pointsRef.current.position.y = -((t * 0.18) % 3.5)
+      // Winter: Gentle falling snow across the viewport
+      pointsRef.current.rotation.y = Math.sin(t * 0.05) * 0.08
+      pointsRef.current.position.y = -((t * 0.22) % 4)
     } else if (activeSeason === 1) {
-      // Spring: Swirling petal mist haze
-      pointsRef.current.rotation.y = t * 0.018
-      pointsRef.current.rotation.z = Math.sin(t * 0.05) * 0.04
+      // Spring: Slow drifting flower petals & soft breeze movement
+      pointsRef.current.rotation.y = t * 0.02
+      pointsRef.current.rotation.z = Math.sin(t * 0.06) * 0.05
+      pointsRef.current.position.x = Math.sin(t * 0.1) * 0.2
     } else if (activeSeason === 2) {
-      // Summer: Shimmering sunbeam float
-      pointsRef.current.rotation.y = t * 0.022
-      pointsRef.current.position.y = Math.sin(t * 0.28) * 0.14
+      // Summer: Volumetric sunlight float & heat shimmer
+      pointsRef.current.rotation.y = t * 0.025
+      pointsRef.current.position.y = Math.sin(t * 0.3) * 0.16
     } else {
-      // Autumn: Slow drifting amber embers
-      pointsRef.current.rotation.y = Math.cos(t * 0.09) * 0.09
-      pointsRef.current.position.x = Math.sin(t * 0.14) * 0.18
+      // Autumn: Slow drifting amber leaves & copper haze
+      pointsRef.current.rotation.y = Math.cos(t * 0.08) * 0.1
+      pointsRef.current.position.x = Math.sin(t * 0.15) * 0.22
     }
   })
 
@@ -65,10 +69,11 @@ function SeasonalParticles({ activeSeason }: { activeSeason: number }) {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        size={size}
-        color={color}
+        ref={matRef}
+        size={0.05}
+        color="#e2f2f8"
         transparent
-        opacity={opacity}
+        opacity={0.22}
         blending={THREE.AdditiveBlending}
       />
     </points>
