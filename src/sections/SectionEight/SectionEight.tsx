@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
-import { registerScrollTrigger } from '../../motion/scrollTrigger'
+import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
 import SectionEightCanvas from './SectionEightCanvas'
 import styles from './SectionEight.module.css'
