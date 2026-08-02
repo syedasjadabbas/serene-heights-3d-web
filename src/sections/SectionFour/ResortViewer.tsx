@@ -2,7 +2,7 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import ResortLighting from './ResortLighting'
 import ResortCameraControls from './ResortCameraControls'
-import ResortModel from './ResortModel'
+import ResortModel, { ResortPlaceholderModel } from './ResortModel'
 import ResortHotspots from './ResortHotspots'
 import ResortLoader from './ResortLoader'
 import { CAMERA_CONFIG } from './config'
@@ -10,7 +10,6 @@ import { CAMERA_CONFIG } from './config'
 export default function ResortViewer() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [shouldInitialize, setShouldInitialize] = useState(false)
-
   const [canvasReady, setCanvasReady] = useState(false)
 
   // Lazy Initialization: Only mount Three.js Canvas when Section 4 approaches viewport
@@ -68,7 +67,7 @@ export default function ResortViewer() {
           >
             <ResortLighting />
 
-            <Suspense fallback={null}>
+            <Suspense fallback={<ResortPlaceholderModel />}>
               <ResortModel />
               <ResortHotspots />
             </Suspense>

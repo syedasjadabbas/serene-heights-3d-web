@@ -1,14 +1,46 @@
-import { useRef, useMemo, useEffect } from 'react'
+import { Component, useRef, useMemo, useEffect } from 'react'
+import type { ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { RESORT_MODEL_URL } from './config'
 
+interface ErrorBoundaryProps {
+  fallback: ReactNode
+  children: ReactNode
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean
+}
+
+class GLBErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: unknown) {
+    console.warn('GLB Model asset unavailable. Rendering architectural placeholder.', error)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback
+    }
+    return this.props.children
+  }
+}
+
 /**
  * Neutral Architectural Placeholder Model.
  * Rendered when GLB asset is loading or not yet present at RESORT_MODEL_URL.
  */
-function ResortPlaceholderModel() {
+export function ResortPlaceholderModel() {
   const groupRef = useRef<THREE.Group>(null)
 
   useFrame((state) => {
@@ -86,14 +118,9 @@ function ResortGLBModel({ url }: { url: string }) {
 }
 
 export default function ResortModel() {
-  // Preload model URL dynamically
-  try {
-    return <ResortGLBModel url={RESORT_MODEL_URL} />
-  } catch {
-    // If GLB asset is not yet created in /public/models/resort.glb, render placeholder
-    return <ResortPlaceholderModel />
-  }
+  return (
+    <GLBErrorBoundary fallback={<ResortPlaceholderModel />}>
+      <ResortGLBModel url={RESORT_MODEL_URL} />
+    </GLBErrorBoundary>
+  )
 }
-
-// Preload GLB helper
-useGLTF.preload(RESORT_MODEL_URL)
