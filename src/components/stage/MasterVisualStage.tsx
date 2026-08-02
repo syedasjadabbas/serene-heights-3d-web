@@ -126,26 +126,9 @@ export default function MasterVisualStage() {
       scrub: true,
       invalidateOnRefresh: true,
       onUpdate: () => {
- updateFrameFromScroll()
+        updateFrameFromScroll()
       },
     })
-
-    // Smooth ScrollTrigger Fade Out: Fades video backdrop to 0 as Section 8 (#story) enters
-    let fadeSt: ScrollTrigger | null = null
-    const sectionEightEl = document.getElementById('story')
-    if (sectionEightEl && stageRef.current) {
-      fadeSt = ScrollTrigger.create({
-        trigger: sectionEightEl,
-        start: 'top 95%',  // Begins fade as Section 8 enters lower viewport
-        end: 'top 30%',    // Fully faded out before Section 8 reaches top
-        scrub: true,
-        onUpdate: (self) => {
-          if (stageRef.current) {
-            gsap.set(stageRef.current, { opacity: 1 - self.progress })
-          }
-        },
-      })
-    }
 
     window.addEventListener('scroll', updateFrameFromScroll, { passive: true })
     gsap.ticker.add(updateFrameFromScroll)
@@ -153,7 +136,6 @@ export default function MasterVisualStage() {
 
     return () => {
       st.kill()
-      fadeSt?.kill()
       window.removeEventListener('scroll', updateFrameFromScroll)
       gsap.ticker.remove(updateFrameFromScroll)
       loader.destroy()

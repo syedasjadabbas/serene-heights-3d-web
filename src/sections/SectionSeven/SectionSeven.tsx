@@ -99,31 +99,67 @@ export default function SectionSeven() {
       if (!sectionRef.current) return
 
       const updateStep = (progress: number) => {
-        // Calculate active step index from 0 to 5 based on scroll progress
-        const rawStep = Math.floor(progress * 6)
-        const activeIdx = Math.min(5, Math.max(0, rawStep))
+        const numStages = 6
+        const stepWindow = 1 / numStages
 
-        // Cross-fade left visual scenes
+        // Apple Keynote Pacing: Arrival (0-12%) -> Extended Reading Hold (12-88%) -> Transition Out (88-100%)
         scenesRef.current.forEach((scene, idx) => {
           if (!scene) return
-          if (idx === activeIdx) {
-            scene.classList.add(styles.sceneActive)
-          } else {
-            scene.classList.remove(styles.sceneActive)
+          const stepStart = idx * stepWindow
+          const relProgress = (progress - stepStart) / stepWindow
+
+          let focus = 0
+          if (relProgress >= 0 && relProgress <= 1) {
+            if (relProgress < 0.12) {
+              focus = relProgress / 0.12
+            } else if (relProgress <= 0.88) {
+              focus = 1.0
+            } else {
+              focus = (1.0 - relProgress) / 0.12
+            }
+          }
+
+          const img = scene.querySelector(`.${styles.sceneImage}`) as HTMLElement | null
+
+          gsap.set(scene, {
+            opacity: focus,
+            zIndex: Math.round(1 + focus * 10),
+          })
+
+          if (img) {
+            gsap.set(img, {
+              scale: 1.04 - 0.04 * focus,
+              filter: `brightness(${0.72 + 0.33 * focus})`,
+            })
           }
         })
 
-        // Fade & translate right editorial cards
         cardsRef.current.forEach((card, idx) => {
           if (!card) return
-          if (idx === activeIdx) {
-            card.classList.add(styles.cardActive)
-          } else {
-            card.classList.remove(styles.cardActive)
+          const stepStart = idx * stepWindow
+          const relProgress = (progress - stepStart) / stepWindow
+
+          let focus = 0
+          if (relProgress >= 0 && relProgress <= 1) {
+            if (relProgress < 0.12) {
+              focus = relProgress / 0.12
+            } else if (relProgress <= 0.88) {
+              focus = 1.0
+            } else {
+              focus = (1.0 - relProgress) / 0.12
+            }
           }
+
+          gsap.set(card, {
+            opacity: focus,
+            y: 16 * (1 - focus),
+            pointerEvents: focus > 0.5 ? 'auto' : 'none',
+            zIndex: Math.round(1 + focus * 10),
+          })
         })
 
-        // Progress dots
+        // Active step dot indicator
+        const activeIdx = Math.min(5, Math.floor(progress * 5.99))
         dotsRef.current.forEach((dot, idx) => {
           if (!dot) return
           if (idx === activeIdx) {
@@ -134,17 +170,34 @@ export default function SectionSeven() {
         })
       }
 
-      // Pin section and scrub step progress
+      // Pin section and scrub step progress continuously
       gsap.to(sectionRef.current, {
         scrollTrigger: {
           trigger: sectionRef.current,
           pin: true,
           pinSpacing: true,
-          scrub: 1,
+          anticipatePin: 1,
+          scrub: true,
           start: 'top top',
-          end: () => `+=${window.innerHeight * 3.5}`,
+          end: () => `+=${window.innerHeight * 3.2}`,
           invalidateOnRefresh: true,
-          onUpdate: (self) => updateStep(self.progress),
+          onUpdate: (self) => {
+            updateStep(self.progress)
+            // Subtle entrance & exit fade to create visual breathing space into Section 8
+            const headerEl = sectionRef.current?.querySelector(`.${styles.header}`)
+            const stageEl = sectionRef.current?.querySelector(`.${styles.stageContainer}`)
+
+            let fade = 1.0
+            if (self.progress < 0.05) {
+              fade = 0.5 + (self.progress / 0.05) * 0.5
+            } else if (self.progress > 0.92) {
+              fade = 1.0 - ((self.progress - 0.92) / 0.08) * 0.45
+            }
+
+            if (headerEl && stageEl) {
+              gsap.set([headerEl, stageEl], { opacity: fade })
+            }
+          },
           onRefresh: (self) => updateStep(self.progress),
         },
       })

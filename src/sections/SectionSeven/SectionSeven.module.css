@@ -84,14 +84,14 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: clamp(32px, 4vw, 64px);
+  grid-template-columns: 1.18fr 0.82fr;
+  gap: clamp(24px, 3.2vw, 44px);
   width: 100%;
-  max-width: 1280px;
+  max-width: 1120px;
   margin-inline: auto;
-  height: clamp(380px, 54vh, 540px);
+  height: clamp(340px, 48vh, 480px);
   align-items: center;
-  padding-inline: clamp(20px, 4vw, 48px);
+  padding-inline: clamp(16px, 3vw, 40px);
 }
 
 /* Left Pane: Continuous Cinematic Visual Scene Stage */
@@ -124,13 +124,6 @@
   height: 100%;
   opacity: 0;
   will-change: opacity, transform;
-  transition: opacity 0.6s var(--ease-out-soft), transform 0.6s var(--ease-out-soft);
-}
-
-.sceneActive {
-  opacity: 1 !important;
-  transform: scale(1.0) !important;
-  z-index: 2;
 }
 
 .sceneImage {
@@ -138,7 +131,7 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: brightness(0.85);
+  will-change: filter, transform;
 }
 
 .sceneOverlay {
@@ -183,17 +176,8 @@
   flex-direction: column;
   justify-content: center;
   opacity: 0;
-  transform: translateY(20px);
   will-change: opacity, transform;
-  transition: opacity 0.5s var(--ease-out-soft), transform 0.5s var(--ease-out-soft);
   pointer-events: none;
-}
-
-.cardActive {
-  opacity: 1 !important;
-  transform: translateY(0px) !important;
-  pointer-events: auto;
-  z-index: 3;
 }
 
 .stepHeader {
@@ -205,7 +189,7 @@
 
 .giantNumber {
   font-family: var(--font-display);
-  font-size: clamp(3.2rem, 4.5vw, 5.5rem);
+  font-size: clamp(2.5rem, 3.5vw, 4.2rem);
   font-weight: 400;
   line-height: 0.9;
   color: var(--color-accent-gold);
@@ -224,20 +208,20 @@
 .stageHeadline {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.8rem, 1.3rem + 1.6vw, 2.8rem);
+  font-size: clamp(1.4rem, 1.1rem + 1.1vw, 2.2rem);
   line-height: 1.1;
   color: var(--color-cream);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
 }
 
 .stageDescription {
   font-family: var(--font-sans);
-  font-size: clamp(0.875rem, 0.82rem + 0.2vw, 1.0rem);
+  font-size: clamp(0.8125rem, 0.78rem + 0.15vw, 0.9375rem);
   line-height: 1.5;
   color: rgba(244, 239, 228, 0.82);
-  max-width: 44ch;
-  margin-bottom: clamp(16px, 2.5vh, 28px);
+  max-width: 40ch;
+  margin-bottom: clamp(12px, 2vh, 20px);
 }
 
 .statCallout {
@@ -245,12 +229,12 @@
   align-items: center;
   gap: 0.6em;
   font-family: var(--font-sans);
-  font-size: clamp(0.72rem, 0.68rem + 0.18vw, 0.8125rem);
+  font-size: clamp(0.65rem, 0.62rem + 0.14vw, 0.75rem);
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-accent-gold);
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-left: 3px solid var(--color-accent-gold);
   background: rgba(206, 162, 92, 0.08);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;

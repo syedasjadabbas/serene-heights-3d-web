@@ -54,20 +54,8 @@ const EXHIBITION_CARDS: ExhibitionCard[] = [
     sizeClass: 'cardLarge',
   },
   {
-    id: 'views',
-    num: '04',
-    tag: 'MOUNTAIN VIEWS',
-    title: 'Panoramic Views of the Pine Forests',
-    subtitle:
-      'Floor-to-ceiling glass frames uninterrupted views across snow-covered pine forests and the Galyat range skyline.',
-    spec: 'VIEW SPEC · 7,906 FT ALTITUDE',
-    imageUrl:
-      'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop',
-    sizeClass: 'cardSmall',
-  },
-  {
     id: 'wellness',
-    num: '05',
+    num: '04',
     tag: 'WELLNESS & SPA',
     title: 'Heated Indoor Infinity Pool',
     subtitle:
@@ -78,20 +66,8 @@ const EXHIBITION_CARDS: ExhibitionCard[] = [
     sizeClass: 'cardLarge',
   },
   {
-    id: 'dining',
-    num: '06',
-    tag: 'FINE DINING',
-    title: 'An Executive Table, Elevated',
-    subtitle:
-      'Fine dining restaurants and executive lounges curated for residents, framed by mountain views and private service.',
-    spec: 'DINING SPEC · EXECUTIVE LOUNGE',
-    imageUrl:
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1600&auto=format&fit=crop',
-    sizeClass: 'cardMedium',
-  },
-  {
     id: 'investment',
-    num: '07',
+    num: '05',
     tag: 'INVESTMENT OPPORTUNITY',
     title: '13–15% Projected Annual ROI',
     subtitle:
@@ -99,18 +75,6 @@ const EXHIBITION_CARDS: ExhibitionCard[] = [
     spec: 'INVESTMENT SPEC · FREEHOLD TITLE',
     imageUrl:
       'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
-    sizeClass: 'cardLarge',
-  },
-  {
-    id: 'statement',
-    num: '08',
-    tag: 'THE STATEMENT',
-    title: 'Not a Residence. A Legacy in the Clouds.',
-    subtitle:
-      'Serene Heights is where mountain heritage meets architectural ambition — a sanctuary built to outlast generations.',
-    spec: 'SERENE HEIGHTS · NATHIA GALI',
-    imageUrl:
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop',
     sizeClass: 'cardMedium',
   },
 ]
@@ -150,8 +114,16 @@ export default function SectionSix() {
             const rect = card.getBoundingClientRect()
             const cardCenter = rect.left + rect.width / 2
             const dist = Math.abs(cardCenter - viewportCenter)
-            const raw = 1 - Math.min(1, dist / maxDistance)
-            const fp = Math.pow(raw, 2.2) // sharper peak for cinematic isolation
+            const normDist = dist / maxDistance
+
+            // Apple Keynote Presentation Rhythm: Arrive -> Center Hold Plateau -> Depart
+            let fp = 0
+            if (normDist < 0.22) {
+              fp = 1.0
+            } else {
+              const falloff = 1 - Math.min(1, (normDist - 0.22) / 0.78)
+              fp = Math.pow(falloff, 2.0)
+            }
 
             const scale = 0.84 + 0.26 * fp
             const opacity = 0.55 + 0.45 * fp
@@ -194,7 +166,16 @@ export default function SectionSix() {
             start: 'top top',
             end: () => `+=${getScrollAmount()}`,
             invalidateOnRefresh: true,
-            onUpdate: updateCardFocus,
+            onUpdate: (self) => {
+              updateCardFocus()
+              // Subtle exit fade to create visual breathing space as Section 6 finishes
+              if (self.progress > 0.88) {
+                const fade = 1 - (self.progress - 0.88) / 0.12 * 0.55
+                gsap.set([track, section.querySelector(`.${styles.header}`)], { opacity: fade })
+              } else {
+                gsap.set([track, section.querySelector(`.${styles.header}`)], { opacity: 1 })
+              }
+            },
             onRefresh: updateCardFocus,
           },
         })
