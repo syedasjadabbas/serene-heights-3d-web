@@ -14,6 +14,8 @@ interface SeasonData {
   stat: string
   imageUrl: string
   glowGradient: string
+  imgFilter: string
+  borderTop: string
 }
 
 const SEASONS: SeasonData[] = [
@@ -28,7 +30,9 @@ const SEASONS: SeasonData[] = [
     imageUrl:
       'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop',
     glowGradient:
-      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(232, 244, 248, 0.06) 0%, rgba(10, 17, 13, 0.96) 75%)',
+      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(220, 238, 245, 0.12) 0%, rgba(10, 17, 13, 0.96) 75%)',
+    imgFilter: 'brightness(0.85) contrast(1.02) saturate(0.88)',
+    borderTop: 'rgba(220, 238, 245, 0.40)',
   },
   {
     id: 'spring',
@@ -41,7 +45,9 @@ const SEASONS: SeasonData[] = [
     imageUrl:
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600&auto=format&fit=crop',
     glowGradient:
-      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(122, 168, 133, 0.08) 0%, rgba(10, 17, 13, 0.96) 75%)',
+      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(122, 168, 133, 0.14) 0%, rgba(10, 17, 13, 0.96) 75%)',
+    imgFilter: 'brightness(0.95) contrast(1.04) saturate(1.05)',
+    borderTop: 'rgba(122, 168, 133, 0.40)',
   },
   {
     id: 'summer',
@@ -54,7 +60,9 @@ const SEASONS: SeasonData[] = [
     imageUrl:
       'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
     glowGradient:
-      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(243, 212, 152, 0.09) 0%, rgba(10, 17, 13, 0.96) 75%)',
+      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(243, 212, 152, 0.16) 0%, rgba(10, 17, 13, 0.96) 75%)',
+    imgFilter: 'brightness(1.02) contrast(1.06) saturate(1.12)',
+    borderTop: 'rgba(243, 212, 152, 0.50)',
   },
   {
     id: 'autumn',
@@ -67,13 +75,16 @@ const SEASONS: SeasonData[] = [
     imageUrl:
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop',
     glowGradient:
-      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(198, 125, 56, 0.08) 0%, rgba(10, 17, 13, 0.96) 75%)',
+      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(216, 138, 66, 0.15) 0%, rgba(10, 17, 13, 0.96) 75%)',
+    imgFilter: 'brightness(0.92) contrast(1.04) saturate(1.08)',
+    borderTop: 'rgba(216, 138, 66, 0.45)',
   },
 ]
 
 export default function SectionEight() {
   const sectionRef = useRef<HTMLElement>(null)
   const ambientGlowRef = useRef<HTMLDivElement>(null)
+  const stageFrameRef = useRef<HTMLDivElement>(null)
   const scenesRef = useRef<(HTMLDivElement | null)[]>([])
   const navItemsRef = useRef<(HTMLButtonElement | null)[]>([])
   const indicatorRef = useRef<HTMLDivElement>(null)
@@ -91,123 +102,100 @@ export default function SectionEight() {
 
       if (!sectionRef.current) return
 
-      const updateSeasonState = (index: number) => {
-        activeSeasonRef.current = index
-        setActiveSeason(index)
+      const updateSeasonProgress = (progress: number) => {
+        const numSeasons = 4
+        const stepWindow = 1 / numSeasons
 
-        // 1. Ambient Glow Transition
-        if (ambientGlowRef.current) {
-          ambientGlowRef.current.style.background = SEASONS[index].glowGradient
-        }
+        // Keynote Pacing: Arrival (15%) -> Unhurried 70% Reading Plateau Hold -> Exit (15%)
+        SEASONS.forEach((seasonData, idx) => {
+          const stepStart = idx * stepWindow
+          const relProgress = (progress - stepStart) / stepWindow
 
-        // 2. Staggered Scene Transition (25-30% slower for unhurried presentation)
-        scenesRef.current.forEach((scene, idx) => {
+          let focus = 0
+          if (relProgress >= 0 && relProgress <= 1) {
+            if (relProgress < 0.15) {
+              focus = relProgress / 0.15
+            } else if (relProgress <= 0.85) {
+              focus = 1.0
+            } else {
+              focus = (1.0 - relProgress) / 0.15
+            }
+          }
+
+          const scene = scenesRef.current[idx]
           if (!scene) return
-          const isCurrent = idx === index
+
           const img = scene.querySelector(`.${styles.sceneImage}`) as HTMLElement | null
           const headline = scene.querySelector(`.${styles.sceneHeadline}`) as HTMLElement | null
           const story = scene.querySelector(`.${styles.sceneStory}`) as HTMLElement | null
           const stat = scene.querySelector(`.${styles.sceneStat}`) as HTMLElement | null
 
-          if (isCurrent) {
+          if (focus > 0) {
             scene.classList.add(styles.sceneActive)
-            gsap.fromTo(scene, { opacity: 0 }, { opacity: 1, duration: 0.75, ease: 'power2.out' })
+            gsap.set(scene, { opacity: focus, zIndex: Math.round(1 + focus * 10) })
 
             if (img) {
-              gsap.fromTo(img, { scale: 1.05 }, { scale: 1.0, duration: 0.95, ease: 'power2.out' })
+              gsap.set(img, {
+                scale: 1.04 - 0.04 * focus,
+                filter: seasonData.imgFilter,
+              })
             }
 
             if (headline) {
-              gsap.fromTo(headline, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.75, delay: 0.12, ease: 'power2.out' })
+              gsap.set(headline, { opacity: focus, y: 16 * (1 - focus) })
             }
 
             if (story) {
-              gsap.fromTo(story, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.75, delay: 0.22, ease: 'power2.out' })
+              gsap.set(story, { opacity: focus, y: 12 * (1 - focus) })
             }
 
             if (stat) {
-              gsap.fromTo(stat, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.32, ease: 'power2.out' })
+              gsap.set(stat, { opacity: focus, y: 10 * (1 - focus) })
             }
           } else {
             scene.classList.remove(styles.sceneActive)
-            gsap.set(scene, { opacity: 0 })
+            gsap.set(scene, { opacity: 0, zIndex: 1 })
           }
         })
 
-        // 3. Update Indicator Underline Position
-        const activeNavBtn = navItemsRef.current[index]
-        if (activeNavBtn && indicatorRef.current) {
-          indicatorRef.current.style.left = `${activeNavBtn.offsetLeft}px`
-          indicatorRef.current.style.width = `${activeNavBtn.offsetWidth}px`
+        // Active season index indicator
+        const activeIdx = Math.min(3, Math.floor(progress * 3.99))
+        if (activeIdx !== activeSeasonRef.current) {
+          activeSeasonRef.current = activeIdx
+          setActiveSeason(activeIdx)
+
+          if (ambientGlowRef.current) {
+            ambientGlowRef.current.style.background = SEASONS[activeIdx].glowGradient
+          }
+
+          if (stageFrameRef.current) {
+            stageFrameRef.current.style.borderTopColor = SEASONS[activeIdx].borderTop
+          }
+
+          const activeNavBtn = navItemsRef.current[activeIdx]
+          if (activeNavBtn && indicatorRef.current) {
+            indicatorRef.current.style.left = `${activeNavBtn.offsetLeft}px`
+            indicatorRef.current.style.width = `${activeNavBtn.offsetWidth}px`
+          }
         }
       }
 
-      // ScrollTrigger for Season Scrubbing across the section
+      // Pin Section 8 for continuous unhurried keynote presentation runway
       const st = ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: 'top 60%',
-        end: 'bottom 40%',
-        onUpdate: (self) => {
-          const seasonProgress = Math.min(0.99, self.progress * 1.25)
-          const currentIdx = Math.min(3, Math.floor(seasonProgress * 4))
-          if (currentIdx !== activeSeasonRef.current) {
-            updateSeasonState(currentIdx)
-          }
-        },
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        scrub: true,
+        start: 'top top',
+        end: () => `+=${window.innerHeight * 2.8}`,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => updateSeasonProgress(self.progress),
+        onRefresh: (self) => updateSeasonProgress(self.progress),
       })
 
-      // ScrollTrigger for Ceremonial Conclusion & Metric Items Stagger Reveal
-      if (conclusionRef.current) {
-        gsap.to(conclusionRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 1.0,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: conclusionRef.current,
-            start: 'top 82%',
-            toggleActions: 'play none none reverse',
-          },
-        })
-      }
-
-      if (metricsRef.current) {
-        const metricItems = metricsRef.current.querySelectorAll(`.${styles.metricItem}`)
-
-        gsap.to(metricsRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: metricsRef.current,
-            start: 'top 84%',
-            toggleActions: 'play none none reverse',
-          },
-        })
-
-        if (metricItems.length > 0) {
-          gsap.fromTo(
-            metricItems,
-            { opacity: 0, y: 16 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.7,
-              stagger: 0.14,
-              ease: 'power2.out',
-              scrollTrigger: {
-                trigger: metricsRef.current,
-                start: 'top 84%',
-                toggleActions: 'play none none reverse',
-              },
-            },
-          )
-        }
-      }
-
       // Initial state
-      updateSeasonState(0)
+      updateSeasonProgress(0)
 
       return () => st.kill()
     }, sectionRef)
@@ -261,7 +249,7 @@ export default function SectionEight() {
       </div>
 
       {/* Seasonal Image & Story Stage */}
-      <div className={styles.stageFrame}>
+      <div ref={stageFrameRef} className={styles.stageFrame}>
         {SEASONS.map((s, idx) => (
           <div
             key={s.id}
