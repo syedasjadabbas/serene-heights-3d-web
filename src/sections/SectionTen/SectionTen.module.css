@@ -61,7 +61,7 @@
   gap: 0.5em;
   font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: rgba(244, 239, 228, 0.85);
@@ -74,6 +74,7 @@
 
 .eyebrowNum {
   color: var(--color-accent-gold);
+  font-weight: 500;
 }
 
 .eyebrowDivider {
@@ -82,21 +83,23 @@
 
 .headline {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: 300;
   font-size: clamp(3rem, 2.4rem + 4.2vw, 6rem);
-  line-height: 1.02;
-  letter-spacing: -0.025em;
+  line-height: 1.04;
+  letter-spacing: -0.028em;
   color: var(--color-cream);
   margin-bottom: var(--space-5);
   text-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+  text-wrap: balance;
 }
 
 .subcopy {
   font-family: var(--font-sans);
-  font-size: clamp(1.1rem, 1rem + 0.4vw, 1.35rem);
-  line-height: 1.6;
+  font-size: clamp(1rem, 0.94rem + 0.35vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.55;
   color: rgba(244, 239, 228, 0.85);
-  max-width: 54ch;
+  max-width: 50ch;
   margin-inline: auto;
   margin-bottom: clamp(36px, 5vh, 56px);
 }
@@ -129,16 +132,16 @@
 .brandName {
   font-family: var(--font-sans);
   font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-weight: 500;
+  letter-spacing: 0.22em;
   color: var(--color-cream);
 }
 
 .brandLocation {
   font-family: var(--font-sans);
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-weight: 500;
+  letter-spacing: 0.18em;
   color: var(--color-accent-gold);
 }
 
@@ -154,8 +157,8 @@
 .navLink {
   font-family: var(--font-sans);
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-weight: 500;
+  letter-spacing: 0.20em;
   color: rgba(244, 239, 228, 0.7);
   transition: color 0.3s ease;
 }

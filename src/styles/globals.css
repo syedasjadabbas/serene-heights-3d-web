@@ -3,7 +3,7 @@
 @import '@fontsource-variable/inter';
 
 :root {
-  /* Brand color */
+  /* Brand colors */
   --color-forest-950: #101d18;
   --color-forest-900: #16281f;
   --color-forest-800: #1f3a2d;
@@ -15,39 +15,46 @@
   --color-cream-dim: #e9e2d1;
   --color-black: #0b0c0a;
 
-  --color-text-on-dark: var(--color-cream);
-  --color-text-on-dark-muted: rgb(244 239 228 / 70%);
-  --color-text-on-light: var(--color-black);
-  --color-text-on-light-muted: rgb(11 12 10 / 58%);
+  --color-accent-gold: #cea25c;
+  --color-accent-gold-light: #f3d498;
+  --color-accent-sage: #64a078;
+  --color-accent-mist: #8ea3bf;
 
-  --color-border-on-dark: rgb(244 239 228 / 16%);
-  --color-border-on-light: rgb(11 12 10 / 12%);
+  --color-text-on-dark: var(--color-cream);
+  --color-text-on-dark-muted: rgba(244, 239, 228, 0.72);
+  --color-text-on-light: var(--color-black);
+  --color-text-on-light-muted: rgba(11, 12, 10, 0.58);
+
+  --color-border-on-dark: rgba(244, 239, 228, 0.16);
+  --color-border-on-light: rgba(11, 12, 10, 0.12);
 
   --color-bg: #0a1410;
   --color-fg: var(--color-cream);
 
-  /* Type */
+  /* Typography System — Apple/Aesop/Polestar Benchmarks */
   --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', ui-serif, Georgia, serif;
   --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  --text-display: clamp(3.4rem, 2.2rem + 7.2vw, 10.5rem);
-  --text-h1: clamp(2.4rem, 1.6rem + 3.2vw, 4.75rem);
-  --text-h2: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
-  --text-lead: clamp(1.15rem, 1rem + 0.6vw, 1.5rem);
-  --text-body: clamp(1rem, 0.94rem + 0.24vw, 1.125rem);
+  --text-display: clamp(3.6rem, 2.4rem + 7.5vw, 10.8rem);
+  --text-h1: clamp(2.4rem, 1.8rem + 3.4vw, 4.8rem);
+  --text-h2: clamp(1.75rem, 1.4rem + 1.8vw, 2.85rem);
+  --text-lead: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+  --text-body: clamp(0.9375rem, 0.88rem + 0.2vw, 1.0625rem);
   --text-small: 0.8125rem;
-  --text-label: 0.75rem;
+  --text-label: 0.72rem;
 
-  --tracking-tight: -0.02em;
+  --tracking-tight: -0.03em;
+  --tracking-subhead: -0.015em;
   --tracking-normal: 0;
-  --tracking-wide: 0.12em;
-  --tracking-widest: 0.22em;
+  --tracking-wide: 0.14em;
+  --tracking-widest: 0.26em;
 
-  --leading-tight: 0.98;
-  --leading-snug: 1.15;
-  --leading-normal: 1.5;
+  --leading-tight: 0.94;
+  --leading-headline: 1.04;
+  --leading-snug: 1.2;
+  --leading-editorial: 1.5;
 
-  /* Layout */
+  /* Layout & Spacing */
   --container-max: 1560px;
   --container-pad: clamp(20px, 4.4vw, 64px);
 
