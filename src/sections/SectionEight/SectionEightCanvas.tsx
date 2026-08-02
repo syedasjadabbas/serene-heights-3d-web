@@ -1,119 +1,153 @@
-import { useMemo, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { useEffect, useRef } from 'react'
 
 interface SectionEightCanvasProps {
   activeSeason: number // 0: Winter, 1: Spring, 2: Summer, 3: Autumn
 }
 
-function SeasonalParticles({ activeSeason }: { activeSeason: number }) {
-  const count = 68
-  const pointsRef = useRef<THREE.Points>(null)
-  const matRef = useRef<THREE.PointsMaterial>(null)
-  const currentColor = useRef(new THREE.Color('#e2f2f8'))
-
-  // 70% edge distribution / 30% center cross to keep readable center focus
-  const positions = useMemo(() => {
-    const pos = new Float32Array(count * 3)
-    for (let i = 0; i < count; i++) {
-      const isEdgeParticle = i < Math.floor(count * 0.7)
-      if (isEdgeParticle) {
-        // Peripheral edge region (|x| > 3.8, |y| > 2.2)
-        const sideX = Math.random() > 0.5 ? 1 : -1
-        const sideY = Math.random() > 0.5 ? 1 : -1
-        pos[i * 3] = (3.8 + Math.random() * 8.5) * sideX
-        pos[i * 3 + 1] = (2.2 + Math.random() * 5.5) * sideY
-        pos[i * 3 + 2] = (Math.random() - 0.5) * 6
-      } else {
-        // Central region crossers
-        pos[i * 3] = (Math.random() - 0.5) * 7.5
-        pos[i * 3 + 1] = (Math.random() - 0.5) * 5.5
-        pos[i * 3 + 2] = (Math.random() - 0.5) * 4
-      }
-    }
-    return pos
-  }, [count])
-
-  // Color, size & opacity parameters per season
-  const seasonParams = useMemo(() => {
-    return [
-      { color: new THREE.Color('#e2f2f8'), size: 0.052, opacity: 0.24 }, // 0: Winter (cool snow)
-      { color: new THREE.Color('#88bfa0'), size: 0.044, opacity: 0.20 }, // 1: Spring (alpine petal mist)
-      { color: new THREE.Color('#f6d89b'), size: 0.062, opacity: 0.26 }, // 2: Summer (golden sunbeams)
-      { color: new THREE.Color('#e09448'), size: 0.048, opacity: 0.22 }, // 3: Autumn (copper embers)
-    ]
-  }, [])
-
-  useFrame((state, delta) => {
-    if (!pointsRef.current || !matRef.current) return
-    const t = state.clock.getElapsedTime()
-    const target = seasonParams[activeSeason] || seasonParams[0]
-
-    // Smooth 0.9s environmental blending across seasons
-    currentColor.current.lerp(target.color, delta * 3.2)
-    matRef.current.color.copy(currentColor.current)
-    matRef.current.opacity = THREE.MathUtils.lerp(matRef.current.opacity, target.opacity, delta * 3.2)
-    matRef.current.size = THREE.MathUtils.lerp(matRef.current.size, target.size, delta * 3.2)
-
-    if (activeSeason === 0) {
-      // Winter: Falling snow drifting continuously from top with wind sway
-      pointsRef.current.rotation.y = Math.sin(t * 0.05) * 0.08
-      pointsRef.current.position.y = -((t * 0.22) % 4)
-      pointsRef.current.position.x = Math.sin(t * 0.08) * 0.15
-    } else if (activeSeason === 1) {
-      // Spring: Slow drifting flower petals & soft breeze movement
-      pointsRef.current.rotation.y = t * 0.02
-      pointsRef.current.rotation.z = Math.sin(t * 0.06) * 0.05
-      pointsRef.current.position.x = Math.sin(t * 0.1) * 0.2
-    } else if (activeSeason === 2) {
-      // Summer: Volumetric sunlight float & heat shimmer
-      pointsRef.current.rotation.y = t * 0.025
-      pointsRef.current.position.y = Math.sin(t * 0.3) * 0.16
-    } else {
-      // Autumn: Slow drifting amber leaves & copper haze with gentle rotation
-      pointsRef.current.rotation.y = Math.cos(t * 0.08) * 0.12
-      pointsRef.current.rotation.z = Math.sin(t * 0.05) * 0.06
-      pointsRef.current.position.x = Math.sin(t * 0.15) * 0.22
-    }
-  })
-
-  return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        ref={matRef}
-        size={0.05}
-        color="#e2f2f8"
-        transparent
-        opacity={0.22}
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
-  )
+interface Particle {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  size: number
+  rotation: number
+  rotSpeed: number
+  alpha: number
+  isEdge: boolean
 }
 
 export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const activeSeasonRef = useRef(activeSeason)
+  activeSeasonRef.current = activeSeason
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let animId: number
+    let width = (canvas.width = canvas.parentElement?.clientWidth || window.innerWidth)
+    let height = (canvas.height = canvas.parentElement?.clientHeight || window.innerHeight)
+
+    const handleResize = () => {
+      if (!canvas || !canvas.parentElement) return
+      width = canvas.width = canvas.parentElement.clientWidth
+      height = canvas.height = canvas.parentElement.clientHeight
+    }
+    window.addEventListener('resize', handleResize)
+
+    // Particle count: 68
+    const numParticles = 68
+    const particles: Particle[] = []
+
+    for (let i = 0; i < numParticles; i++) {
+      const isEdge = i < Math.floor(numParticles * 0.7)
+      particles.push({
+        x: isEdge
+          ? Math.random() > 0.5
+            ? Math.random() * (width * 0.24)
+            : width * 0.76 + Math.random() * (width * 0.24)
+          : Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.7,
+        vy: 0.4 + Math.random() * 0.9,
+        size: 4 + Math.random() * 7,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.035,
+        alpha: 0.65 + Math.random() * 0.32,
+        isEdge,
+      })
+    }
+
+    const render = (now: number) => {
+
+      ctx.clearRect(0, 0, width, height)
+      const targetIdx = activeSeasonRef.current
+
+      // Render living seasonal particles with high visibility & soft glow
+      particles.forEach((p) => {
+        p.x += p.vx + Math.sin(now * 0.0012 + p.y * 0.008) * 0.4
+        p.y += p.vy
+        p.rotation += p.rotSpeed
+
+        // Wrap around boundaries smoothly
+        if (p.y > height + 25) {
+          p.y = -25
+          p.x = p.isEdge
+            ? Math.random() > 0.5
+              ? Math.random() * (width * 0.24)
+              : width * 0.76 + Math.random() * (width * 0.24)
+            : Math.random() * width
+        }
+
+        ctx.save()
+        ctx.translate(p.x, p.y)
+        ctx.rotate(p.rotation)
+        ctx.globalAlpha = p.alpha
+
+        if (targetIdx === 0) {
+          // WINTER: Gentle falling snowflakes with icy cold white halo
+          ctx.shadowBlur = 10
+          ctx.shadowColor = 'rgba(220, 238, 245, 0.95)'
+          ctx.fillStyle = 'rgba(240, 248, 255, 0.95)'
+          ctx.beginPath()
+          ctx.arc(0, 0, p.size * 0.65, 0, Math.PI * 2)
+          ctx.fill()
+        } else if (targetIdx === 1) {
+          // SPRING: Floating alpine flower petals with soft pink glow
+          ctx.shadowBlur = 8
+          ctx.shadowColor = 'rgba(232, 168, 184, 0.75)'
+          ctx.fillStyle = 'rgba(238, 184, 196, 0.90)'
+          ctx.beginPath()
+          ctx.ellipse(0, 0, p.size * 0.95, p.size * 0.5, 0, 0, Math.PI * 2)
+          ctx.fill()
+        } else if (targetIdx === 2) {
+          // SUMMER: Volumetric golden dust shimmering in sunlight
+          ctx.shadowBlur = 12
+          ctx.shadowColor = 'rgba(243, 212, 152, 0.95)'
+          ctx.fillStyle = 'rgba(253, 220, 140, 0.92)'
+          ctx.beginPath()
+          ctx.arc(0, 0, p.size * 0.75, 0, Math.PI * 2)
+          ctx.fill()
+        } else {
+          // AUTUMN: Falling rotating amber leaves with warm copper glow
+          ctx.shadowBlur = 8
+          ctx.shadowColor = 'rgba(216, 138, 66, 0.85)'
+          ctx.fillStyle = 'rgba(228, 152, 76, 0.92)'
+          ctx.beginPath()
+          ctx.moveTo(0, -p.size)
+          ctx.quadraticCurveTo(p.size * 0.85, 0, 0, p.size)
+          ctx.quadraticCurveTo(-p.size * 0.85, 0, 0, -p.size)
+          ctx.fill()
+        }
+
+        ctx.restore()
+      })
+
+      animId = requestAnimationFrame(render)
+    }
+
+    animId = requestAnimationFrame(render)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(animId)
+    }
+  }, [])
+
   return (
-    <div
+    <canvas
+      ref={canvasRef}
       style={{
         position: 'absolute',
         inset: 0,
+        width: '100%',
+        height: '100%',
         pointerEvents: 'none',
-        zIndex: 0,
-        overflow: 'hidden',
+        zIndex: 1,
       }}
-    >
-      <Canvas
-        camera={{ position: [0, 0, 8], fov: 45 }}
-        gl={{ alpha: true, antialias: true }}
-        dpr={[1, 1.5]}
-      >
-        <ambientLight intensity={0.38} />
-        <SeasonalParticles activeSeason={activeSeason} />
-        <fog attach="fog" args={['#0a1410', 4, 20]} />
-      </Canvas>
-    </div>
+    />
   )
 }

@@ -205,7 +205,39 @@ export default function SectionEight() {
             indicatorRef.current.style.left = `${activeNavBtn.offsetLeft}px`
             indicatorRef.current.style.width = `${activeNavBtn.offsetWidth}px`
           }
+
+          // Trigger metric counter animation once user scrolls into Section 8
+          if (progress >= 0.10 && !metricsAnimatedRef.current) {
+            triggerMetricCounters()
+          }
         }
+      }
+
+      const triggerMetricCounters = () => {
+        if (metricsAnimatedRef.current) return
+        metricsAnimatedRef.current = true
+
+        const counterConfigs = [
+          { end: 7906, format: (val: number) => `${Math.round(val).toLocaleString()} FT` },
+          { end: 4, format: (val: number) => (val >= 3.8 ? 'FOUR' : `${Math.round(val)}`) },
+          { end: 365, format: (val: number) => `${Math.round(val)} DAYS` },
+          { end: 15, format: (val: number) => `13–${Math.round(val)}%` },
+        ]
+
+        counterConfigs.forEach((cfg, idx) => {
+          const el = metricValRefs.current[idx]
+          if (!el) return
+          const obj = { val: 0 }
+          gsap.to(obj, {
+            val: cfg.end,
+            duration: 2.2,
+            delay: idx * 0.18,
+            ease: 'power2.out',
+            onUpdate: () => {
+              el.textContent = cfg.format(obj.val)
+            },
+          })
+        })
       }
 
       // Pin Section 8 for continuous unhurried keynote presentation runway
@@ -220,41 +252,8 @@ export default function SectionEight() {
         invalidateOnRefresh: true,
         onUpdate: (self) => updateSeasonProgress(self.progress),
         onRefresh: (self) => updateSeasonProgress(self.progress),
+        onEnter: () => triggerMetricCounters(),
       })
-
-      // Staggered One-Time Animated Metrics Counter
-      if (metricsRef.current) {
-        ScrollTrigger.create({
-          trigger: metricsRef.current,
-          start: 'top 85%',
-          onEnter: () => {
-            if (metricsAnimatedRef.current) return
-            metricsAnimatedRef.current = true
-
-            const counterConfigs = [
-              { end: 7906, format: (val: number) => `${Math.round(val).toLocaleString()} FT` },
-              { end: 4, format: (val: number) => (val >= 3.8 ? 'FOUR' : `${Math.round(val)}`) },
-              { end: 365, format: (val: number) => `${Math.round(val)} DAYS` },
-              { end: 15, format: (val: number) => `13–${Math.round(val)}%` },
-            ]
-
-            counterConfigs.forEach((cfg, idx) => {
-              const el = metricValRefs.current[idx]
-              if (!el) return
-              const obj = { val: 0 }
-              gsap.to(obj, {
-                val: cfg.end,
-                duration: 1.8,
-                delay: idx * 0.16,
-                ease: 'power2.out',
-                onUpdate: () => {
-                  el.textContent = cfg.format(obj.val)
-                },
-              })
-            })
-          },
-        })
-      }
 
       // Initial state
       updateSeasonProgress(0)
