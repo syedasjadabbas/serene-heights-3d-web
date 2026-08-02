@@ -3,6 +3,7 @@ import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
 import Button from '../../components/ui/Button'
+import Logo from '../../components/ui/Logo'
 import styles from './Hero.module.css'
 
 function clamp01(value: number): number {
@@ -288,9 +289,12 @@ export default function Hero() {
         <div ref={backgroundRef} className={styles.background} />
 
         <div ref={headlineGroupRef} className={styles.headlineGroup}>
-          <p ref={kickerRef} className={styles.kicker}>
-            SERENE HEIGHTS · NATHIA GALI
-          </p>
+          <div ref={kickerRef} className={styles.brandHeader}>
+            <Logo markOnly className={styles.heroLogoMark} />
+            <span className={styles.heroWordmark}>SERENE HEIGHTS</span>
+            <span className={styles.heroLocation}>NATHIA GALI</span>
+          </div>
+
           <h1 ref={headlineRef} className={styles.headline}>
             <span className={styles.lineMask}>
               <span className={styles.lineInner}>Pakistan's First</span>
@@ -301,9 +305,19 @@ export default function Hero() {
               </span>
             </span>
           </h1>
-          <p ref={supportingRef} className={styles.supportingCopy}>
-            Luxury mountain living at 7,906 ft.
-          </p>
+
+          <div ref={supportingRef} className={styles.heroHighlights}>
+            <span className={styles.highlightItem}>
+              <span className={styles.highlightDot} />
+              7,906 FT ALTITUDE
+            </span>
+            <span className={styles.highlightDivider}>·</span>
+            <span className={styles.highlightItem}>
+              <span className={styles.highlightDot} />
+              5-STAR MANAGED RESIDENCES
+            </span>
+          </div>
+
           <div ref={ctaRef} className={styles.ctaWrap}>
             <Button href="#enquire" variant="ghost">
               EXPLORE SERENE HEIGHTS
