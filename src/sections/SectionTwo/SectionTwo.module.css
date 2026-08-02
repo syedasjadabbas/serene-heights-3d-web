@@ -348,6 +348,48 @@
 
 /* --- Smart Property Unit: single focal card --- */
 
+/* --- Editorial Spec Breakdown Block (Center & Right Column Enrichment) --- */
+
+.editorialSpecList {
+  position: relative;
+  z-index: 2;
+  margin-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid rgba(244, 239, 228, 0.12);
+  transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 12px);
+  transition: transform 0.15s cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+
+.editorialSpecRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 8px 12px;
+  background: rgba(16, 26, 22, 0.4);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(244, 239, 228, 0.06);
+}
+
+.editorialSpecLabel {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 228, 0.65);
+}
+
+.editorialSpecVal {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+}
+
 .unitCardWrap {
   display: flex;
   justify-content: center;

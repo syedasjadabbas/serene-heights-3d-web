@@ -84,11 +84,38 @@ function IconConcierge() {
   )
 }
 
+function IconLocation() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+      <path
+        d="M12 21s-7-5.5-7-11.5a7 7 0 1 1 14 0C19 15.5 12 21 12 21z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="9.5" r="2.5" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  )
+}
+
+function IconPark() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+      <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H7c-1.1 0-2 .9-2 2v7c0 .6.4 1 1 1h2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="7.5" cy="17.5" r="2.5" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="16.5" cy="17.5" r="2.5" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  )
+}
+
 const RESIDENCE_FACTS: Array<{ icon: ReactNode; headline: string; caption: string }> = [
   { icon: <IconBuilding />, headline: '150+ Hotel Apartments', caption: 'Across 3 signature alpine towers' },
   { icon: <IconBalcony />, headline: 'Mountain-Facing Balconies', caption: '180° pristine pine forest vistas' },
   { icon: <IconConcierge />, headline: '24/7 Concierge Services', caption: 'Turnkey DM Consortium management' },
   { icon: <IconShield />, headline: 'Zero Owner Maintenance', caption: 'No operational fees or owner hassle' },
+  { icon: <IconLocation />, headline: '7,906 ft Altitude Location', caption: 'Set in pristine Nathia Gali pine forests' },
+  { icon: <IconPark />, headline: 'All-Weather Valet Parking', caption: 'Heavy snow-resistant covered basement parking' },
 ]
 
 const PAYMENT_FACTS: Array<{ value: string; label: string; tone: string; rotate: number }> = [
@@ -291,6 +318,27 @@ export default function SectionTwo() {
                 </div>
               ))}
             </div>
+
+            {/* Enriched Editorial Specification Breakdown */}
+            <div className={styles.editorialSpecList}>
+              <div className={styles.editorialSpecRow}>
+                <span className={styles.editorialSpecLabel}>Construction</span>
+                <span className={styles.editorialSpecVal}>On Schedule · 36 Months</span>
+              </div>
+              <div className={styles.editorialSpecRow}>
+                <span className={styles.editorialSpecLabel}>Inventory</span>
+                <span className={styles.editorialSpecVal}>Towers A, B & C Release</span>
+              </div>
+              <div className={styles.editorialSpecRow}>
+                <span className={styles.editorialSpecLabel}>Facade Glass</span>
+                <span className={styles.editorialSpecVal}>Triple-Glazed Thermal</span>
+              </div>
+              <div className={styles.editorialSpecRow}>
+                <span className={styles.editorialSpecLabel}>Yield Target</span>
+                <span className={styles.editorialSpecVal}>13–15% Annual ROI</span>
+              </div>
+            </div>
+
             <CardCta href="#payment-plan" tone="sage" />
           </div>
 
@@ -349,6 +397,27 @@ export default function SectionTwo() {
                 </div>
               </div>
             </div>
+
+            {/* Enriched Supporting Information Chips */}
+            <div className={styles.editorialSpecList}>
+              <div className={styles.editorialSpecRow}>
+                <span className={styles.editorialSpecLabel}>Approval</span>
+                <span className={styles.editorialSpecVal}>GDA Approved</span>
+              </div>
+              <div className={styles.editorialSpecRow}>
+                <span className={styles.editorialSpecLabel}>Ownership</span>
+                <span className={styles.editorialSpecVal}>100% Freehold Title</span>
+              </div>
+              <div className={styles.editorialSpecRow}>
+                <span className={styles.editorialSpecLabel}>Operator</span>
+                <span className={styles.editorialSpecVal}>DM Consortium</span>
+              </div>
+              <div className={styles.editorialSpecRow}>
+                <span className={styles.editorialSpecLabel}>Transfer</span>
+                <span className={styles.editorialSpecVal}>Fully Transferable</span>
+              </div>
+            </div>
+
             <p className={styles.disclaimer}>*Projected figures provided by developer, not guaranteed returns.</p>
             <CardCta href="#smart-property-unit" tone="mist" />
           </div>
