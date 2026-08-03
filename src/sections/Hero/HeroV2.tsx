@@ -6,44 +6,45 @@ import heroImageSrc from '../../assets/hero/scene-01-establish.png'
 import styles from './HeroV2.module.css'
 
 /**
- * HeroV2 — Architectural Mountain Capsule Portal & Camera Fly-Through
+ * HeroV2 — Unified Optical Viewport Dolly & Fullscreen World Camera Rig
  *
- * ─── Design Concept ───────────────────────────────────────────────
- *   - The mountain capsule is NOT branding/logo anymore.
- *   - It is an architectural object, an airplane window, a viewport.
- *   - REMOVED COMPLETELY: All PNG logos, typography, "SERENE HEIGHTS", "LAHORE".
- *   - The mountain capsule sits ALONE on the deep green background (#0a1410).
- *   - As scroll begins, the interior reveals the resort photograph.
- *   - Camera moves toward the window (photograph zooms 1.00 → 1.35 inside frame).
- *   - Capsule frame barely scales (1.00 → 1.05).
- *   - Camera flies THROUGH the mountain capsule window into the resort landscape.
- *   - ONLY AFTER entering the world does the large SERENE HEIGHTS title fade in.
+ * ─── Camera Rig & Geometry Match Invariants ───────────────────────
+ *   - The clipPath cutout and SVG outline frame scale UNIFORMLY at all times
+ *     with 100% identical capsule geometry (100:136 aspect ratio).
+ *   - NO aspect ratio morphing or rectangular stretching.
+ *   - Resort photograph sits in a full-resolution fullscreen layer (worldLayer)
+ *     behind the deep green wall (#0a1410).
+ *   - Camera dolly: world scales 1.00 → 1.40 behind window (p 0.20 → 0.45),
+ *     then capsule aperture expands exponentially (Power-4) past the viewport
+ *     edges (p 0.45 → 0.60).
+ *   - SVG outline frame dissolves ONLY after capsule bounds exceed viewport (p 0.585 → 0.60).
  *
  * ─── Timeline (runway: +=700%) ────────────────────────────────────
- *   p 0.00 → 0.20   Static Green Opening & Mountain Capsule Hold
+ *   p 0.00 → 0.20   Static Green Opening & Centered Viewport Hold
  *                   Full-screen deep green background (#0a1410).
- *                   SVG mountain capsule icon (logoMarkRef) sits ALONE.
- *                   100% static hold. Zero text, zero PNG.
+ *                   Capsule viewport centered at 45% vh + brand lockup below.
+ *                   World layer sitting full-resolution at scale = 1.00 behind window.
  *
- *   p 0.20 → 0.40   Airplane Window Camera Approach
- *                   Inside of mountain capsule reveals resort photograph.
- *                   Capsule window frame stays anchored (scale 1.00 → 1.05).
- *                   Photograph behind capsule zooms forward (scale 1.00 → 1.35).
+ *   p 0.20 → 0.45   Camera Dolly Approach
+ *                   Camera moves forward toward airplane window.
+ *                   World behind window scales 1.00 → 1.40 (increasing world scale).
+ *                   Capsule viewport frame stays anchored (scale 1.00 → 1.15).
+ *                   Brand lockup fades out smoothly (p 0.20 → 0.38).
  *
- *   p 0.40 → 0.60   Camera Fly-Through Mountain Capsule Window
- *                   SVG clip-path expands from capsule → fullscreen.
- *                   Photograph passes through glass plane (scale 1.35 → 1.00).
- *                   Capsule SVG outline dissolves as camera enters resort world (p 0.48→0.58).
- *                   Reaches full-screen resort landscape at p = 0.60.
+ *   p 0.45 → 0.60   Camera Fly-Through & Uniform Aperture Expansion
+ *                   Camera steps through capsule window plane.
+ *                   Viewport aperture expands exponentially (Power-4) maintaining 100:136 capsule shape.
+ *                   World scale settles smoothly 1.40 → 1.00 (1:1 full bleed).
+ *                   SVG frame dissolves ONLY during last 10% of motion (p 0.585 → 0.60).
  *
- *   p 0.60 → 0.78   Fullscreen Photograph Hold
+ *   p 0.60 → 0.78   Fullscreen Photograph Hold (~1s Scroll Hold)
  *                   Clean fullscreen resort landscape (scale 1.00). Zero text, zero movement.
  *
- *   p 0.78 → 0.86   Title Reveal (Only After Entering Resort World)
+ *   p 0.78 → 0.86   Title Reveal (Only After Fullscreen Hold)
  *                   Large SERENE HEIGHTS title + HOTEL & RESIDENCES subtitle fade in.
  *
  *   p 0.86 → 0.92   Subtle Ken Burns Zoom
- *                   portalImage scale 1.00 → 1.03.
+ *                   worldScale = 1.00 → 1.03.
  *
  *   p 0.92 → 1.00   Invisible Video Crossfade
  *                   portalImage opacity 1→0, heroVideo opacity 0→1.
@@ -51,7 +52,6 @@ import styles from './HeroV2.module.css'
  *
  * ─── Architecture Invariants ──────────────────────────────────────
  *   ONE pinned section · ONE ScrollTrigger · ONE onUpdate
- *   SVG clipPath on exact logo capsule geometry
  *   No pub/sub · No tickers · No canvas · No extra render loops
  *   Every animated property = pure f(scroll progress p)
  */
@@ -70,6 +70,14 @@ const CAPSULE_H = 130 / 136
 const RX_FRAC   = 47 / 100
 const RY_FRAC   = 47 / 136
 
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+}
+
+function remap(p: number, inMin: number, inMax: number): number {
+  return Math.max(0, Math.min(1, (p - inMin) / (inMax - inMin)))
+}
+
 function computeClipAttrs(
   p: number,
   vw: number,
@@ -78,40 +86,57 @@ function computeClipAttrs(
   const lw = logoNaturalW(vw)
   const lh = logoNaturalH(lw)
 
-  // p 0.00→0.40: Capsule window stays anchored at natural size (expandP = 0)
-  // p 0.40→0.60: Aperture expansion as camera passes through mountain capsule window
-  const expandP = Math.max(0, Math.min(1, (p - 0.40) / 0.20))
+  const startW  = CAPSULE_W * lw
+  const startH  = CAPSULE_H * lh
+  const startRx = RX_FRAC   * lw
+  const startRy = RY_FRAC   * lh
 
-  const effW = lw
-  const effH = lh
+  // Scale factor required to push capsule inner bounds completely past viewport edges
+  const maxScale = Math.max(vw / startW, vh / startH) * 1.5
 
-  const startX  = (vw - effW) / 2 + MARGIN_X  * effW
-  const startY  = (vh - effH) / 2 + MARGIN_Y  * effH
-  const startW  = CAPSULE_W * effW
-  const startH  = CAPSULE_H * effH
-  const startRx = RX_FRAC   * effW
-  const startRy = RY_FRAC   * effH
+  const approachP    = easeInOutCubic(remap(p, 0.20, 0.45))
+  const flyP        = remap(p, 0.45, 0.60)
+  const exponentialP = Math.pow(flyP, 4)
+
+  let frameScale = 1.00
+  if (p < 0.20) {
+    frameScale = 1.00
+  } else if (p >= 0.20 && p < 0.45) {
+    frameScale = 1.00 + approachP * 0.15
+  } else if (p >= 0.45 && p < 0.60) {
+    frameScale = 1.15 + exponentialP * (maxScale - 1.15)
+  } else {
+    frameScale = maxScale
+  }
+
+  // Smoothly lerp vertical center from 0.45 vh to 0.50 vh during expansion
+  const centerYLerp   = remap(p, 0.45, 0.60)
+  const targetCenterY = vh * 0.45 + centerYLerp * (vh * 0.50 - vh * 0.45)
+
+  const currentW  = startW  * frameScale
+  const currentH  = startH  * frameScale
+  const currentRx = startRx * frameScale
+  const currentRy = startRy * frameScale
+
+  const currentX = (vw - currentW) / 2
+  const currentY = targetCenterY - (currentH / 2)
 
   return {
-    x:      startX  * (1 - expandP),
-    y:      startY  * (1 - expandP),
-    width:  startW  + (vw - startW) * expandP,
-    height: startH  + (vh - startH) * expandP,
-    rx:     startRx * (1 - expandP),
-    ry:     startRy * (1 - expandP),
+    x:      currentX,
+    y:      currentY,
+    width:  currentW,
+    height: currentH,
+    rx:     currentRx,
+    ry:     currentRy,
   }
-}
-
-function remap(p: number, inMin: number, inMax: number): number {
-  return Math.max(0, Math.min(1, (p - inMin) / (inMax - inMin)))
 }
 
 export default function HeroV2() {
   const heroRef        = useRef<HTMLElement>(null)
   const clipRectRef    = useRef<SVGRectElement>(null)
-  const portalRef      = useRef<HTMLDivElement>(null)
   const portalImageRef = useRef<HTMLImageElement>(null)
   const logoMarkRef    = useRef<HTMLImageElement>(null)
+  const brandLockupRef = useRef<HTMLDivElement>(null)
   const videoRef       = useRef<HTMLVideoElement>(null)
   const fullTitleRef   = useRef<HTMLDivElement>(null)
 
@@ -133,7 +158,8 @@ export default function HeroV2() {
 
     // Deterministic initial layer states:
     gsap.set(logoMarkRef.current,    { opacity: 1, scale: 1 })
-    gsap.set(portalImageRef.current, { scale: 1.00, opacity: 1 })
+    gsap.set(brandLockupRef.current, { opacity: 1 })
+    gsap.set(portalImageRef.current, { scale: 1, opacity: 1 })
     gsap.set(videoRef.current,       { opacity: 0 })
     gsap.set(fullTitleRef.current,   { opacity: 0 })
 
@@ -156,51 +182,67 @@ export default function HeroV2() {
         const vw = vwRef.current
         const vh = vhRef.current
 
-        // ── SVG clip rect ─────────────────────────────────────────
+        const lw = logoNaturalW(vw)
+        const lh = logoNaturalH(lw)
+
+        const startW = CAPSULE_W * lw
+        const startH = CAPSULE_H * lh
+        const maxScale = Math.max(vw / startW, vh / startH) * 1.5
+
+        // ── Minimal Opening Lockup Fade Out (p 0.20 → 0.38) ────────
+        const lockupFade = remap(p, 0.20, 0.38)
+        gsap.set(brandLockupRef.current, {
+          opacity: Math.max(0, 1 - lockupFade),
+        })
+
+        // ── Viewport Clip Aperture (Uniform Capsule Scaling) ────────
         gsap.set(clipRectRef.current, {
           attr: computeClipAttrs(p, vw, vh),
         })
 
-        // ── Mountain Capsule Frame Perspective ─────────────────────
-        // p 0.20 → 0.40: capsule stays almost fixed on screen (scale 1.00 → 1.05)
-        // p 0.40 → 0.60: capsule outline dissolves naturally as camera passes through (opacity 1→0)
-        const frameCreepP = remap(p, 0.20, 0.40)
-        gsap.set(logoMarkRef.current, {
-          scale: 1.00 + frameCreepP * 0.05,
-          opacity: Math.max(0, 1 - remap(p, 0.48, 0.58)),
-        })
+        // ── Camera Dolly Motion & World Scale ──────────────────────
+        const approachP    = easeInOutCubic(remap(p, 0.20, 0.45))
+        const flyP        = remap(p, 0.45, 0.60)
+        const exponentialP = Math.pow(flyP, 4)
+        const kbP          = remap(p, 0.86, 0.92)
+        const xfade        = remap(p, 0.92, 1.00)
 
-        // ── p 0.78→0.86  Large title fades in (ONLY AFTER entering resort world) ──
-        gsap.set(fullTitleRef.current, { opacity: remap(p, 0.78, 0.86) })
+        let worldScale = 1.00
+        let frameScale = 1.00
 
-        // ── Camera Motion Profile (Airplane Window Fly-Through) ────
-        // p 0.00 → 0.20: scale = 1.00 (static hold)
-        // p 0.20 → 0.40: scale = 1.00 → 1.35 (camera moves forward toward capsule window pane)
-        // p 0.40 → 0.60: scale = 1.35 → 1.00 (camera passes through capsule plane into resort landscape)
-        // p 0.60 → 0.86: scale = 1.00 (motion stops completely, clean still hold & title reveal)
-        // p 0.86 → 0.92: scale = 1.00 → 1.03 (subtle Ken Burns zoom)
-        // p 0.92 → 1.00: scale = 1.03 (held during video crossfade)
-        const approachP = remap(p, 0.20, 0.40)
-        const flyP      = remap(p, 0.40, 0.60)
-        const kbP       = remap(p, 0.86, 0.92)
-        const xfade     = remap(p, 0.92, 1.00)
-
-        let imageScale = 1.00
-        if (p >= 0.20 && p < 0.40) {
-          imageScale = 1.00 + approachP * 0.35 // 1.00 → 1.35 (approaching glass)
-        } else if (p >= 0.40 && p < 0.60) {
-          imageScale = 1.35 - flyP * 0.35      // 1.35 → 1.00 (passing through window)
+        if (p < 0.20) {
+          worldScale = 1.00
+          frameScale = 1.00
+        } else if (p >= 0.20 && p < 0.45) {
+          worldScale = 1.00 + approachP * 0.40       // 1.00 → 1.40 (world scales forward behind window)
+          frameScale = 1.00 + approachP * 0.15       // 1.00 → 1.15 (anchored viewport frame)
+        } else if (p >= 0.45 && p < 0.60) {
+          worldScale = 1.40 - flyP * 0.40            // 1.40 → 1.00 (settles into 1:1 full bleed)
+          frameScale = 1.15 + exponentialP * (maxScale - 1.15) // frame expands in lockstep with aperture
         } else if (p >= 0.60 && p < 0.86) {
-          imageScale = 1.00
+          worldScale = 1.00
+          frameScale = maxScale
         } else if (p >= 0.86) {
-          imageScale = 1.00 + kbP * 0.03       // 1.00 → 1.03
+          worldScale = 1.00 + kbP * 0.03             // 1.00 → 1.03 (Ken Burns)
+          frameScale = maxScale
         }
 
-        gsap.set(portalImageRef.current, {
-          scale:   imageScale,
-          opacity: 1 - xfade,
+        // SVG Outline Frame: scale matches clip-path aperture 1:1, lerps vertical center to 50%
+        const centerYLerp   = remap(p, 0.45, 0.60)
+        const targetCenterYPercent = 45 + centerYLerp * 5 // 45% -> 50%
+        const outlineFade   = remap(p, 0.585, 0.60)
+
+        gsap.set(logoMarkRef.current, {
+          top: `${targetCenterYPercent}%`,
+          scale: frameScale,
+          opacity: Math.max(0, 1 - outlineFade),
         })
-        gsap.set(videoRef.current, { opacity: xfade })
+
+        gsap.set(portalImageRef.current, { scale: worldScale, opacity: 1 - xfade })
+        gsap.set(videoRef.current,       { opacity: xfade })
+
+        // ── p 0.78→0.86  Large title fades in (ONLY AFTER ~1s fullscreen hold) ──
+        gsap.set(fullTitleRef.current, { opacity: remap(p, 0.78, 0.86) })
 
         // ── Video pre-start ───────────────────────────────────────
         if (p > 0.85 && !videoStarted.current && videoRef.current) {
@@ -218,7 +260,7 @@ export default function HeroV2() {
   return (
     <section ref={heroRef} id="top" className={styles.hero}>
 
-      {/* ── Hidden SVG: portal clip-path definition ───────────── */}
+      {/* ── Fixed SVG Clip-Path Definition for Viewport Aperture ── */}
       <svg className={styles.clipDefs} aria-hidden="true" focusable="false">
         <defs>
           <clipPath id="heroPortalClip" clipPathUnits="userSpaceOnUse">
@@ -227,10 +269,8 @@ export default function HeroV2() {
         </defs>
       </svg>
 
-      {/* ── Portal: clipped to SVG mountain capsule → expands to fullscreen ──── */}
-      <div ref={portalRef} className={styles.portal}>
-
-        {/* Still hero image inside portal */}
+      {/* ── Fullscreen World Layer (sits full-resolution behind everything) ── */}
+      <div className={styles.worldLayer}>
         <img
           ref={portalImageRef}
           src={heroImageSrc}
@@ -238,15 +278,6 @@ export default function HeroV2() {
           aria-hidden="true"
           className={styles.portalImage}
         />
-
-        {/* SVG mountain capsule icon — architectural viewport frame */}
-        <img
-          ref={logoMarkRef}
-          src={logoSvg}
-          alt="Serene Heights Mountain Viewport"
-          className={styles.logoMark}
-        />
-
         {/* Video crossfade target */}
         <video
           ref={videoRef}
@@ -263,15 +294,30 @@ export default function HeroV2() {
           />
         </video>
 
-        {/* Dark vignette inside portal */}
+        {/* Dark vignette inside viewport */}
         <div className={styles.portalOverlay} aria-hidden="true" />
+      </div>
 
-        {/* Fullscreen title — fades in p 0.78→0.86 ONLY AFTER entering resort world */}
+      {/* ── SVG Outline Frame (attached to viewport aperture at 45% vh) ── */}
+      <img
+        ref={logoMarkRef}
+        src={logoSvg}
+        alt="Serene Heights Mountain Viewport"
+        className={styles.logoMark}
+      />
+
+      {/* ── Fullscreen Title Overlay (fades in p 0.78→0.86) ── */}
+      <div className={styles.fullTitleWrap} style={{ zIndex: 6 }}>
         <div ref={fullTitleRef} className={styles.fullTitleWrap}>
           <h1 className={styles.fullTitle}>Serene Heights</h1>
           <p className={styles.fullSubtitle}>Hotel &amp; Residences &nbsp;·&nbsp; Nathia Gali</p>
         </div>
+      </div>
 
+      {/* ── Minimal Opening Brand Lockup below capsule (p 0.00 → 0.38) ── */}
+      <div ref={brandLockupRef} className={styles.openingLockup} aria-hidden="true">
+        <p className={styles.openingTitle}>Serene Heights</p>
+        <p className={styles.openingSubtitle}>Hotel &amp; Residences · Nathia Gali</p>
       </div>
 
     </section>
