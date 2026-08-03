@@ -38,6 +38,8 @@
   pointer-events: auto;
   overflow: hidden;
   will-change: opacity;
+  /* Limit SVG mask recalculations to this subtree only */
+  contain: layout style;
 }
 
 /* Centered HTML Window element locked dead-center at 50vw 50vh */

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+﻿import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
 import {
@@ -45,14 +45,8 @@ function drawCover(
 }
 
 /**
- * Cinematic color grade baked directly into the canvas pixel buffer.
- *
- * Uses 2D compositing blend modes — no CSS filter applied.
- * The result feels like naturally beautiful cinematography, not a filtered image.
- *
- * Grade target: warm golden-hour daylight, Aman / Six Senses editorial quality.
- *   1. Warm ivory multiply  → reduces exposure + warms highlights toward soft gold
- *   2. Soft-light contrast  → adds local depth without crushing shadows
+ * Cinematic color grade -- applied ONCE per frame to an offscreen cache canvas.
+ * The scroll paint path NEVER calls this. It only copies pre-graded pixels.
  */
 function applyCanvasCinematicGrade(
   ctx: CanvasRenderingContext2D,
@@ -60,21 +54,12 @@ function applyCanvasCinematicGrade(
   h: number,
 ) {
   ctx.save()
-
-  // Pass 1: Warm Ivory Multiply
-  // — Darkens exposure slightly
-  // — Warm color shifts whites toward soft golden daylight
   ctx.globalCompositeOperation = 'multiply'
   ctx.fillStyle = 'rgba(228, 212, 190, 0.14)'
   ctx.fillRect(0, 0, w, h)
-
-  // Pass 2: Soft-Light Contrast Punch
-  // — Lifts mid-tone contrast, makes architecture stand out
-  // — Does not crush deep shadows
   ctx.globalCompositeOperation = 'soft-light'
   ctx.fillStyle = 'rgba(24, 16, 8, 0.10)'
   ctx.fillRect(0, 0, w, h)
-
   ctx.globalCompositeOperation = 'source-over'
   ctx.restore()
 }
@@ -88,24 +73,29 @@ export default function MasterVisualStage() {
   useLayoutEffect(() => {
     const frameIndexRef = { current: 0 }
     const lastDrawnIndexRef = { current: -1 }
-    let cachedMaxScroll = 1
+
+    // Pre-graded frame cache (PERF FIX #1)
+    // Each raw frame graded once into an offscreen canvas at load time.
+    // Scroll path: single drawImage copy, zero blending, zero GPU readback.
+    const gradedCache = new Map<number, HTMLCanvasElement>()
 
     const loader = createSequenceLoader(() => redraw())
     let resizeObserver: ResizeObserver | null = null
 
-    function updateMaxScroll() {
-      const docEl = document.documentElement
-      const body = document.body
-      const scrollHeight = Math.max(
-        body.scrollHeight,
-        docEl.scrollHeight,
-        body.offsetHeight,
-        docEl.offsetHeight,
-        body.clientHeight,
-        docEl.clientHeight,
-      )
-      const clientHeight = window.innerHeight || docEl.clientHeight
-      cachedMaxScroll = Math.max(1, scrollHeight - clientHeight)
+    function buildGradedFrame(index: number): CanvasImageSource | undefined {
+      const cached = gradedCache.get(index)
+      if (cached) return cached
+      const img = loader.getFrame(index)
+      if (!img) return undefined
+      const oc = document.createElement('canvas')
+      oc.width = FRAME_WIDTH
+      oc.height = FRAME_HEIGHT
+      const ctx2 = oc.getContext('2d')
+      if (!ctx2) return img
+      ctx2.drawImage(img, 0, 0, FRAME_WIDTH, FRAME_HEIGHT)
+      applyCanvasCinematicGrade(ctx2, FRAME_WIDTH, FRAME_HEIGHT)
+      gradedCache.set(index, oc)
+      return oc
     }
 
     function redraw(force = false) {
@@ -115,18 +105,17 @@ export default function MasterVisualStage() {
       const available = nearestLoadedFrame(loader, target)
       if (available === -1) return
       if (available === lastDrawnIndexRef.current && !force) return
-      const img = loader.getFrame(available)
+      const graded = buildGradedFrame(available)
+      if (!graded) return
       const ctx = canvas.getContext('2d')
-      if (!img || !ctx) return
-      drawCover(ctx, img, FRAME_WIDTH, FRAME_HEIGHT, canvas.width, canvas.height)
-      applyCanvasCinematicGrade(ctx, canvas.width, canvas.height)
+      if (!ctx) return
+      drawCover(ctx, graded, FRAME_WIDTH, FRAME_HEIGHT, canvas.width, canvas.height)
       lastDrawnIndexRef.current = available
     }
 
     function resizeCanvas() {
       const canvas = canvasRef.current
       if (!canvas) return
-      updateMaxScroll()
       const rect = canvas.getBoundingClientRect()
       if (rect.width === 0 || rect.height === 0) return
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -141,7 +130,6 @@ export default function MasterVisualStage() {
 
     registerScrollTrigger()
 
-    // Request initial frame 0 eagerly so building is visible inside portal immediately
     loader.request(0)
     for (let i = 1; i <= 11; i += 1) loader.request(i)
     loader.startBackgroundFill()
@@ -150,14 +138,21 @@ export default function MasterVisualStage() {
       resizeObserver = new ResizeObserver(() => resizeCanvas())
       resizeObserver.observe(canvasRef.current)
     }
-    window.addEventListener('resize', updateMaxScroll, { passive: true })
+    window.addEventListener('resize', resizeCanvas, { passive: true })
     window.addEventListener('orientationchange', resizeCanvas)
     resizeCanvas()
+
+    // Dirty-value tracking (PERF FIX #4)
+    // Skip gsap.set() calls when the computed value matches the last written value.
+    let lastCanvasScale = -1
+    let lastCanvasX = 0
+    let lastCanvasY = 0
+    let lastCanvasWrapOpacity = -1
+    let lastStillOpacity = -1
 
     const updateStageFromScroll = () => {
       const p = getHeroProgress()
 
-      // Phase 3 & 4: Synchronized Camera Push toward world (p = 0.35 -> 0.65 portal expansion)
       let camPushScale = 1.0
       if (p >= 0.35 && p <= 0.65) {
         const normPushP = (p - 0.35) / 0.30
@@ -169,11 +164,9 @@ export default function MasterVisualStage() {
         camPushScale = 1.06 + 0.04 * easePush
       }
 
-      // Living Window: Subtle ambient environmental breathing & micro-drift behind portal window cutout
       let ambientDriftScale = 1.0
       let ambientX = 0
       let ambientY = 0
-
       if (p < 0.65) {
         const time = Date.now() * 0.001
         ambientDriftScale = 1.0 + 0.008 * Math.sin(time * 0.8)
@@ -183,15 +176,18 @@ export default function MasterVisualStage() {
 
       const totalCanvasScale = camPushScale * ambientDriftScale
 
-      if (canvasRef.current) {
-        gsap.set(canvasRef.current, {
-          scale: totalCanvasScale,
-          x: ambientX,
-          y: ambientY,
-        })
+      if (
+        canvasRef.current &&
+        (totalCanvasScale !== lastCanvasScale ||
+          ambientX !== lastCanvasX ||
+          ambientY !== lastCanvasY)
+      ) {
+        gsap.set(canvasRef.current, { scale: totalCanvasScale, x: ambientX, y: ambientY })
+        lastCanvasScale = totalCanvasScale
+        lastCanvasX = ambientX
+        lastCanvasY = ambientY
       }
 
-      // Mode 1: Update frame for Hero cinematic
       const targetFrame = mapProgressToFrame()
       if (targetFrame !== frameIndexRef.current) {
         frameIndexRef.current = targetFrame
@@ -201,60 +197,62 @@ export default function MasterVisualStage() {
         redraw()
       }
 
-      // Mode 1 -> Mode 2: Cross-fade opacity at end of Hero into Section 2
       const mode1Opacity = getHeroCinematicOpacity()
-      if (canvasWrapRef.current) {
+      if (canvasWrapRef.current && mode1Opacity !== lastCanvasWrapOpacity) {
         gsap.set(canvasWrapRef.current, { opacity: mode1Opacity })
+        lastCanvasWrapOpacity = mode1Opacity
       }
 
-      // Hero Still Cover: art-direction benchmark image, visible p=0.65–0.96
       const stillOpacity = getHeroStillOpacity()
-      if (heroStillRef.current) {
+      if (heroStillRef.current && stillOpacity !== lastStillOpacity) {
         gsap.set(heroStillRef.current, { opacity: stillOpacity })
+        lastStillOpacity = stillOpacity
       }
     }
 
-    // Attach ScrollTrigger on entire page scroll to drive ticker updates
+    // PERF FIX #2: Single scroll driver.
+    // Lenis already drives ScrollTrigger.update on every tick (lenis.ts:19).
+    // window 'scroll' listener REMOVED (was triple-firing updateStageFromScroll).
     const st = ScrollTrigger.create({
       trigger: document.body,
       start: 'top top',
       end: 'bottom bottom',
       scrub: true,
       invalidateOnRefresh: true,
-      onUpdate: () => {
-        updateStageFromScroll()
-      },
+      onUpdate: () => updateStageFromScroll(),
     })
 
-    window.addEventListener('scroll', updateStageFromScroll, { passive: true })
-    gsap.ticker.add(updateStageFromScroll)
+    // PERF FIX #3: Ambient ticker gated to portal phase (p < 0.65).
+    // Needed for breathing drift while stationary. Not needed post-portal.
+    const ambientTickerFn = () => {
+      if (getHeroProgress() < 0.65) {
+        updateStageFromScroll()
+      }
+    }
+    gsap.ticker.add(ambientTickerFn)
+
     updateStageFromScroll()
 
     return () => {
       st.kill()
-      window.removeEventListener('scroll', updateStageFromScroll)
-      window.removeEventListener('resize', updateMaxScroll)
-      gsap.ticker.remove(updateStageFromScroll)
-      loader.destroy()
-      resizeObserver?.disconnect()
+      window.removeEventListener('resize', resizeCanvas)
       window.removeEventListener('orientationchange', resizeCanvas)
+      gsap.ticker.remove(ambientTickerFn)
+      loader.destroy()
+      gradedCache.clear()
+      resizeObserver?.disconnect()
     }
   }, [])
 
   return (
     <div ref={stageRef} className={styles.stage} aria-hidden="true">
-      {/* Mode 2: Permanent Green Architectural World (Sections 2–10) */}
       <div className={styles.architecturalWorld}>
         <div className={styles.ambientBreathingGrid} />
         <div className={styles.ambientGlowMesh} />
       </div>
-
-      {/* Mode 1: Hero Cinematic Canvas (Hero Only, cross-fades out at end of Hero) */}
       <div ref={canvasWrapRef} className={styles.heroCinematicWrap}>
         <canvas ref={canvasRef} className={styles.canvas} />
       </div>
-
-      {/* Hero Still Cover: Art-direction benchmark — holds after portal, crossfades invisibly into canvas */}
       <img
         ref={heroStillRef}
         src={heroStillSrc}

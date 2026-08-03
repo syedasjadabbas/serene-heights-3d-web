@@ -60,6 +60,7 @@
   inset: 0;
   z-index: 2;
   will-change: opacity;
+  contain: layout style paint;
 }
 
 /*
@@ -95,6 +96,7 @@
   pointer-events: none;
   opacity: 0;
   will-change: opacity;
+  contain: layout style paint;
   filter: brightness(0.87) contrast(1.10);
 }
 

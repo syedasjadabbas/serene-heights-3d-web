@@ -58,7 +58,15 @@ export default function Hero() {
           // Deliberate cinematic runway (1200vh Desktop) for uninterrupted blended movement
           const runwayVh = conditions.isMobile ? 900 : conditions.isTablet ? 1050 : 1200
 
-          const applyProgress = (p: number) => {
+          const applyProgress = (() => {
+            // One-time initialization of Phase 1 static properties.
+            // These values never change during Phase 1 so we set them once
+            // instead of calling gsap.set() on every 60fps ticker frame.
+            let phase1Initialized = false
+            // letterSpacing dirty check -- avoids text relayout on every tick
+            let lastTracking = -999
+
+            return (p: number) => {
             // Update global stage progress deterministically
             setHeroProgress(p)
 
@@ -67,16 +75,27 @@ export default function Hero() {
               if (reduced) {
                 gsap.set(portalWrapRef.current, { opacity: 0, display: 'none' })
               } else if (p <= 0.12) {
-                // Phase 1 — Luxury Brand Identity (0% - 12%): Solid emblem mark on deep green, ambient golden glow, quiet signature
-                const time = Date.now() * 0.0016
-                const breathing = 1.0 + 0.018 * Math.sin(time)
-
-                gsap.set(portalWrapRef.current, {
-                  opacity: 1,
-                  display: 'block',
-                  pointerEvents: 'auto',
-                })
+                // Phase 1 -- Luxury Brand Identity
+                // Static properties: set once, not on every 60fps tick
+                if (!phase1Initialized) {
+                  phase1Initialized = true
+                  gsap.set(portalWrapRef.current, { opacity: 1, display: 'block', pointerEvents: 'auto' })
+                  if (glassStopCenterRef.current) {
+                    glassStopCenterRef.current.setAttribute('offset', '0%')
+                    glassStopCenterRef.current.setAttribute('stop-color', '#ffffff')
+                  }
+                  if (glassStopEdgeRef.current) {
+                    glassStopEdgeRef.current.setAttribute('offset', '0%')
+                    glassStopEdgeRef.current.setAttribute('stop-color', '#ffffff')
+                  }
+                  if (portalLogoSolidFillRef.current) gsap.set(portalLogoSolidFillRef.current, { opacity: 1 })
+                  if (portalLogoImageRef.current) gsap.set(portalLogoImageRef.current, { opacity: 1 })
+                  if (openingSignatureRef.current) gsap.set(openingSignatureRef.current, { opacity: 1 })
+                }
+                // Animated: only the breathing scale changes per tick
                 if (portalWindowRef.current) {
+                  const time = Date.now() * 0.0016
+                  const breathing = 1.0 + 0.018 * Math.sin(time)
                   gsap.set(portalWindowRef.current, {
                     scale: breathing,
                     xPercent: -50,
@@ -84,25 +103,9 @@ export default function Hero() {
                     transformOrigin: 'center center',
                   })
                 }
-                if (glassStopCenterRef.current) {
-                  glassStopCenterRef.current.setAttribute('offset', '0%')
-                  glassStopCenterRef.current.setAttribute('stop-color', '#ffffff')
-                }
-                if (glassStopEdgeRef.current) {
-                  glassStopEdgeRef.current.setAttribute('offset', '0%')
-                  glassStopEdgeRef.current.setAttribute('stop-color', '#ffffff')
-                }
-                if (portalLogoSolidFillRef.current) {
-                  gsap.set(portalLogoSolidFillRef.current, { opacity: 1 })
-                }
-                if (portalLogoImageRef.current) {
-                  gsap.set(portalLogoImageRef.current, { opacity: 1 })
-                }
-                if (openingSignatureRef.current) {
-                  gsap.set(openingSignatureRef.current, { opacity: 1 })
-                }
               } else if (p <= 0.30) {
-                // Phase 2 — Center-Outward Radial Glass Transformation (12% - 30%): Solid emblem un-frosts smoothly
+                // Phase 2 -- Radial Glass Un-frosting
+                phase1Initialized = false // reset for re-entry on reverse scroll
                 const normGlassP = (p - 0.12) / 0.18
                 const time = Date.now() * 0.0016
                 const breathing = 1.0 + 0.018 * Math.sin(time)
@@ -120,7 +123,6 @@ export default function Hero() {
                     transformOrigin: 'center center',
                   })
                 }
-                // Radial Glass Un-frosting: Center offset grows from 0% to 120%
                 const centerOffset = `${(normGlassP * 120).toFixed(1)}%`
                 const edgeOffset = `${Math.min(100, normGlassP * 140 + 15).toFixed(1)}%`
 
@@ -142,10 +144,11 @@ export default function Hero() {
                   gsap.set(openingSignatureRef.current, { opacity: Math.max(0, 1 - normGlassP * 0.9) })
                 }
               } else if (p < 0.58) {
-                // Phase 3 — Overlapping Physical Expansion (28% - 58%): Travel through logo window into resort
+                // Phase 3 -- Overlapping Physical Expansion
+                phase1Initialized = false
                 const normP = (p - 0.28) / 0.30
-                const portalScale = 1.0 + 39.0 * (normP * normP) // Smooth inertial acceleration
-                const logoOpacity = Math.max(0, 1 - normP * 1.8) // Logo stroke & gold contour dissolve
+                const portalScale = 1.0 + 39.0 * (normP * normP)
+                const logoOpacity = Math.max(0, 1 - normP * 1.8)
 
                 gsap.set(portalWrapRef.current, {
                   opacity: 1,
@@ -178,7 +181,8 @@ export default function Hero() {
                   gsap.set(openingSignatureRef.current, { opacity: 0 })
                 }
               } else if (p < 0.65) {
-                // Phase 4 — Seamless Transition (58% - 65%): Portal fills viewport, green overlay dissolves cleanly
+                // Phase 4 -- Seamless Transition
+                phase1Initialized = false
                 const fadeOut = (p - 0.58) / 0.07
                 const portalScale = 40.0 + 12.0 * ((p - 0.58) / 0.07)
 
@@ -200,6 +204,7 @@ export default function Hero() {
                 }
               } else {
                 // Entered world completely
+                phase1Initialized = false
                 gsap.set(portalWrapRef.current, {
                   opacity: 0,
                   display: 'none',
@@ -218,7 +223,6 @@ export default function Hero() {
                   filter: 'blur(0px)',
                 })
               } else if (p < 0.70) {
-                // World Arrival Pause (65% - 70% of Hero): Visitor experiences the pristine architecture holding still
                 gsap.set(cinematicTitleRef.current, {
                   opacity: 0,
                   scale: 0.92,
@@ -226,9 +230,7 @@ export default function Hero() {
                   filter: 'blur(6px)',
                 })
               } else if (p <= 0.78) {
-                // Phase 5 — Hero Title Emergence (70% - 78% of Hero): Gentle emergence from architecture
                 const normP = (p - 0.70) / 0.08
-                // Smooth S-curve easing
                 const easeP = (1 - Math.cos(normP * Math.PI)) / 2
 
                 gsap.set(cinematicTitleRef.current, {
@@ -239,7 +241,6 @@ export default function Hero() {
                   pointerEvents: 'auto',
                 })
               } else {
-                // Phase 6 — Cinematic Scroll Sequence: Title growth & optical tracking (78% - 100% of Hero)
                 const normP = Math.min(1, (p - 0.78) / 0.18)
                 const scale = 1.0 + 0.28 * Math.sin((normP * Math.PI) / 2)
                 const tracking = 0.18 - 0.10 * normP
@@ -258,11 +259,19 @@ export default function Hero() {
                   pointerEvents: p > 0.92 ? 'none' : 'auto',
                 })
 
+                // letterSpacing dirty check (PERF FIX #5)
+                // toFixed(3) allocates a new string + triggers text relayout on every tick.
+                // Only write when the rounded value has actually changed.
                 if (brandTitleRef.current) {
-                  gsap.set(brandTitleRef.current, {
-                    letterSpacing: `${tracking.toFixed(3)}em`,
-                    paddingLeft: `${tracking.toFixed(3)}em`,
-                  })
+                  const roundedTracking = Math.round(tracking * 1000) / 1000
+                  if (roundedTracking !== lastTracking) {
+                    lastTracking = roundedTracking
+                    const trackingStr = `${roundedTracking.toFixed(3)}em`
+                    gsap.set(brandTitleRef.current, {
+                      letterSpacing: trackingStr,
+                      paddingLeft: trackingStr,
+                    })
+                  }
                 }
               }
             }
@@ -282,6 +291,7 @@ export default function Hero() {
               }
             }
           }
+          })()
 
           // Smooth inertial scrub (1.4s) for reversible cinematic film progress
           const st = ScrollTrigger.create({
