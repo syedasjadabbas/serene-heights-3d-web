@@ -22,24 +22,7 @@
   pointer-events: none;
 }
 
-/* ─── Official PNG Brand Logo (Opening Hold) ───────────────── */
-/*
- * Centred pixel-for-pixel original PNG logo.
- * Rendered at z-index: 5 (above the portal). Fades out seamlessly
- * over 150-200ms (p = 0.18 → 0.24) to hand off to the SVG clip window.
- */
-.officialLogo {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: clamp(100px, 14vw, 200px);
-  height: auto;
-  display: block;
-  z-index: 5;
-  will-change: opacity;
-  pointer-events: none;
-}
+
 
 /* ─── Portal panel ─────────────────────────────────────────── */
 /*

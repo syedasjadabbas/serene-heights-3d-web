@@ -1,53 +1,46 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
-import logoPng from '../../assets/branding/serene-heights-logo.png'
 import logoSvg from '../../assets/branding/serene-heights-logo.svg'
 import heroImageSrc from '../../assets/hero/scene-01-establish.png'
 import styles from './HeroV2.module.css'
 
 /**
- * HeroV2 — Minimal Opening & Airplane Window Camera Fly-Through
+ * HeroV2 — Architectural Mountain Capsule Portal & Camera Fly-Through
  *
- * ─── Opening Frame ────────────────────────────────────────────────
- *   - Deep green background (#0a1410).
- *   - Official mountain logo capsule emblem ONLY.
- *   - REMOVED COMPLETELY: All titles, subtitles, "Lahore", scroll text,
- *     small lockups. Ultra-minimal, silent, luxury opening.
- *
- * ─── Airplane Window Fly-Through ─────────────────────────────────
- *   - Logo remains almost fixed on screen (slight perspective creep scale 1.00 → 1.05).
- *   - Interior reveals the resort photograph inside the window.
+ * ─── Design Concept ───────────────────────────────────────────────
+ *   - The mountain capsule is NOT branding/logo anymore.
+ *   - It is an architectural object, an airplane window, a viewport.
+ *   - REMOVED COMPLETELY: All PNG logos, typography, "SERENE HEIGHTS", "LAHORE".
+ *   - The mountain capsule sits ALONE on the deep green background (#0a1410).
+ *   - As scroll begins, the interior reveals the resort photograph.
  *   - Camera moves toward the window (photograph zooms 1.00 → 1.35 inside frame).
- *   - Camera passes THROUGH the logo window plane (clip-path expands to fullscreen).
- *   - Logo naturally dissolves as camera enters the resort world.
+ *   - Capsule frame barely scales (1.00 → 1.05).
+ *   - Camera flies THROUGH the mountain capsule window into the resort landscape.
  *   - ONLY AFTER entering the world does the large SERENE HEIGHTS title fade in.
  *
  * ─── Timeline (runway: +=700%) ────────────────────────────────────
- *   p 0.00 → 0.20   Static Green Opening & Minimal Logo Hold
+ *   p 0.00 → 0.20   Static Green Opening & Mountain Capsule Hold
  *                   Full-screen deep green background (#0a1410).
- *                   Original logo asset (serene-heights-logo.png) ONLY.
- *                   100% static hold. Zero typography.
- *
- *   p 0.18 → 0.24   Invisible Logo Handoff (150–200ms crossfade)
- *                   PNG logo (officialLogoRef) crossfades 1→0 into SVG clip window.
+ *                   SVG mountain capsule icon (logoMarkRef) sits ALONE.
+ *                   100% static hold. Zero text, zero PNG.
  *
  *   p 0.20 → 0.40   Airplane Window Camera Approach
- *                   Window frame stays anchored in screen space.
- *                   Photograph behind logo zooms forward (scale 1.00 → 1.35).
- *                   Simulates camera walking toward the glass window.
+ *                   Inside of mountain capsule reveals resort photograph.
+ *                   Capsule window frame stays anchored (scale 1.00 → 1.05).
+ *                   Photograph behind capsule zooms forward (scale 1.00 → 1.35).
  *
- *   p 0.40 → 0.60   Camera Fly-Through Window Plane
+ *   p 0.40 → 0.60   Camera Fly-Through Mountain Capsule Window
  *                   SVG clip-path expands from capsule → fullscreen.
  *                   Photograph passes through glass plane (scale 1.35 → 1.00).
- *                   Logo outline dissolves as camera steps into resort world (p 0.48→0.58).
+ *                   Capsule SVG outline dissolves as camera enters resort world (p 0.48→0.58).
  *                   Reaches full-screen resort landscape at p = 0.60.
  *
  *   p 0.60 → 0.78   Fullscreen Photograph Hold
  *                   Clean fullscreen resort landscape (scale 1.00). Zero text, zero movement.
  *
- *   p 0.78 → 0.86   Title Reveal (Only After Entering World)
- *                   Large SERENE HEIGHTS title fades in.
+ *   p 0.78 → 0.86   Title Reveal (Only After Entering Resort World)
+ *                   Large SERENE HEIGHTS title + HOTEL & RESIDENCES subtitle fade in.
  *
  *   p 0.86 → 0.92   Subtle Ken Burns Zoom
  *                   portalImage scale 1.00 → 1.03.
@@ -85,8 +78,8 @@ function computeClipAttrs(
   const lw = logoNaturalW(vw)
   const lh = logoNaturalH(lw)
 
-  // p 0.00→0.40: Window frame stays anchored at natural logo capsule size (expandP = 0)
-  // p 0.40→0.60: Aperture expansion as camera passes through window frame
+  // p 0.00→0.40: Capsule window stays anchored at natural size (expandP = 0)
+  // p 0.40→0.60: Aperture expansion as camera passes through mountain capsule window
   const expandP = Math.max(0, Math.min(1, (p - 0.40) / 0.20))
 
   const effW = lw
@@ -114,14 +107,13 @@ function remap(p: number, inMin: number, inMax: number): number {
 }
 
 export default function HeroV2() {
-  const heroRef         = useRef<HTMLElement>(null)
-  const clipRectRef     = useRef<SVGRectElement>(null)
-  const portalRef       = useRef<HTMLDivElement>(null)
-  const portalImageRef  = useRef<HTMLImageElement>(null)
-  const officialLogoRef = useRef<HTMLImageElement>(null)
-  const logoMarkRef     = useRef<HTMLImageElement>(null)
-  const videoRef        = useRef<HTMLVideoElement>(null)
-  const fullTitleRef    = useRef<HTMLDivElement>(null)
+  const heroRef        = useRef<HTMLElement>(null)
+  const clipRectRef    = useRef<SVGRectElement>(null)
+  const portalRef      = useRef<HTMLDivElement>(null)
+  const portalImageRef = useRef<HTMLImageElement>(null)
+  const logoMarkRef    = useRef<HTMLImageElement>(null)
+  const videoRef       = useRef<HTMLVideoElement>(null)
+  const fullTitleRef   = useRef<HTMLDivElement>(null)
 
   const vwRef = useRef(window.innerWidth)
   const vhRef = useRef(window.innerHeight)
@@ -140,7 +132,6 @@ export default function HeroV2() {
     })
 
     // Deterministic initial layer states:
-    gsap.set(officialLogoRef.current,{ opacity: 1, scale: 1 })
     gsap.set(logoMarkRef.current,    { opacity: 1, scale: 1 })
     gsap.set(portalImageRef.current, { scale: 1.00, opacity: 1 })
     gsap.set(videoRef.current,       { opacity: 0 })
@@ -170,14 +161,9 @@ export default function HeroV2() {
           attr: computeClipAttrs(p, vw, vh),
         })
 
-        // ── p 0.18→0.24  Invisible Handoff: PNG logo crossfades to SVG clip ──
-        gsap.set(officialLogoRef.current, {
-          opacity: Math.max(0, 1 - remap(p, 0.18, 0.24)),
-        })
-
-        // ── Logo Frame Perspective (anchored on screen, slight perspective creep) ──
-        // p 0.20 → 0.40: logo stays almost fixed on screen (scale 1.00 → 1.05)
-        // p 0.40 → 0.60: logo outline dissolves naturally as camera passes through (opacity 1→0)
+        // ── Mountain Capsule Frame Perspective ─────────────────────
+        // p 0.20 → 0.40: capsule stays almost fixed on screen (scale 1.00 → 1.05)
+        // p 0.40 → 0.60: capsule outline dissolves naturally as camera passes through (opacity 1→0)
         const frameCreepP = remap(p, 0.20, 0.40)
         gsap.set(logoMarkRef.current, {
           scale: 1.00 + frameCreepP * 0.05,
@@ -189,8 +175,8 @@ export default function HeroV2() {
 
         // ── Camera Motion Profile (Airplane Window Fly-Through) ────
         // p 0.00 → 0.20: scale = 1.00 (static hold)
-        // p 0.20 → 0.40: scale = 1.00 → 1.35 (camera moves forward toward window glass pane)
-        // p 0.40 → 0.60: scale = 1.35 → 1.00 (camera passes through window plane into resort landscape)
+        // p 0.20 → 0.40: scale = 1.00 → 1.35 (camera moves forward toward capsule window pane)
+        // p 0.40 → 0.60: scale = 1.35 → 1.00 (camera passes through capsule plane into resort landscape)
         // p 0.60 → 0.86: scale = 1.00 (motion stops completely, clean still hold & title reveal)
         // p 0.86 → 0.92: scale = 1.00 → 1.03 (subtle Ken Burns zoom)
         // p 0.92 → 1.00: scale = 1.03 (held during video crossfade)
@@ -232,14 +218,6 @@ export default function HeroV2() {
   return (
     <section ref={heroRef} id="top" className={styles.hero}>
 
-      {/* ── Official PNG Brand Logo (Opening Hold - Minimal, No Text) ── */}
-      <img
-        ref={officialLogoRef}
-        src={logoPng}
-        alt="Serene Heights"
-        className={styles.officialLogo}
-      />
-
       {/* ── Hidden SVG: portal clip-path definition ───────────── */}
       <svg className={styles.clipDefs} aria-hidden="true" focusable="false">
         <defs>
@@ -249,7 +227,7 @@ export default function HeroV2() {
         </defs>
       </svg>
 
-      {/* ── Portal: clipped to SVG logo capsule → expands to fullscreen ──── */}
+      {/* ── Portal: clipped to SVG mountain capsule → expands to fullscreen ──── */}
       <div ref={portalRef} className={styles.portal}>
 
         {/* Still hero image inside portal */}
@@ -261,11 +239,11 @@ export default function HeroV2() {
           className={styles.portalImage}
         />
 
-        {/* SVG logo mark — outline frame inside window */}
+        {/* SVG mountain capsule icon — architectural viewport frame */}
         <img
           ref={logoMarkRef}
           src={logoSvg}
-          alt="Serene Heights"
+          alt="Serene Heights Mountain Viewport"
           className={styles.logoMark}
         />
 
