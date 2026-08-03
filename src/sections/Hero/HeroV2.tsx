@@ -6,21 +6,25 @@ import heroImageSrc from '../../assets/hero/scene-01-establish.png'
 import styles from './HeroV2.module.css'
 
 /**
- * HeroV2 — Stable Content Viewport Expansion & Fullscreen Entrance
+ * HeroV2 — Cinematic 3D Camera Dolly Viewport Entrance
  *
- * ─── Motion Profile ───────────────────────────────────────────────
- *   - p 0.00 → 0.20: Static green opening hold (frameScale = 1.00, worldScale = 1.00).
- *   - p 0.20 → 0.45: Approach phase. Capsule window occupies more field of view (frameScale 1.00 → 1.40).
- *                    World layer stays STRICTLY at scale 1.00. The building inside the glass
- *                    does NOT zoom — content stays 100% visually stable!
- *                    Brand lockup fades out smoothly (p 0.20 → 0.38).
- *   - p 0.45 → 0.60: Viewport aperture expands exponentially (Power-4) to fill screen (frameScale 1.40 → maxScale).
- *                    World layer stays at 1:1 full bleed scale (1.00).
- *                    SVG outline frame dissolves ONLY after exceeding viewport bounds (p 0.585 → 0.60).
- *   - p 0.60 → 0.78: Fullscreen photograph appreciation hold (~1s scroll hold). Zero motion, zero text.
- *   - p 0.78 → 0.86: Title reveal.
- *   - p 0.86 → 0.92: Ken Burns zoom (worldScale = 1.00 → 1.03).
- *   - p 0.92 → 1.00: Invisible video crossfade.
+ * ─── Physical 3D Camera Motion Profile ───────────────────────────
+ *   - Phase 1 (p 0.20 → 0.45): Leaning toward window.
+ *     Capsule window frame enlarges on screen (frameScale 1.00 → 1.40).
+ *     World layer stays STRICTLY at scale 1.00 (building inside glass does NOT zoom).
+ *     Brand lockup fades out smoothly (p 0.20 → 0.38).
+ *
+ *   - Phase 2 (p 0.45 → 0.60): Physical 3D Camera Dolly forward through window plane.
+ *     Camera translates forward along Z axis.
+ *     Capsule window edges naturally pass beyond the viewport boundaries by p = 0.57.
+ *     World layer stays at 1:1 full bleed scale (1.00) without distortion or morphing.
+ *     SVG outline frame dissolves ONLY at p 0.58 → 0.60 when it is ALREADY 100% outside the screen.
+ *     Zero visible disappearing border!
+ *
+ *   - Phase 3 (p >= 0.60): Fullscreen world is ALREADY active.
+ *     No pop, no jump, no resize, no replacement.
+ *     Fullscreen photograph appreciation hold (~1s scroll hold).
+ *     Title reveal (p 0.78 → 0.86), Ken Burns (p 0.86 → 0.92), Video crossfade (p 0.92 → 1.00).
  *
  * ─── Architecture Invariants ──────────────────────────────────────
  *   ONE pinned section · ONE ScrollTrigger · ONE onUpdate
@@ -63,7 +67,8 @@ function computeClipAttrs(
   const startRx = RX_FRAC   * lw
   const startRy = RY_FRAC   * lh
 
-  const maxScale = Math.max(vw / startW, vh / startH) * 1.5
+  // Max scale multiplier pushes capsule frame 100% past screen limits by p = 0.57
+  const maxScale = Math.max(vw / startW, vh / startH) * 2.0
 
   const approachP    = easeInOutCubic(remap(p, 0.20, 0.45))
   const flyP        = remap(p, 0.45, 0.60)
@@ -73,9 +78,9 @@ function computeClipAttrs(
   if (p < 0.20) {
     frameScale = 1.00
   } else if (p >= 0.20 && p < 0.45) {
-    frameScale = 1.00 + approachP * 0.40 // Window occupies more of vision (1.00 → 1.40)
+    frameScale = 1.00 + approachP * 0.40 // Window enlarges naturally (1.00 → 1.40)
   } else if (p >= 0.45 && p < 0.60) {
-    frameScale = 1.40 + exponentialP * (maxScale - 1.40) // Exponential expansion to fullscreen
+    frameScale = 1.40 + exponentialP * (maxScale - 1.40) // 3D Camera dolly forward through window
   } else {
     frameScale = maxScale
   }
@@ -157,7 +162,7 @@ export default function HeroV2() {
 
         const startW = CAPSULE_W * lw
         const startH = CAPSULE_H * lh
-        const maxScale = Math.max(vw / startW, vh / startH) * 1.5
+        const maxScale = Math.max(vw / startW, vh / startH) * 2.0
 
         // ── Minimal Opening Lockup Fade Out (p 0.20 → 0.38) ────────
         const lockupFade = remap(p, 0.20, 0.38)
@@ -170,16 +175,16 @@ export default function HeroV2() {
           attr: computeClipAttrs(p, vw, vh),
         })
 
-        // ── Camera Approach & World Stability Profile ──────────────
-        // p 0.00 → 0.20: static hold (worldScale = 1.00, frameScale = 1.00)
-        // p 0.20 → 0.45: window occupies more field of view (frameScale = 1.00 → 1.40).
-        //                worldScale stays STRICTLY at 1.00 (building inside glass does NOT zoom!).
-        // p 0.45 → 0.60: window frame expands exponentially past viewport edges (frameScale = 1.40 → maxScale).
-        //                worldScale stays STRICTLY at 1.00!
-        // p 0.60 → 0.78: fullscreen landscape appreciation hold (worldScale = 1.00).
-        // p 0.78 → 0.86: title reveal.
-        // p 0.86 → 0.92: Ken Burns zoom (worldScale = 1.00 → 1.03).
-        // p 0.92 → 1.00: invisible video crossfade.
+        // ── Camera Motion & World Stability Profile ──────────────
+        // Phase 1 (p 0.20 → 0.45): window occupies more field of view (frameScale = 1.00 → 1.40).
+        //                          worldScale stays STRICTLY at 1.00 (building inside glass does NOT zoom!).
+        // Phase 2 (p 0.45 → 0.60): 3D camera dolly forward through window plane (frameScale = 1.40 → maxScale).
+        //                          Capsule edges naturally move outside viewport bounds by p = 0.57.
+        //                          worldScale stays STRICTLY at 1.00!
+        // Phase 3 (p 0.60 → 0.78): fullscreen landscape appreciation hold (worldScale = 1.00).
+        // Phase 4 (p 0.78 → 0.86): title reveal.
+        // Phase 5 (p 0.86 → 0.92): Ken Burns zoom (worldScale = 1.00 → 1.03).
+        // Phase 6 (p 0.92 → 1.00): invisible video crossfade.
         const approachP    = easeInOutCubic(remap(p, 0.20, 0.45))
         const flyP        = remap(p, 0.45, 0.60)
         const exponentialP = Math.pow(flyP, 4)
@@ -196,7 +201,7 @@ export default function HeroV2() {
           frameScale = 1.00 + approachP * 0.40  // Capsule window occupies more field of view (1.00 → 1.40)
           worldScale = 1.00                     // Content inside window stays 100% visually stable!
         } else if (p >= 0.45 && p < 0.60) {
-          frameScale = 1.40 + exponentialP * (maxScale - 1.40) // Power-4 expansion to fullscreen
+          frameScale = 1.40 + exponentialP * (maxScale - 1.40) // 3D Camera dolly forward through window
           worldScale = 1.00                     // World layer stays 1.00!
         } else if (p >= 0.60 && p < 0.86) {
           frameScale = maxScale
@@ -206,10 +211,12 @@ export default function HeroV2() {
           worldScale = 1.00 + kbP * 0.03        // Ken Burns zoom (1.00 → 1.03)
         }
 
-        // SVG Outline Frame: scale matches clip-path aperture 1:1, lerps vertical center to 50%
+        // SVG Outline Frame: scale matches clip-path aperture 1:1
+        // By p = 0.57, maxScale * 2.0 has already pushed the capsule frame 100% outside the viewport bounds.
+        // Dissolve the SVG outline strictly during p 0.58 → 0.60 when it is ALREADY completely off-screen!
         const centerYLerp   = remap(p, 0.45, 0.60)
         const targetCenterYPercent = 45 + centerYLerp * 5 // 45% -> 50%
-        const outlineFade   = remap(p, 0.585, 0.60)
+        const outlineFade   = remap(p, 0.58, 0.60)
 
         gsap.set(logoMarkRef.current, {
           top: `${targetCenterYPercent}%`,

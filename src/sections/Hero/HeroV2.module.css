@@ -6,6 +6,9 @@
   background: #0a1410;
   overflow: clip;
   z-index: 2;
+  perspective: 1200px;
+  perspective-origin: 50% 45%;
+  transform-style: preserve-3d;
 }
 
 /* ─── Hidden SVG that holds the <clipPath> definition ─────── */
