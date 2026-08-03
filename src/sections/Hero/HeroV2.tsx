@@ -6,49 +6,22 @@ import heroImageSrc from '../../assets/hero/scene-01-establish.png'
 import styles from './HeroV2.module.css'
 
 /**
- * HeroV2 — Unified Optical Viewport Dolly & Fullscreen World Camera Rig
+ * HeroV2 — True Optical Camera Dolly & Viewport Aperture Entrance
  *
- * ─── Camera Rig & Geometry Match Invariants ───────────────────────
- *   - The clipPath cutout and SVG outline frame scale UNIFORMLY at all times
- *     with 100% identical capsule geometry (100:136 aspect ratio).
- *   - NO aspect ratio morphing or rectangular stretching.
- *   - Resort photograph sits in a full-resolution fullscreen layer (worldLayer)
- *     behind the deep green wall (#0a1410).
- *   - Camera dolly: world scales 1.00 → 1.40 behind window (p 0.20 → 0.45),
- *     then capsule aperture expands exponentially (Power-4) past the viewport
- *     edges (p 0.45 → 0.60).
- *   - SVG outline frame dissolves ONLY after capsule bounds exceed viewport (p 0.585 → 0.60).
- *
- * ─── Timeline (runway: +=700%) ────────────────────────────────────
- *   p 0.00 → 0.20   Static Green Opening & Centered Viewport Hold
- *                   Full-screen deep green background (#0a1410).
- *                   Capsule viewport centered at 45% vh + brand lockup below.
- *                   World layer sitting full-resolution at scale = 1.00 behind window.
- *
- *   p 0.20 → 0.45   Camera Dolly Approach
- *                   Camera moves forward toward airplane window.
- *                   World behind window scales 1.00 → 1.40 (increasing world scale).
- *                   Capsule viewport frame stays anchored (scale 1.00 → 1.15).
- *                   Brand lockup fades out smoothly (p 0.20 → 0.38).
- *
- *   p 0.45 → 0.60   Camera Fly-Through & Uniform Aperture Expansion
- *                   Camera steps through capsule window plane.
- *                   Viewport aperture expands exponentially (Power-4) maintaining 100:136 capsule shape.
- *                   World scale settles smoothly 1.40 → 1.00 (1:1 full bleed).
- *                   SVG frame dissolves ONLY during last 10% of motion (p 0.585 → 0.60).
- *
- *   p 0.60 → 0.78   Fullscreen Photograph Hold (~1s Scroll Hold)
- *                   Clean fullscreen resort landscape (scale 1.00). Zero text, zero movement.
- *
- *   p 0.78 → 0.86   Title Reveal (Only After Fullscreen Hold)
- *                   Large SERENE HEIGHTS title + HOTEL & RESIDENCES subtitle fade in.
- *
- *   p 0.86 → 0.92   Subtle Ken Burns Zoom
- *                   worldScale = 1.00 → 1.03.
- *
- *   p 0.92 → 1.00   Invisible Video Crossfade
- *                   portalImage opacity 1→0, heroVideo opacity 0→1.
- *                   Photograph comes alive.
+ * ─── Camera Dolly Physics ─────────────────────────────────────────
+ *   - p 0.00 → 0.20: Static green opening hold (frameScale = 1.00, worldScale = 1.00).
+ *   - p 0.20 → 0.45: Camera approaches glass.
+ *                    Viewport frame stays 100% STATIONARY (frameScale = 1.00).
+ *                    World behind window zooms forward (worldScale = 1.00 → 2.20).
+ *                    Creates 100% optical illusion of walking toward a fixed window pane.
+ *   - p 0.45 → 0.60: Passing through glass plane into open world.
+ *                    Viewport aperture expands exponentially (Power-5) to fill screen.
+ *                    World scale settles smoothly 2.20 → 1.00 (1:1 full bleed).
+ *                    SVG outline frame dissolves ONLY after exceeding viewport bounds (p 0.585 → 0.60).
+ *   - p 0.60 → 0.78: Fullscreen photograph appreciation hold (~1s scroll hold). Zero motion, zero text.
+ *   - p 0.78 → 0.86: Title reveal.
+ *   - p 0.86 → 0.92: Ken Burns zoom (worldScale = 1.00 → 1.03).
+ *   - p 0.92 → 1.00: Invisible video crossfade.
  *
  * ─── Architecture Invariants ──────────────────────────────────────
  *   ONE pinned section · ONE ScrollTrigger · ONE onUpdate
@@ -91,25 +64,20 @@ function computeClipAttrs(
   const startRx = RX_FRAC   * lw
   const startRy = RY_FRAC   * lh
 
-  // Scale factor required to push capsule inner bounds completely past viewport edges
   const maxScale = Math.max(vw / startW, vh / startH) * 1.5
 
-  const approachP    = easeInOutCubic(remap(p, 0.20, 0.45))
   const flyP        = remap(p, 0.45, 0.60)
-  const exponentialP = Math.pow(flyP, 4)
+  const exponentialP = Math.pow(flyP, 5) // Power-5 exponential aperture explosion
 
   let frameScale = 1.00
-  if (p < 0.20) {
-    frameScale = 1.00
-  } else if (p >= 0.20 && p < 0.45) {
-    frameScale = 1.00 + approachP * 0.15
+  if (p < 0.45) {
+    frameScale = 1.00 // Window frame stays 100% stationary during camera approach
   } else if (p >= 0.45 && p < 0.60) {
-    frameScale = 1.15 + exponentialP * (maxScale - 1.15)
+    frameScale = 1.00 + exponentialP * (maxScale - 1.00) // Aperture expands to fullscreen
   } else {
     frameScale = maxScale
   }
 
-  // Smoothly lerp vertical center from 0.45 vh to 0.50 vh during expansion
   const centerYLerp   = remap(p, 0.45, 0.60)
   const targetCenterY = vh * 0.45 + centerYLerp * (vh * 0.50 - vh * 0.45)
 
@@ -203,7 +171,7 @@ export default function HeroV2() {
         // ── Camera Dolly Motion & World Scale ──────────────────────
         const approachP    = easeInOutCubic(remap(p, 0.20, 0.45))
         const flyP        = remap(p, 0.45, 0.60)
-        const exponentialP = Math.pow(flyP, 4)
+        const exponentialP = Math.pow(flyP, 5)
         const kbP          = remap(p, 0.86, 0.92)
         const xfade        = remap(p, 0.92, 1.00)
 
@@ -214,11 +182,11 @@ export default function HeroV2() {
           worldScale = 1.00
           frameScale = 1.00
         } else if (p >= 0.20 && p < 0.45) {
-          worldScale = 1.00 + approachP * 0.40       // 1.00 → 1.40 (world scales forward behind window)
-          frameScale = 1.00 + approachP * 0.15       // 1.00 → 1.15 (anchored viewport frame)
+          worldScale = 1.00 + approachP * 1.20       // 1.00 → 2.20 (world scales forward behind fixed window)
+          frameScale = 1.00                          // Window frame stays 100% stationary!
         } else if (p >= 0.45 && p < 0.60) {
-          worldScale = 1.40 - flyP * 0.40            // 1.40 → 1.00 (settles into 1:1 full bleed)
-          frameScale = 1.15 + exponentialP * (maxScale - 1.15) // frame expands in lockstep with aperture
+          worldScale = 2.20 - flyP * 1.20            // 2.20 → 1.00 (settles into 1:1 full bleed)
+          frameScale = 1.00 + exponentialP * (maxScale - 1.00) // Power-5 expansion to fullscreen
         } else if (p >= 0.60 && p < 0.86) {
           worldScale = 1.00
           frameScale = maxScale
