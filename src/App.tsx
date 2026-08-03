@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import Navigation from './components/navigation/Navigation'
-import MasterVisualStage from './components/stage/MasterVisualStage'
-import Hero from './sections/Hero/Hero'
+// import MasterVisualStage from './components/stage/MasterVisualStage' // backup
+// import Hero from './sections/Hero/Hero' // backup
+import HeroV2 from './sections/Hero/HeroV2'
 import SectionTwo from './sections/SectionTwo/SectionTwo'
 import SectionThree from './sections/SectionThree/SectionThree'
 import SectionFour from './sections/SectionFour/SectionFour'
@@ -37,10 +38,10 @@ function App() {
 
   return (
     <>
-      <MasterVisualStage />
+      {/* <MasterVisualStage /> */}
       <Navigation />
       <main>
-        <Hero />
+        <HeroV2 />
         <SectionTwo />
         <SectionThree />
         <SectionFour />
