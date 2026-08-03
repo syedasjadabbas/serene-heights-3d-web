@@ -6,17 +6,16 @@ import heroImageSrc from '../../assets/hero/scene-01-establish.png'
 import styles from './HeroV2.module.css'
 
 /**
- * HeroV2 — True Optical Camera Dolly & Viewport Aperture Entrance
+ * HeroV2 — Stable Content Viewport Expansion & Fullscreen Entrance
  *
- * ─── Camera Dolly Physics ─────────────────────────────────────────
+ * ─── Motion Profile ───────────────────────────────────────────────
  *   - p 0.00 → 0.20: Static green opening hold (frameScale = 1.00, worldScale = 1.00).
- *   - p 0.20 → 0.45: Camera approaches glass.
- *                    Viewport frame stays 100% STATIONARY (frameScale = 1.00).
- *                    World behind window zooms forward (worldScale = 1.00 → 2.20).
- *                    Creates 100% optical illusion of walking toward a fixed window pane.
- *   - p 0.45 → 0.60: Passing through glass plane into open world.
- *                    Viewport aperture expands exponentially (Power-5) to fill screen.
- *                    World scale settles smoothly 2.20 → 1.00 (1:1 full bleed).
+ *   - p 0.20 → 0.45: Approach phase. Capsule window occupies more field of view (frameScale 1.00 → 1.40).
+ *                    World layer stays STRICTLY at scale 1.00. The building inside the glass
+ *                    does NOT zoom — content stays 100% visually stable!
+ *                    Brand lockup fades out smoothly (p 0.20 → 0.38).
+ *   - p 0.45 → 0.60: Viewport aperture expands exponentially (Power-4) to fill screen (frameScale 1.40 → maxScale).
+ *                    World layer stays at 1:1 full bleed scale (1.00).
  *                    SVG outline frame dissolves ONLY after exceeding viewport bounds (p 0.585 → 0.60).
  *   - p 0.60 → 0.78: Fullscreen photograph appreciation hold (~1s scroll hold). Zero motion, zero text.
  *   - p 0.78 → 0.86: Title reveal.
@@ -66,14 +65,17 @@ function computeClipAttrs(
 
   const maxScale = Math.max(vw / startW, vh / startH) * 1.5
 
+  const approachP    = easeInOutCubic(remap(p, 0.20, 0.45))
   const flyP        = remap(p, 0.45, 0.60)
-  const exponentialP = Math.pow(flyP, 5) // Power-5 exponential aperture explosion
+  const exponentialP = Math.pow(flyP, 4)
 
   let frameScale = 1.00
-  if (p < 0.45) {
-    frameScale = 1.00 // Window frame stays 100% stationary during camera approach
+  if (p < 0.20) {
+    frameScale = 1.00
+  } else if (p >= 0.20 && p < 0.45) {
+    frameScale = 1.00 + approachP * 0.40 // Window occupies more of vision (1.00 → 1.40)
   } else if (p >= 0.45 && p < 0.60) {
-    frameScale = 1.00 + exponentialP * (maxScale - 1.00) // Aperture expands to fullscreen
+    frameScale = 1.40 + exponentialP * (maxScale - 1.40) // Exponential expansion to fullscreen
   } else {
     frameScale = maxScale
   }
@@ -168,31 +170,40 @@ export default function HeroV2() {
           attr: computeClipAttrs(p, vw, vh),
         })
 
-        // ── Camera Dolly Motion & World Scale ──────────────────────
+        // ── Camera Approach & World Stability Profile ──────────────
+        // p 0.00 → 0.20: static hold (worldScale = 1.00, frameScale = 1.00)
+        // p 0.20 → 0.45: window occupies more field of view (frameScale = 1.00 → 1.40).
+        //                worldScale stays STRICTLY at 1.00 (building inside glass does NOT zoom!).
+        // p 0.45 → 0.60: window frame expands exponentially past viewport edges (frameScale = 1.40 → maxScale).
+        //                worldScale stays STRICTLY at 1.00!
+        // p 0.60 → 0.78: fullscreen landscape appreciation hold (worldScale = 1.00).
+        // p 0.78 → 0.86: title reveal.
+        // p 0.86 → 0.92: Ken Burns zoom (worldScale = 1.00 → 1.03).
+        // p 0.92 → 1.00: invisible video crossfade.
         const approachP    = easeInOutCubic(remap(p, 0.20, 0.45))
         const flyP        = remap(p, 0.45, 0.60)
-        const exponentialP = Math.pow(flyP, 5)
+        const exponentialP = Math.pow(flyP, 4)
         const kbP          = remap(p, 0.86, 0.92)
         const xfade        = remap(p, 0.92, 1.00)
 
-        let worldScale = 1.00
         let frameScale = 1.00
+        let worldScale = 1.00
 
         if (p < 0.20) {
-          worldScale = 1.00
           frameScale = 1.00
-        } else if (p >= 0.20 && p < 0.45) {
-          worldScale = 1.00 + approachP * 1.20       // 1.00 → 2.20 (world scales forward behind fixed window)
-          frameScale = 1.00                          // Window frame stays 100% stationary!
-        } else if (p >= 0.45 && p < 0.60) {
-          worldScale = 2.20 - flyP * 1.20            // 2.20 → 1.00 (settles into 1:1 full bleed)
-          frameScale = 1.00 + exponentialP * (maxScale - 1.00) // Power-5 expansion to fullscreen
-        } else if (p >= 0.60 && p < 0.86) {
           worldScale = 1.00
+        } else if (p >= 0.20 && p < 0.45) {
+          frameScale = 1.00 + approachP * 0.40  // Capsule window occupies more field of view (1.00 → 1.40)
+          worldScale = 1.00                     // Content inside window stays 100% visually stable!
+        } else if (p >= 0.45 && p < 0.60) {
+          frameScale = 1.40 + exponentialP * (maxScale - 1.40) // Power-4 expansion to fullscreen
+          worldScale = 1.00                     // World layer stays 1.00!
+        } else if (p >= 0.60 && p < 0.86) {
           frameScale = maxScale
+          worldScale = 1.00
         } else if (p >= 0.86) {
-          worldScale = 1.00 + kbP * 0.03             // 1.00 → 1.03 (Ken Burns)
           frameScale = maxScale
+          worldScale = 1.00 + kbP * 0.03        // Ken Burns zoom (1.00 → 1.03)
         }
 
         // SVG Outline Frame: scale matches clip-path aperture 1:1, lerps vertical center to 50%
