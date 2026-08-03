@@ -247,7 +247,7 @@ export default function SectionTwo() {
           <p ref={eyebrowRef} className={styles.eyebrow}>
             <span className={styles.eyebrowNum}>02</span>
             <span className={styles.eyebrowDivider}>/</span>
-            <span>OWNERSHIP & INVESTMENT</span>
+            <span>OWNERSHIP &amp; INVESTMENT</span>
           </p>
           <h2 ref={statementRef} className={styles.statement}>
             Own your place in the mountains,

@@ -4,7 +4,7 @@
   position: relative;
   z-index: 2;
   background: transparent;
-  padding-block: clamp(36px, 4.5vh, 64px) clamp(48px, 6vh, 80px);
+  padding-block: clamp(64px, 8vh, 120px) clamp(80px, 10vh, 140px);
   transform: translateZ(0);
 }
 
@@ -14,8 +14,14 @@
 }
 
 .header {
-  max-width: 960px;
-  margin-bottom: clamp(20px, 3vh, 36px);
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: 0;
+  text-align: right;
+  margin-bottom: clamp(48px, 6vh, 84px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .eyebrow {
@@ -25,10 +31,11 @@
   font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(244, 239, 228, 0.88);
-  margin-bottom: var(--space-2);
+  color: rgba(244, 239, 228, 0.85);
+  margin-bottom: var(--space-3);
+  justify-content: flex-end;
 }
 
 .eyebrowNum {
@@ -48,16 +55,16 @@
   letter-spacing: -0.028em;
   color: var(--color-cream);
   text-shadow: 0 4px 28px rgba(0, 0, 0, 0.6);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
   text-wrap: balance;
 }
 
 .subcopy {
-  max-width: 52ch;
+  max-width: 44ch;
   font-family: var(--font-sans);
   font-size: clamp(0.9375rem, 0.88rem + 0.2vw, 1.0625rem);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.6;
   color: rgba(244, 239, 228, 0.82);
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }

@@ -6,8 +6,11 @@
 }
 
 .header {
-  margin-bottom: clamp(80px, 12vh, 140px);
-  text-align: center;
+  margin-bottom: clamp(90px, 14vh, 160px);
+  text-align: left;
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: var(--space-4);
 }
 
 .eyebrow {
@@ -17,14 +20,13 @@
   font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: rgba(244, 239, 228, 0.85);
   margin-bottom: var(--space-4);
-  background: rgba(16, 26, 22, 0.5);
-  border: 1px solid rgba(244, 239, 228, 0.15);
-  padding: 6px 16px;
-  border-radius: var(--radius-pill);
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .eyebrowNum {
