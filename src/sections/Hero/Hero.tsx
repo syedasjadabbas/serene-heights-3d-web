@@ -12,7 +12,8 @@ export default function Hero() {
   const portalWrapRef = useRef<HTMLDivElement>(null)
   const portalWindowRef = useRef<HTMLDivElement>(null)
   const portalLogoImageRef = useRef<SVGImageElement>(null)
-  const portalMaskCutoutRef = useRef<SVGRectElement>(null)
+  const glassStopCenterRef = useRef<SVGStopElement>(null)
+  const glassStopEdgeRef = useRef<SVGStopElement>(null)
   const portalLogoSolidFillRef = useRef<SVGRectElement>(null)
   const openingSignatureRef = useRef<HTMLDivElement>(null)
 
@@ -37,7 +38,7 @@ export default function Hero() {
 
       // Initial Hidden State for Title Card
       if (cinematicTitleRef.current) {
-        gsap.set(cinematicTitleRef.current, { opacity: 0 })
+        gsap.set(cinematicTitleRef.current, { opacity: 0, y: 6, filter: 'blur(6px)' })
       }
 
       const mm = gsap.matchMedia()
@@ -54,21 +55,21 @@ export default function Hero() {
             isTablet: boolean
             isDesktop: boolean
           }
-          // 2x Longer Runway (~1150vh Desktop) for deliberate, slow portal world transformation
-          const runwayVh = conditions.isMobile ? 850 : conditions.isTablet ? 1000 : 1150
+          // Deliberate cinematic runway (1200vh Desktop) for uninterrupted blended movement
+          const runwayVh = conditions.isMobile ? 900 : conditions.isTablet ? 1050 : 1200
 
           const applyProgress = (p: number) => {
             // Update global stage progress deterministically
             setHeroProgress(p)
 
-            // --- 1. Viewport-Locked Centered Portal Sequence (Phases 1-4: p = 0.00 -> 0.54) ---
+            // --- 1. Viewport-Locked Centered Portal Sequence (Phases 1-4: p = 0.00 -> 0.65) ---
             if (portalWrapRef.current) {
               if (reduced) {
                 gsap.set(portalWrapRef.current, { opacity: 0, display: 'none' })
-              } else if (p <= 0.04) {
-                // Phase 1 — Official Brand Identity: Pristine luxury hotel brand mark on deep green background
+              } else if (p <= 0.12) {
+                // Phase 1 — Luxury Brand Identity (0% - 12%): Solid emblem mark on deep green, ambient golden glow, quiet signature
                 const time = Date.now() * 0.0016
-                const breathing = 1.0 + 0.02 * Math.sin(time)
+                const breathing = 1.0 + 0.018 * Math.sin(time)
 
                 gsap.set(portalWrapRef.current, {
                   opacity: 1,
@@ -83,9 +84,13 @@ export default function Hero() {
                     transformOrigin: 'center center',
                   })
                 }
-                // Mask cutout is closed (solid green background), logo solid fill is opaque
-                if (portalMaskCutoutRef.current) {
-                  gsap.set(portalMaskCutoutRef.current, { opacity: 0 })
+                if (glassStopCenterRef.current) {
+                  glassStopCenterRef.current.setAttribute('offset', '0%')
+                  glassStopCenterRef.current.setAttribute('stop-color', '#ffffff')
+                }
+                if (glassStopEdgeRef.current) {
+                  glassStopEdgeRef.current.setAttribute('offset', '0%')
+                  glassStopEdgeRef.current.setAttribute('stop-color', '#ffffff')
                 }
                 if (portalLogoSolidFillRef.current) {
                   gsap.set(portalLogoSolidFillRef.current, { opacity: 1 })
@@ -96,11 +101,11 @@ export default function Hero() {
                 if (openingSignatureRef.current) {
                   gsap.set(openingSignatureRef.current, { opacity: 1 })
                 }
-              } else if (p <= 0.18) {
-                // Phase 2 — Logo Comes Alive: Interior of logo slowly transforms into live 3D resort world
-                const normRevealP = (p - 0.04) / 0.14
+              } else if (p <= 0.30) {
+                // Phase 2 — Center-Outward Radial Glass Transformation (12% - 30%): Solid emblem un-frosts smoothly
+                const normGlassP = (p - 0.12) / 0.18
                 const time = Date.now() * 0.0016
-                const breathing = 1.0 + 0.02 * Math.sin(time)
+                const breathing = 1.0 + 0.018 * Math.sin(time)
 
                 gsap.set(portalWrapRef.current, {
                   opacity: 1,
@@ -115,25 +120,32 @@ export default function Hero() {
                     transformOrigin: 'center center',
                   })
                 }
-                // Mask cutout opens progressively, revealing 3D world behind emblem
-                if (portalMaskCutoutRef.current) {
-                  gsap.set(portalMaskCutoutRef.current, { opacity: normRevealP })
+                // Radial Glass Un-frosting: Center offset grows from 0% to 120%
+                const centerOffset = `${(normGlassP * 120).toFixed(1)}%`
+                const edgeOffset = `${Math.min(100, normGlassP * 140 + 15).toFixed(1)}%`
+
+                if (glassStopCenterRef.current) {
+                  glassStopCenterRef.current.setAttribute('offset', centerOffset)
+                  glassStopCenterRef.current.setAttribute('stop-color', '#000000')
+                }
+                if (glassStopEdgeRef.current) {
+                  glassStopEdgeRef.current.setAttribute('offset', edgeOffset)
+                  glassStopEdgeRef.current.setAttribute('stop-color', '#ffffff')
                 }
                 if (portalLogoSolidFillRef.current) {
-                  gsap.set(portalLogoSolidFillRef.current, { opacity: 1 - normRevealP })
+                  gsap.set(portalLogoSolidFillRef.current, { opacity: Math.max(0, 1 - normGlassP * 1.4) })
                 }
                 if (portalLogoImageRef.current) {
                   gsap.set(portalLogoImageRef.current, { opacity: 1 })
                 }
                 if (openingSignatureRef.current) {
-                  gsap.set(openingSignatureRef.current, { opacity: 1 - normRevealP * 0.4 })
+                  gsap.set(openingSignatureRef.current, { opacity: Math.max(0, 1 - normGlassP * 0.9) })
                 }
-              } else if (p < 0.46) {
-                // Phase 3 — Portal Expansion: Logo fully transformed into window, expanding into resort world
-                const normP = (p - 0.18) / 0.28
-                const portalScale = 1.0 + 38.0 * (normP * normP) // Smooth inertial acceleration
-                const logoOpacity = Math.max(0, 1 - normP * 1.8) // Logo stroke & gold border dissolve
-                const signatureOpacity = Math.max(0, 0.6 - normP * 2.0) // Signature text fades quietly
+              } else if (p < 0.58) {
+                // Phase 3 — Overlapping Physical Expansion (28% - 58%): Travel through logo window into resort
+                const normP = (p - 0.28) / 0.30
+                const portalScale = 1.0 + 39.0 * (normP * normP) // Smooth inertial acceleration
+                const logoOpacity = Math.max(0, 1 - normP * 1.8) // Logo stroke & gold contour dissolve
 
                 gsap.set(portalWrapRef.current, {
                   opacity: 1,
@@ -148,8 +160,13 @@ export default function Hero() {
                     transformOrigin: 'center center',
                   })
                 }
-                if (portalMaskCutoutRef.current) {
-                  gsap.set(portalMaskCutoutRef.current, { opacity: 1 })
+                if (glassStopCenterRef.current) {
+                  glassStopCenterRef.current.setAttribute('offset', '100%')
+                  glassStopCenterRef.current.setAttribute('stop-color', '#000000')
+                }
+                if (glassStopEdgeRef.current) {
+                  glassStopEdgeRef.current.setAttribute('offset', '100%')
+                  glassStopEdgeRef.current.setAttribute('stop-color', '#000000')
                 }
                 if (portalLogoSolidFillRef.current) {
                   gsap.set(portalLogoSolidFillRef.current, { opacity: 0 })
@@ -158,12 +175,12 @@ export default function Hero() {
                   gsap.set(portalLogoImageRef.current, { opacity: logoOpacity })
                 }
                 if (openingSignatureRef.current) {
-                  gsap.set(openingSignatureRef.current, { opacity: signatureOpacity })
+                  gsap.set(openingSignatureRef.current, { opacity: 0 })
                 }
-              } else if (p < 0.54) {
-                // Phase 4 — Seamless Transition: Portal fills viewport, overlay dissolves cleanly
-                const fadeOut = (p - 0.46) / 0.08
-                const portalScale = 39.0 + 12.0 * ((p - 0.46) / 0.08)
+              } else if (p < 0.65) {
+                // Phase 4 — Seamless Transition (58% - 65%): Portal fills viewport, green overlay dissolves cleanly
+                const fadeOut = (p - 0.58) / 0.07
+                const portalScale = 40.0 + 12.0 * ((p - 0.58) / 0.07)
 
                 gsap.set(portalWrapRef.current, {
                   opacity: 1 - fadeOut,
@@ -191,40 +208,54 @@ export default function Hero() {
               }
             }
 
-            // --- 2. World Arrival Pause & Hero Title Card Reveal (Phases 5-7: p = 0.54 -> 1.00) ---
+            // --- 2. World Arrival Pause & Hero Title Card Emergence (p = 0.65 -> 1.00) ---
             if (cinematicTitleRef.current) {
               if (reduced) {
                 gsap.set(cinematicTitleRef.current, {
                   opacity: p > 0.9 ? 0 : 1,
                   scale: 1,
+                  y: 0,
+                  filter: 'blur(0px)',
                 })
               } else if (p < 0.70) {
-                // World Arrival Pause (p = 0.54 -> 0.70): Visitor experiences the pristine architecture holding still
-                gsap.set(cinematicTitleRef.current, { opacity: 0, scale: 0.88 })
-              } else if (p <= 0.78) {
-                // Soft fade-in of Hero Title Card after arrival pause (p = 0.70 -> 0.78)
-                const fadeIn = (p - 0.70) / 0.08
+                // World Arrival Pause (65% - 70% of Hero): Visitor experiences the pristine architecture holding still
                 gsap.set(cinematicTitleRef.current, {
-                  opacity: fadeIn,
-                  scale: 0.88 + 0.12 * fadeIn,
+                  opacity: 0,
+                  scale: 0.92,
+                  y: 6,
+                  filter: 'blur(6px)',
+                })
+              } else if (p <= 0.78) {
+                // Phase 5 — Hero Title Emergence (70% - 78% of Hero): Gentle emergence from architecture
+                const normP = (p - 0.70) / 0.08
+                // Smooth S-curve easing
+                const easeP = (1 - Math.cos(normP * Math.PI)) / 2
+
+                gsap.set(cinematicTitleRef.current, {
+                  opacity: easeP,
+                  scale: 0.92 + 0.08 * easeP,
+                  y: 6 * (1 - easeP),
+                  filter: `blur(${(6 * (1 - easeP)).toFixed(2)}px)`,
                   pointerEvents: 'auto',
                 })
               } else {
-                // Phase 6 — Cinematic Scroll Sequence: Title growth & optical tracking (p = 0.78 -> 0.94)
-                const normP = Math.min(1, (p - 0.78) / 0.16)
+                // Phase 6 — Cinematic Scroll Sequence: Title growth & optical tracking (78% - 100% of Hero)
+                const normP = Math.min(1, (p - 0.78) / 0.18)
                 const scale = 1.0 + 0.28 * Math.sin((normP * Math.PI) / 2)
                 const tracking = 0.18 - 0.10 * normP
 
                 let opacity = 1
-                if (p > 0.90) {
-                  const fade = Math.min(1, Math.max(0, (p - 0.90) / 0.10))
+                if (p > 0.94) {
+                  const fade = Math.min(1, Math.max(0, (p - 0.94) / 0.06))
                   opacity = 1 - fade
                 }
 
                 gsap.set(cinematicTitleRef.current, {
                   opacity,
                   scale,
-                  pointerEvents: p > 0.88 ? 'none' : 'auto',
+                  y: 0,
+                  filter: 'blur(0px)',
+                  pointerEvents: p > 0.92 ? 'none' : 'auto',
                 })
 
                 if (brandTitleRef.current) {
@@ -240,11 +271,11 @@ export default function Hero() {
             if (scrollCueRef.current) {
               if (p < 0.04) {
                 gsap.set(scrollCueRef.current, { opacity: 0 })
-              } else if (p < 0.12) {
-                const cueIn = (p - 0.04) / 0.08
+              } else if (p < 0.15) {
+                const cueIn = (p - 0.04) / 0.11
                 gsap.set(scrollCueRef.current, { opacity: cueIn })
-              } else if (p > 0.82) {
-                const cueFade = Math.min(1, Math.max(0, (p - 0.82) / 0.10))
+              } else if (p > 0.85) {
+                const cueFade = Math.min(1, Math.max(0, (p - 0.85) / 0.10))
                 gsap.set(scrollCueRef.current, { opacity: 1 - cueFade })
               } else {
                 gsap.set(scrollCueRef.current, { opacity: 1 })
@@ -269,7 +300,7 @@ export default function Hero() {
 
           // Drive ambient breathing loop ticker when stationary at p = 0
           const tickerFn = () => {
-            if (st.progress <= 0.04) {
+            if (st.progress <= 0.15) {
               applyProgress(st.progress)
             }
           }
@@ -303,6 +334,19 @@ export default function Hero() {
               aria-hidden="true"
             >
               <defs>
+                {/* Radial Glass Un-Frosting Gradient (Center-outward transition in Phase 2) */}
+                <radialGradient
+                  id="sereneGlassUnfrostGradient"
+                  cx="50%"
+                  cy="50%"
+                  r="50%"
+                  fx="50%"
+                  fy="50%"
+                >
+                  <stop ref={glassStopCenterRef} offset="0%" stopColor="#ffffff" stopOpacity="1" />
+                  <stop ref={glassStopEdgeRef} offset="0%" stopColor="#ffffff" stopOpacity="1" />
+                </radialGradient>
+
                 <mask
                   id="sereneOfficialPortalCutoutMask"
                   maskUnits="userSpaceOnUse"
@@ -313,16 +357,15 @@ export default function Hero() {
                 >
                   {/* Concentric 20,000x20,000 unit rect filled white (deep green overlay) */}
                   <rect x="-9950" y="-9932" width="20000" height="20000" fill="#ffffff" />
-                  {/* Capsule Pill Window Cutout (Opacity controlled dynamically during Phase 2 reveal) */}
+                  {/* Capsule Pill Window Cutout filled with radial glass un-frosting gradient */}
                   <rect
-                    ref={portalMaskCutoutRef}
                     x="3"
                     y="3"
                     width="94"
                     height="130"
                     rx="47"
                     ry="47"
-                    fill="#000000"
+                    fill="url(#sereneGlassUnfrostGradient)"
                   />
                 </mask>
               </defs>
@@ -349,7 +392,7 @@ export default function Hero() {
                 fill="#0a1410"
               />
 
-              {/* Official Logo Emblem Overlay (Stroke & Gold Contour) */}
+              {/* Official Logo Emblem Overlay (Stroke & Gold Contour with Soft Ambient Glow) */}
               <image
                 ref={portalLogoImageRef}
                 href={logoSvg}
@@ -357,6 +400,7 @@ export default function Hero() {
                 y="0"
                 width="100"
                 height="136"
+                className={styles.openingEmblemImage}
               />
             </svg>
           </div>
@@ -375,8 +419,6 @@ export default function Hero() {
             SERENE HEIGHTS
           </h1>
           <p className={styles.brandSubtitle}>HOTEL &amp; RESIDENCES · NATHIA GALI</p>
-          <div className={styles.brandDividerRule} aria-hidden="true" />
-          <p className={styles.brandTagline}>A sanctuary above the clouds.</p>
         </div>
 
         {/* Quiet Scroll Cue */}

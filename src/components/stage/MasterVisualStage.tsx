@@ -11,8 +11,10 @@ import {
 import {
   mapProgressToFrame,
   getHeroCinematicOpacity,
+  getHeroStillOpacity,
   getHeroProgress,
 } from './masterVisualStageState'
+import heroStillSrc from '../../assets/hero/scene-01-establish.png'
 import styles from './MasterVisualStage.module.css'
 
 const FOCAL_X = 0.15
@@ -42,9 +44,45 @@ function drawCover(
   ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvasW, canvasH)
 }
 
+/**
+ * Cinematic color grade baked directly into the canvas pixel buffer.
+ *
+ * Uses 2D compositing blend modes — no CSS filter applied.
+ * The result feels like naturally beautiful cinematography, not a filtered image.
+ *
+ * Grade target: warm golden-hour daylight, Aman / Six Senses editorial quality.
+ *   1. Warm ivory multiply  → reduces exposure + warms highlights toward soft gold
+ *   2. Soft-light contrast  → adds local depth without crushing shadows
+ */
+function applyCanvasCinematicGrade(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+) {
+  ctx.save()
+
+  // Pass 1: Warm Ivory Multiply
+  // — Darkens exposure slightly
+  // — Warm color shifts whites toward soft golden daylight
+  ctx.globalCompositeOperation = 'multiply'
+  ctx.fillStyle = 'rgba(228, 212, 190, 0.14)'
+  ctx.fillRect(0, 0, w, h)
+
+  // Pass 2: Soft-Light Contrast Punch
+  // — Lifts mid-tone contrast, makes architecture stand out
+  // — Does not crush deep shadows
+  ctx.globalCompositeOperation = 'soft-light'
+  ctx.fillStyle = 'rgba(24, 16, 8, 0.10)'
+  ctx.fillRect(0, 0, w, h)
+
+  ctx.globalCompositeOperation = 'source-over'
+  ctx.restore()
+}
+
 export default function MasterVisualStage() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const canvasWrapRef = useRef<HTMLDivElement>(null)
+  const heroStillRef = useRef<HTMLImageElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
@@ -81,6 +119,7 @@ export default function MasterVisualStage() {
       const ctx = canvas.getContext('2d')
       if (!img || !ctx) return
       drawCover(ctx, img, FRAME_WIDTH, FRAME_HEIGHT, canvas.width, canvas.height)
+      applyCanvasCinematicGrade(ctx, canvas.width, canvas.height)
       lastDrawnIndexRef.current = available
     }
 
@@ -118,12 +157,16 @@ export default function MasterVisualStage() {
     const updateStageFromScroll = () => {
       const p = getHeroProgress()
 
-      // Phase 5 -> 7 S-Curve Camera Push (1.00 -> 1.08) after entering portal
+      // Phase 3 & 4: Synchronized Camera Push toward world (p = 0.35 -> 0.65 portal expansion)
       let camPushScale = 1.0
-      if (p > 0.60) {
-        const normP = Math.min(1, (p - 0.60) / 0.34)
-        const easeP = (1 - Math.cos(normP * Math.PI)) / 2
-        camPushScale = 1.0 + 0.08 * easeP
+      if (p >= 0.35 && p <= 0.65) {
+        const normPushP = (p - 0.35) / 0.30
+        const easePush = (1 - Math.cos(normPushP * Math.PI)) / 2
+        camPushScale = 1.0 + 0.06 * easePush
+      } else if (p > 0.65) {
+        const normPushP = Math.min(1, (p - 0.65) / 0.30)
+        const easePush = (1 - Math.cos(normPushP * Math.PI)) / 2
+        camPushScale = 1.06 + 0.04 * easePush
       }
 
       // Living Window: Subtle ambient environmental breathing & micro-drift behind portal window cutout
@@ -131,7 +174,7 @@ export default function MasterVisualStage() {
       let ambientX = 0
       let ambientY = 0
 
-      if (p < 0.60) {
+      if (p < 0.65) {
         const time = Date.now() * 0.001
         ambientDriftScale = 1.0 + 0.008 * Math.sin(time * 0.8)
         ambientX = Math.sin(time * 0.6) * 2.5
@@ -162,6 +205,12 @@ export default function MasterVisualStage() {
       const mode1Opacity = getHeroCinematicOpacity()
       if (canvasWrapRef.current) {
         gsap.set(canvasWrapRef.current, { opacity: mode1Opacity })
+      }
+
+      // Hero Still Cover: art-direction benchmark image, visible p=0.65–0.96
+      const stillOpacity = getHeroStillOpacity()
+      if (heroStillRef.current) {
+        gsap.set(heroStillRef.current, { opacity: stillOpacity })
       }
     }
 
@@ -204,6 +253,16 @@ export default function MasterVisualStage() {
       <div ref={canvasWrapRef} className={styles.heroCinematicWrap}>
         <canvas ref={canvasRef} className={styles.canvas} />
       </div>
+
+      {/* Hero Still Cover: Art-direction benchmark — holds after portal, crossfades invisibly into canvas */}
+      <img
+        ref={heroStillRef}
+        src={heroStillSrc}
+        className={styles.heroStill}
+        alt=""
+        aria-hidden="true"
+        fetchpriority="high"
+      />
     </div>
   )
 }

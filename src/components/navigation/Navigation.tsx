@@ -26,21 +26,21 @@ export default function Navigation() {
     const ctx = gsap.context(() => {
       registerScrollTrigger()
 
-      // Navigation stays 100% hidden through portal transformation & world arrival pause (p < 0.70)
+      // Pure deterministic nav progress (quiet fade in at p >= 0.78 without noticeable sliding)
       const applyNavProgress = () => {
         if (!barRef.current) return
         const p = getHeroProgress()
 
-        if (p < 0.70) {
+        if (p < 0.78) {
           gsap.set(barRef.current, {
-            yPercent: -140,
+            yPercent: 0,
             opacity: 0,
             pointerEvents: 'none',
           })
-        } else if (p <= 0.78) {
-          const normP = (p - 0.70) / 0.08
+        } else if (p <= 0.84) {
+          const normP = (p - 0.78) / 0.06
           gsap.set(barRef.current, {
-            yPercent: -140 * (1 - normP),
+            yPercent: 0,
             opacity: normP,
             pointerEvents: normP > 0.8 ? 'auto' : 'none',
           })

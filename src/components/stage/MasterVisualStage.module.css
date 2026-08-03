@@ -62,8 +62,39 @@
   will-change: opacity;
 }
 
+/*
+ * Canvas CSS: No filter applied — cinematic grade is baked into the
+ * canvas pixel buffer via applyCanvasCinematicGrade() (compositing passes).
+ * The grade is invisible as a filter because it IS the photograph.
+ */
 .canvas {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  will-change: transform;
 }
+
+/*
+ * Hero Still Cover — Art-direction benchmark image
+ * Holds after portal entry (p=0.65), crossfades imperceptibly into canvas at p=0.88.
+ * Sits above the canvas (z-index 3) so it covers any flash from canvas appearing.
+ * Starts invisible (opacity: 0) — driven entirely by JS via gsap.set().
+ *
+ * CSS: Only imperceptible exposure / contrast correction applied here.
+ * No sepia, no hue-rotate — those would be perceptible as "filtered".
+ * The still and canvas should feel like the same natural photograph.
+ */
+.heroStill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 15% center;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+  filter: brightness(0.87) contrast(1.10);
+}
+
