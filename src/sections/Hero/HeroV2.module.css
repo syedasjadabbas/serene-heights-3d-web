@@ -67,6 +67,8 @@
   height: 100%;
   object-fit: cover;
   object-position: center 30%;
+  transform-origin: center center;
+  will-change: transform, opacity;
 }
 
 /* Green fill — covers the still until window "opens" */
