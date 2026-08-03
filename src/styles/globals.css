@@ -31,28 +31,30 @@
   --color-bg: #0a1410;
   --color-fg: var(--color-cream);
 
-  /* Typography System — Apple/Aesop/Polestar Benchmarks */
-  --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', ui-serif, Georgia, serif;
+  /* Luxury Hospitality Editorial Typography System — Aman / Rosewood Benchmarks */
+  --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  --text-display: clamp(3.6rem, 2.4rem + 7.5vw, 10.8rem);
-  --text-h1: clamp(2.4rem, 1.8rem + 3.4vw, 4.8rem);
-  --text-h2: clamp(1.75rem, 1.4rem + 1.8vw, 2.85rem);
-  --text-lead: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
-  --text-body: clamp(0.9375rem, 0.88rem + 0.2vw, 1.0625rem);
-  --text-small: 0.8125rem;
-  --text-label: 0.72rem;
+  --text-hero-display: clamp(2.4rem, 1.9rem + 2.8vw, 4.5rem);
+  --text-h1: clamp(2.5rem, 2.0rem + 3.0vw, 4.4rem);
+  --text-h2: clamp(1.8rem, 1.4rem + 1.6vw, 2.75rem);
+  --text-h3: clamp(1.3rem, 1.1rem + 0.8vw, 1.8rem);
+  --text-lead: clamp(1.025rem, 0.95rem + 0.3vw, 1.225rem);
+  --text-body: clamp(0.9375rem, 0.88rem + 0.18vw, 1.0625rem);
+  --text-caption: clamp(0.8125rem, 0.78rem + 0.12vw, 0.875rem);
+  --text-label: 0.6875rem;
 
-  --tracking-tight: -0.03em;
-  --tracking-subhead: -0.015em;
-  --tracking-normal: 0;
-  --tracking-wide: 0.14em;
-  --tracking-widest: 0.26em;
+  --tracking-hero: -0.022em;
+  --tracking-display: -0.02em;
+  --tracking-headline: -0.015em;
+  --tracking-normal: 0em;
+  --tracking-ui: 0.14em;
+  --tracking-label: 0.28em;
 
-  --leading-tight: 0.94;
-  --leading-headline: 1.04;
-  --leading-snug: 1.2;
-  --leading-editorial: 1.5;
+  --leading-hero: 1.06;
+  --leading-headline: 1.08;
+  --leading-snug: 1.25;
+  --leading-body: 1.55;
 
   /* Layout & Spacing */
   --container-max: 1560px;

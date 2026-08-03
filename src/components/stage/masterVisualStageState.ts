@@ -1,39 +1,53 @@
 /**
  * Master visual stage state for Serene Heights.
  *
- * Implements a slow, architectural camera curve with stillness plateaus and breathing rhythm.
- * Reduces overall camera travel magnitude by ~28% for a subtle, Aesop/Lexus/Apple luxury architectural film feel.
+ * Phase-Based Cinematic Choreography:
+ * Phase 1 (0.00 -> 0.18): Calm green world (Frame 0). Small centered title. Still camera.
+ * Phase 2 (0.18 -> 0.38): Title growth begins. Imperceptible camera push. Frame 0 holds.
+ * Phase 3 (0.38 -> 0.82): Exploded architectural assembly unfolds (Frame 0 -> 68) with S-curve camera push.
+ * Phase 4 (0.82 -> 1.00): Iconic hold at Frame 68 (0.82 -> 0.90), then cross-fade (0.90 -> 1.00) into Mode 2 Section 2+.
  */
-export function mapProgressToFrame(progress: number): number {
-  const p = Math.min(1, Math.max(0, progress))
-  const HERO_EXIT_PROGRESS = 0.88
 
-  const MAX_FRAME = 68 // ~28% overall motion reduction (68 vs 95 frames)
+let heroProgress = 0
 
-  if (p <= 0) return 0
-  if (p >= HERO_EXIT_PROGRESS) return MAX_FRAME
+export function setHeroProgress(progress: number) {
+  heroProgress = Math.min(1, Math.max(0, progress))
+}
 
-  const normP = p / HERO_EXIT_PROGRESS
+export function getHeroProgress(): number {
+  return heroProgress
+}
 
-  // Non-linear S-curve with stillness plateaus (smoothstep easing with subtle holds)
-  let curve = 0
-  if (normP < 0.25) {
-    // Slow architectural opening drift
-    const t = normP / 0.25
-    curve = 0.18 * Math.pow(t, 2)
-  } else if (normP < 0.50) {
-    // First stillness plateau & gentle drift
-    const t = (normP - 0.25) / 0.25
-    curve = 0.18 + 0.28 * (3 * t * t - 2 * t * t * t)
-  } else if (normP < 0.75) {
-    // Second breathing reveal
-    const t = (normP - 0.50) / 0.25
-    curve = 0.46 + 0.34 * (3 * t * t - 2 * t * t * t)
-  } else {
-    // Final deceleration into majestic architectural hold
-    const t = (normP - 0.75) / 0.25
-    curve = 0.80 + 0.20 * (1 - Math.pow(1 - t, 2))
+/** Returns the frame index (0..68) for Hero Cinematic */
+export function mapProgressToFrame(progressOverride?: number): number {
+  const p = progressOverride !== undefined ? progressOverride : heroProgress
+  const MAX_FRAME = 68
+
+  // Phase 1 & Phase 2 (0.00 -> 0.38): Hold Frame 0 while brand establishes
+  if (p <= 0.38) return 0
+
+  // Phase 3 (0.38 -> 0.82): Exploded architectural sequence unfolds with S-curve easing
+  if (p < 0.82) {
+    const normP = (p - 0.38) / 0.44
+    // Smooth S-curve easing
+    const easeP = (1 - Math.cos(normP * Math.PI)) / 2
+    return Math.min(MAX_FRAME, Math.max(0, Math.round(easeP * MAX_FRAME)))
   }
 
-  return Math.min(MAX_FRAME, Math.max(0, Math.round(curve * MAX_FRAME)))
+  // Phase 4 (0.82 -> 1.00): Hold completed frame
+  return MAX_FRAME
+}
+
+/**
+ * Returns opacity (1 -> 0) for Hero Canvas layer.
+ * Cross-fades out between p = 0.90 and p = 1.00 at end of Hero into Section 2.
+ */
+export function getHeroCinematicOpacity(progressOverride?: number): number {
+  const p = progressOverride !== undefined ? progressOverride : heroProgress
+  if (p <= 0.90) return 1
+  if (p < 1.00) {
+    const fade = (p - 0.90) / 0.10
+    return 1 - Math.min(1, Math.max(0, fade))
+  }
+  return 0
 }

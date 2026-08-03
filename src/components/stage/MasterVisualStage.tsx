@@ -8,7 +8,11 @@ import {
   createSequenceLoader,
   nearestLoadedFrame,
 } from '../../sections/Hero/cameraSequence'
-import { mapProgressToFrame } from './masterVisualStageState'
+import {
+  mapProgressToFrame,
+  getHeroCinematicOpacity,
+  getHeroProgress,
+} from './masterVisualStageState'
 import styles from './MasterVisualStage.module.css'
 
 const FOCAL_X = 0.15
@@ -40,6 +44,7 @@ function drawCover(
 
 export default function MasterVisualStage() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasWrapRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
@@ -110,11 +115,23 @@ export default function MasterVisualStage() {
     window.addEventListener('orientationchange', resizeCanvas)
     resizeCanvas()
 
-    const updateFrameFromScroll = () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop || 0
-      const pageProgress = Math.min(1, Math.max(0, scrollTop / cachedMaxScroll))
+    const updateStageFromScroll = () => {
+      const p = getHeroProgress()
 
-      const targetFrame = mapProgressToFrame(pageProgress)
+      // Phase 1 -> 4 S-Curve Camera Push (1.00 -> 1.10)
+      let camPushScale = 1.0
+      if (p > 0.18) {
+        const normP = Math.min(1, (p - 0.18) / 0.67)
+        const easeP = (1 - Math.cos(normP * Math.PI)) / 2
+        camPushScale = 1.0 + 0.10 * easeP
+      }
+
+      if (canvasRef.current) {
+        gsap.set(canvasRef.current, { scale: camPushScale })
+      }
+
+      // Mode 1: Update frame for Hero cinematic
+      const targetFrame = mapProgressToFrame()
       if (targetFrame !== frameIndexRef.current) {
         frameIndexRef.current = targetFrame
         loader.request(targetFrame)
@@ -122,9 +139,15 @@ export default function MasterVisualStage() {
         loader.request(Math.min(FRAME_COUNT - 1, targetFrame + 2))
         redraw()
       }
+
+      // Mode 1 -> Mode 2: Cross-fade opacity at end of Hero into Section 2
+      const mode1Opacity = getHeroCinematicOpacity()
+      if (canvasWrapRef.current) {
+        gsap.set(canvasWrapRef.current, { opacity: mode1Opacity })
+      }
     }
 
-    // Attach ScrollTrigger on entire page scroll
+    // Attach ScrollTrigger on entire page scroll to drive ticker updates
     const st = ScrollTrigger.create({
       trigger: document.body,
       start: 'top top',
@@ -132,19 +155,19 @@ export default function MasterVisualStage() {
       scrub: true,
       invalidateOnRefresh: true,
       onUpdate: () => {
-        updateFrameFromScroll()
+        updateStageFromScroll()
       },
     })
 
-    window.addEventListener('scroll', updateFrameFromScroll, { passive: true })
-    gsap.ticker.add(updateFrameFromScroll)
-    updateFrameFromScroll()
+    window.addEventListener('scroll', updateStageFromScroll, { passive: true })
+    gsap.ticker.add(updateStageFromScroll)
+    updateStageFromScroll()
 
     return () => {
       st.kill()
-      window.removeEventListener('scroll', updateFrameFromScroll)
+      window.removeEventListener('scroll', updateStageFromScroll)
       window.removeEventListener('resize', updateMaxScroll)
-      gsap.ticker.remove(updateFrameFromScroll)
+      gsap.ticker.remove(updateStageFromScroll)
       loader.destroy()
       resizeObserver?.disconnect()
       window.removeEventListener('orientationchange', resizeCanvas)
@@ -153,7 +176,16 @@ export default function MasterVisualStage() {
 
   return (
     <div ref={stageRef} className={styles.stage} aria-hidden="true">
-      <canvas ref={canvasRef} className={styles.canvas} />
+      {/* Mode 2: Permanent Green Architectural World (Sections 2–10) */}
+      <div className={styles.architecturalWorld}>
+        <div className={styles.ambientBreathingGrid} />
+        <div className={styles.ambientGlowMesh} />
+      </div>
+
+      {/* Mode 1: Hero Cinematic Canvas (Hero Only, cross-fades out at end of Hero) */}
+      <div ref={canvasWrapRef} className={styles.heroCinematicWrap}>
+        <canvas ref={canvasRef} className={styles.canvas} />
+      </div>
     </div>
   )
 }
