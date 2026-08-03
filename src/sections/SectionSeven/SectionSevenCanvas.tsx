@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
 
 function FloatingBlueprintGrid() {
   const meshRef = useRef<THREE.Mesh>(null)
@@ -64,8 +65,11 @@ function AmbientGoldParticles() {
 }
 
 export default function SectionSevenCanvas() {
+  const { containerRef, isVisible } = useCanvasVisibility()
+
   return (
     <div
+      ref={containerRef}
       style={{
         position: 'absolute',
         inset: 0,
@@ -78,6 +82,7 @@ export default function SectionSevenCanvas() {
         camera={{ position: [0, 0, 8], fov: 45 }}
         gl={{ alpha: true, antialias: true }}
         dpr={[1, 1.5]}
+        frameloop={isVisible ? 'always' : 'never'}
       >
         <ambientLight intensity={0.4} />
         <directionalLight position={[4, 6, 4]} intensity={0.5} color="#f3d498" />

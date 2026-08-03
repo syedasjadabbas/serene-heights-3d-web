@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
 import ResortLighting from './ResortLighting'
 import ResortCameraControls from './ResortCameraControls'
 import ResortModel, { ResortPlaceholderModel } from './ResortModel'
@@ -8,28 +9,20 @@ import ResortLoader from './ResortLoader'
 import { CAMERA_CONFIG } from './config'
 
 export default function ResortViewer() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [shouldInitialize, setShouldInitialize] = useState(false)
+  // One-time latch: once the section enters the viewport, the Canvas mounts
+  // permanently — we never unmount it (avoids GPU context destruction / flash).
+  const [hasMounted, setHasMounted] = useState(false)
   const [canvasReady, setCanvasReady] = useState(false)
 
-  // Lazy Initialization: Only mount Three.js Canvas when Section 4 approaches viewport
+  // Shared visibility hook: drives both the one-time mount and the frameloop gate.
+  // rootMargin '300px' pre-wakes 300 px before entry (same as the old custom IO)
+  // so the Canvas and ContactShadows have time to initialise before the user arrives.
+  const { containerRef, isVisible } = useCanvasVisibility({ rootMargin: '300px 0px' })
+
+  // Promote isVisible → hasMounted exactly once (never reverts to false).
   useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShouldInitialize(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: '300px' }, // Pre-initializes 300px before scrolling into view
-    )
-
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+    if (isVisible && !hasMounted) setHasMounted(true)
+  }, [isVisible, hasMounted])
 
   return (
     <div
@@ -43,7 +36,7 @@ export default function ResortViewer() {
     >
       <ResortLoader />
 
-      {shouldInitialize && (
+      {hasMounted && (
         <div
           style={{
             width: '100%',
@@ -63,6 +56,11 @@ export default function ResortViewer() {
               alpha: true,
               powerPreference: 'high-performance',
             }}
+            // Gate the render loop: when off-screen, frameloop="never" stops
+            // ALL useFrame subscribers — ContactShadows shadow pass, OrbitControls
+            // damping updates, model drift animations — everything freezes at zero
+            // GPU cost until the section is visible again.
+            frameloop={isVisible ? 'always' : 'never'}
             onCreated={() => setCanvasReady(true)}
           >
             <ResortLighting />
@@ -79,3 +77,4 @@ export default function ResortViewer() {
     </div>
   )
 }
+

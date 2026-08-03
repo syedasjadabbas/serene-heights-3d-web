@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
 
 /**
  * Floating Wireframe Glass Cubes & Architectural Geometries.
@@ -110,8 +111,11 @@ function GoldParticles() {
 }
 
 export default function SectionThreeCanvas() {
+  const { containerRef, isVisible } = useCanvasVisibility()
+
   return (
     <div
+      ref={containerRef}
       style={{
         position: 'absolute',
         inset: 0,
@@ -123,6 +127,7 @@ export default function SectionThreeCanvas() {
       <Canvas
         camera={{ position: [0, 0, 10], fov: 50 }}
         dpr={[1, 1.5]}
+        frameloop={isVisible ? 'always' : 'never'}
         gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
       >
         <ambientLight intensity={0.5} />

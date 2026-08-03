@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
 
 function FloatingInvestmentWireframes() {
   const groupRef = useRef<THREE.Group>(null)
@@ -91,8 +92,11 @@ function FloatingGoldParticles() {
 }
 
 export default function SectionFiveCanvas() {
+  const { containerRef, isVisible } = useCanvasVisibility()
+
   return (
     <div
+      ref={containerRef}
       style={{
         position: 'absolute',
         inset: 0,
@@ -105,6 +109,7 @@ export default function SectionFiveCanvas() {
         camera={{ position: [0, 0, 9], fov: 45 }}
         gl={{ alpha: true, antialias: true }}
         dpr={[1, 1.5]}
+        frameloop={isVisible ? 'always' : 'never'}
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 8, 5]} intensity={0.6} color="#f3d498" />

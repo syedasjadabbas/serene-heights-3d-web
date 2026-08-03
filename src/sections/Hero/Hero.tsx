@@ -55,19 +55,15 @@ export default function Hero() {
             isTablet: boolean
             isDesktop: boolean
           }
-          // Deliberate cinematic runway (1200vh Desktop) for uninterrupted blended movement
           const runwayVh = conditions.isMobile ? 900 : conditions.isTablet ? 1050 : 1200
 
-          const applyProgress = (() => {
-            // One-time initialization of Phase 1 static properties.
-            // These values never change during Phase 1 so we set them once
-            // instead of calling gsap.set() on every 60fps ticker frame.
-            let phase1Initialized = false
-            // letterSpacing dirty check -- avoids text relayout on every tick
-            let lastTracking = -999
-
-            return (p: number) => {
-            // Update global stage progress deterministically
+          /**
+           * Pure deterministic render function: HeroVisual = f(progress p).
+           * Reconstructs the exact DOM/SVG visual state for any p in [0, 1],
+           * forward or backward. Zero closure flags, zero time-dependent state.
+           */
+          const applyProgress = (p: number) => {
+            // Update global stage progress synchronously
             setHeroProgress(p)
 
             // --- 1. Viewport-Locked Centered Portal Sequence (Phases 1-4: p = 0.00 -> 0.65) ---
@@ -76,39 +72,29 @@ export default function Hero() {
                 gsap.set(portalWrapRef.current, { opacity: 0, display: 'none' })
               } else if (p <= 0.12) {
                 // Phase 1 -- Luxury Brand Identity
-                // Static properties: set once, not on every 60fps tick
-                if (!phase1Initialized) {
-                  phase1Initialized = true
-                  gsap.set(portalWrapRef.current, { opacity: 1, display: 'block', pointerEvents: 'auto' })
-                  if (glassStopCenterRef.current) {
-                    glassStopCenterRef.current.setAttribute('offset', '0%')
-                    glassStopCenterRef.current.setAttribute('stop-color', '#ffffff')
-                  }
-                  if (glassStopEdgeRef.current) {
-                    glassStopEdgeRef.current.setAttribute('offset', '0%')
-                    glassStopEdgeRef.current.setAttribute('stop-color', '#ffffff')
-                  }
-                  if (portalLogoSolidFillRef.current) gsap.set(portalLogoSolidFillRef.current, { opacity: 1 })
-                  if (portalLogoImageRef.current) gsap.set(portalLogoImageRef.current, { opacity: 1 })
-                  if (openingSignatureRef.current) gsap.set(openingSignatureRef.current, { opacity: 1 })
-                }
-                // Animated: only the breathing scale changes per tick
+                gsap.set(portalWrapRef.current, { opacity: 1, display: 'block', pointerEvents: 'auto' })
                 if (portalWindowRef.current) {
-                  const time = Date.now() * 0.0016
-                  const breathing = 1.0 + 0.018 * Math.sin(time)
                   gsap.set(portalWindowRef.current, {
-                    scale: breathing,
+                    scale: 1.0,
                     xPercent: -50,
                     yPercent: -50,
                     transformOrigin: 'center center',
                   })
                 }
+                if (glassStopCenterRef.current) {
+                  glassStopCenterRef.current.setAttribute('offset', '0%')
+                  glassStopCenterRef.current.setAttribute('stop-color', '#ffffff')
+                }
+                if (glassStopEdgeRef.current) {
+                  glassStopEdgeRef.current.setAttribute('offset', '0%')
+                  glassStopEdgeRef.current.setAttribute('stop-color', '#ffffff')
+                }
+                if (portalLogoSolidFillRef.current) gsap.set(portalLogoSolidFillRef.current, { opacity: 1 })
+                if (portalLogoImageRef.current) gsap.set(portalLogoImageRef.current, { opacity: 1 })
+                if (openingSignatureRef.current) gsap.set(openingSignatureRef.current, { opacity: 1 })
               } else if (p <= 0.30) {
                 // Phase 2 -- Radial Glass Un-frosting
-                phase1Initialized = false // reset for re-entry on reverse scroll
                 const normGlassP = (p - 0.12) / 0.18
-                const time = Date.now() * 0.0016
-                const breathing = 1.0 + 0.018 * Math.sin(time)
 
                 gsap.set(portalWrapRef.current, {
                   opacity: 1,
@@ -117,7 +103,7 @@ export default function Hero() {
                 })
                 if (portalWindowRef.current) {
                   gsap.set(portalWindowRef.current, {
-                    scale: breathing,
+                    scale: 1.0,
                     xPercent: -50,
                     yPercent: -50,
                     transformOrigin: 'center center',
@@ -145,7 +131,6 @@ export default function Hero() {
                 }
               } else if (p < 0.58) {
                 // Phase 3 -- Overlapping Physical Expansion
-                phase1Initialized = false
                 const normP = (p - 0.28) / 0.30
                 const portalScale = 1.0 + 39.0 * (normP * normP)
                 const logoOpacity = Math.max(0, 1 - normP * 1.8)
@@ -182,7 +167,6 @@ export default function Hero() {
                 }
               } else if (p < 0.65) {
                 // Phase 4 -- Seamless Transition
-                phase1Initialized = false
                 const fadeOut = (p - 0.58) / 0.07
                 const portalScale = 40.0 + 12.0 * ((p - 0.58) / 0.07)
 
@@ -199,12 +183,25 @@ export default function Hero() {
                     transformOrigin: 'center center',
                   })
                 }
+                if (glassStopCenterRef.current) {
+                  glassStopCenterRef.current.setAttribute('offset', '100%')
+                  glassStopCenterRef.current.setAttribute('stop-color', '#000000')
+                }
+                if (glassStopEdgeRef.current) {
+                  glassStopEdgeRef.current.setAttribute('offset', '100%')
+                  glassStopEdgeRef.current.setAttribute('stop-color', '#000000')
+                }
+                if (portalLogoSolidFillRef.current) {
+                  gsap.set(portalLogoSolidFillRef.current, { opacity: 0 })
+                }
+                if (portalLogoImageRef.current) {
+                  gsap.set(portalLogoImageRef.current, { opacity: 0 })
+                }
                 if (openingSignatureRef.current) {
                   gsap.set(openingSignatureRef.current, { opacity: 0 })
                 }
               } else {
-                // Entered world completely
-                phase1Initialized = false
+                // Phase 5+ -- Fully entered world
                 gsap.set(portalWrapRef.current, {
                   opacity: 0,
                   display: 'none',
@@ -259,21 +256,21 @@ export default function Hero() {
                   pointerEvents: p > 0.92 ? 'none' : 'auto',
                 })
 
-                // letterSpacing dirty check (PERF FIX #5)
-                // toFixed(3) allocates a new string + triggers text relayout on every tick.
-                // Only write when the rounded value has actually changed.
                 if (brandTitleRef.current) {
-                  const roundedTracking = Math.round(tracking * 1000) / 1000
-                  if (roundedTracking !== lastTracking) {
-                    lastTracking = roundedTracking
-                    const trackingStr = `${roundedTracking.toFixed(3)}em`
-                    gsap.set(brandTitleRef.current, {
-                      letterSpacing: trackingStr,
-                      paddingLeft: trackingStr,
-                    })
-                  }
+                  const trackingStr = `${tracking.toFixed(3)}em`
+                  gsap.set(brandTitleRef.current, {
+                    letterSpacing: trackingStr,
+                    paddingLeft: trackingStr,
+                  })
                 }
               }
+            }
+
+            if (brandTitleRef.current && p <= 0.78) {
+              gsap.set(brandTitleRef.current, {
+                letterSpacing: '0.18em',
+                paddingLeft: '0.18em',
+              })
             }
 
             // --- 3. Deterministic Scroll Cue ---
@@ -291,9 +288,8 @@ export default function Hero() {
               }
             }
           }
-          })()
 
-          // Smooth inertial scrub (1.4s) for reversible cinematic film progress
+          // Smooth inertial scrub for reversible cinematic film progress
           const st = ScrollTrigger.create({
             trigger: heroRef.current,
             start: 'top top',
@@ -303,22 +299,14 @@ export default function Hero() {
             },
             scrub: 1.4,
             pin: true,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => applyProgress(self.progress),
           })
 
-          // Drive ambient breathing loop ticker when stationary at p = 0
-          const tickerFn = () => {
-            if (st.progress <= 0.15) {
-              applyProgress(st.progress)
-            }
-          }
-          gsap.ticker.add(tickerFn)
+          applyProgress(st.progress)
 
           return () => {
             st.kill()
-            gsap.ticker.remove(tickerFn)
           }
         },
       )

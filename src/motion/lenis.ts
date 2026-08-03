@@ -16,7 +16,15 @@ export function initLenis(): { lenis: Lenis; destroy: () => void } {
     touchMultiplier: 1,
   })
 
-  lenis.on('scroll', ScrollTrigger.update)
+  // Prevent recursive / re-entrant ScrollTrigger updates during layout refresh
+  let isUpdating = false
+  lenis.on('scroll', () => {
+    const isRefreshing = (ScrollTrigger as unknown as { isRefreshing?: boolean }).isRefreshing
+    if (isUpdating || isRefreshing) return
+    isUpdating = true
+    ScrollTrigger.update()
+    isUpdating = false
+  })
 
   const onTick = (time: number) => {
     lenis.raf(time * 1000)
@@ -41,8 +49,6 @@ export function initLenis(): { lenis: Lenis; destroy: () => void } {
   document.addEventListener('click', handleAnchorClick)
 
   if (import.meta.env.DEV) {
-    // Debug-only exposure so live scroll state can be inspected from outside the module
-    // graph (e.g. via Playwright/devtools) — not used by the app itself.
     ;(window as unknown as Record<string, unknown>).__debugLenis = lenis
     ;(window as unknown as Record<string, unknown>).__debugGsap = gsap
     ;(window as unknown as Record<string, unknown>).__debugScrollTrigger = ScrollTrigger
