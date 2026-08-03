@@ -102,7 +102,7 @@ export default function MasterVisualStage() {
 
     registerScrollTrigger()
 
-    // Request initial frame 0 eagerly so building is visible immediately
+    // Request initial frame 0 eagerly so building is visible inside portal immediately
     loader.request(0)
     for (let i = 1; i <= 11; i += 1) loader.request(i)
     loader.startBackgroundFill()
@@ -118,16 +118,34 @@ export default function MasterVisualStage() {
     const updateStageFromScroll = () => {
       const p = getHeroProgress()
 
-      // Phase 1 -> 4 S-Curve Camera Push (1.00 -> 1.10)
+      // Phase 5 -> 7 S-Curve Camera Push (1.00 -> 1.08) after entering portal
       let camPushScale = 1.0
-      if (p > 0.18) {
-        const normP = Math.min(1, (p - 0.18) / 0.67)
+      if (p > 0.60) {
+        const normP = Math.min(1, (p - 0.60) / 0.34)
         const easeP = (1 - Math.cos(normP * Math.PI)) / 2
-        camPushScale = 1.0 + 0.10 * easeP
+        camPushScale = 1.0 + 0.08 * easeP
       }
 
+      // Living Window: Subtle ambient environmental breathing & micro-drift behind portal window cutout
+      let ambientDriftScale = 1.0
+      let ambientX = 0
+      let ambientY = 0
+
+      if (p < 0.60) {
+        const time = Date.now() * 0.001
+        ambientDriftScale = 1.0 + 0.008 * Math.sin(time * 0.8)
+        ambientX = Math.sin(time * 0.6) * 2.5
+        ambientY = Math.cos(time * 0.5) * 1.8
+      }
+
+      const totalCanvasScale = camPushScale * ambientDriftScale
+
       if (canvasRef.current) {
-        gsap.set(canvasRef.current, { scale: camPushScale })
+        gsap.set(canvasRef.current, {
+          scale: totalCanvasScale,
+          x: ambientX,
+          y: ambientY,
+        })
       }
 
       // Mode 1: Update frame for Hero cinematic

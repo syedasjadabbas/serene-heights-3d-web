@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
+import { getHeroProgress } from '../stage/masterVisualStageState'
 import Logo from '../ui/Logo'
 import Button from '../ui/Button'
 import styles from './Navigation.module.css'
@@ -25,17 +26,48 @@ export default function Navigation() {
     const ctx = gsap.context(() => {
       registerScrollTrigger()
 
-      gsap.fromTo(
-        barRef.current,
-        { yPercent: -140, opacity: 0 },
-        { yPercent: 0, opacity: 1, duration: 1.1, delay: 0.15, ease: 'power3.out' },
-      )
+      // Navigation stays 100% hidden through portal transformation & world arrival pause (p < 0.70)
+      const applyNavProgress = () => {
+        if (!barRef.current) return
+        const p = getHeroProgress()
+
+        if (p < 0.70) {
+          gsap.set(barRef.current, {
+            yPercent: -140,
+            opacity: 0,
+            pointerEvents: 'none',
+          })
+        } else if (p <= 0.78) {
+          const normP = (p - 0.70) / 0.08
+          gsap.set(barRef.current, {
+            yPercent: -140 * (1 - normP),
+            opacity: normP,
+            pointerEvents: normP > 0.8 ? 'auto' : 'none',
+          })
+        } else {
+          gsap.set(barRef.current, {
+            yPercent: 0,
+            opacity: 1,
+            pointerEvents: 'auto',
+          })
+        }
+      }
+
+      const st = ScrollTrigger.create({
+        trigger: document.body,
+        start: 'top top',
+        end: 'bottom bottom',
+        onUpdate: applyNavProgress,
+      })
 
       ScrollTrigger.create({
         start: 'top -60',
         end: 99999,
         toggleClass: { targets: barRef.current, className: styles.scrolled },
       })
+
+      // Run initial check
+      applyNavProgress()
     }, navRef)
 
     return () => ctx.revert()

@@ -1,0 +1,10 @@
+<svg viewBox="0 0 100 136" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Capsule Pill Frame -->
+  <rect x="3" y="3" width="94" height="130" rx="47" ry="47" stroke="currentColor" strokeWidth="3.5" fill="none"/>
+  <!-- Inset Double Line Contour -->
+  <rect x="8" y="8" width="84" height="120" rx="42" ry="42" stroke="currentColor" strokeWidth="2" fill="none"/>
+  <!-- Mountain Summit Outline — Transparent Interior View -->
+  <path d="M8 68C22 58 35 48 48 32L56 62L68 44L92 68V84C92 107.192 73.192 126 50 126C26.808 126 8 107.192 8 84V68Z" stroke="currentColor" strokeWidth="2.5" fill="none"/>
+  <!-- Peak Facet Contour Line -->
+  <path d="M48 32L56 62L68 44L54 70Z" stroke="currentColor" strokeWidth="1.8" fill="none" opacity="0.8"/>
+</svg>
