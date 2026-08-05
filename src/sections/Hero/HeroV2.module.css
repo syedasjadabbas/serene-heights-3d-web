@@ -45,8 +45,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
-  transform-origin: center center;
+  object-position: 65% 45%;
+  transform-origin: 65% 45%;
   will-change: transform, opacity;
 }
 
@@ -57,6 +57,7 @@
   left: 50%;
   transform: translate(-50%, -50%) scale(1);
   transform-origin: center center;
+  transform-style: preserve-3d;
   width: clamp(100px, 14vw, 200px);
   height: auto;
   aspect-ratio: 100 / 136;
@@ -120,7 +121,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
+  object-position: 60% 45%;
   opacity: 0;
   will-change: opacity;
 }
@@ -139,47 +140,77 @@
   pointer-events: none;
 }
 
-/* Fullscreen title — appears during hold phase */
+/* Fullscreen title container — left-aligned editorial layout with spacious negative space */
 .fullTitleWrap {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 46%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
-  opacity: 0;
-  will-change: opacity;
+  padding-left: clamp(2.5rem, 8vw, 9rem);
+  box-sizing: border-box;
   pointer-events: none;
 }
 
 .fullTitle {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(5rem, 11vw, 12rem);
-  letter-spacing: 0.24em;
-  line-height: 0.92;
+  font-size: clamp(2.2rem, 4.2vw, 4.8rem);
+  letter-spacing: 0.20em;
+  line-height: 1.08;
   text-transform: uppercase;
   color: #f8f2e6;
+  text-align: left;
   text-shadow:
     0 4px 28px rgba(6, 12, 9, 0.9),
     0 10px 48px rgba(0, 0, 0, 0.85),
     0 1px 3px rgba(0, 0, 0, 0.8);
-  margin: 0 0 clamp(10px, 1.6vh, 18px) 0;
-  padding-left: 0.24em;
+  margin: 0 0 clamp(14px, 2.2vh, 26px) 0;
+  opacity: 0;
+  will-change: opacity, transform;
 }
 
 .fullSubtitle {
   font-family: var(--font-sans);
-  font-size: clamp(0.7rem, 0.64rem + 0.22vw, 0.9rem);
+  font-size: clamp(0.7rem, 0.6rem + 0.2vw, 0.85rem);
   font-weight: 600;
-  letter-spacing: 0.34em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
   color: #dcb36c;
-  padding-left: 0.34em;
+  text-align: left;
   text-shadow:
     0 2px 14px rgba(0, 0, 0, 0.9),
     0 1px 2px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.heroCtaWrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: clamp(28px, 4.5vh, 52px);
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.heroCtaLabel {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(248, 242, 230, 0.85);
+}
+
+.heroCtaLine {
+  width: 32px;
+  height: 1px;
+  background: linear-gradient(to right, #c8a35a, transparent);
 }
 
 /* ─── Responsive ─────────────────────────────────────────────── */
