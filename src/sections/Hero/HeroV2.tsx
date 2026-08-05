@@ -55,6 +55,36 @@ function remap(p: number, inMin: number, inMax: number): number {
   return Math.max(0, Math.min(1, (p - inMin) / (inMax - inMin)))
 }
 
+// ── One-time-per-session breakthrough gate ────────────────────────
+// Matches the documented "After Passing Through (p >= 0.60)" invariant
+// above: once scroll progress has reached that point, the world is
+// fully revealed with no capsule/border remnants on screen. Module
+// state (not component state) so it survives remounts for the life of
+// this page load, and resets only on an actual browser refresh.
+const BREAKTHROUGH_COMPLETE_P = 0.60
+let heroBreakthroughCompleted = false
+
+// ── Hero appreciation hold ─────────────────────────────────────────
+// Short extra pinned scroll distance appended AFTER the original
+// capsule+reveal runway (unchanged) — just enough of a beat to look
+// at the fully-revealed hero before Section 2 arrives.
+const HOLD_PX = 400
+
+// ── Ambient "breathing" — independent of scroll, starts once the
+// world is fully revealed. Runs on portalImageRef's scale exclusively
+// (onUpdate never assigns scale to it past breakthrough — see below),
+// so it can never be fought/reset by the scroll-driven logic.
+function startWorldBreathing(el: HTMLImageElement | null): gsap.core.Tween | null {
+  if (!el) return null
+  return gsap.to(el, {
+    scale: 1.11,
+    duration: 7,
+    ease: 'sine.inOut',
+    yoyo: true,
+    repeat: -1,
+  })
+}
+
 function computeClipAttrs(
   p: number,
   vw: number,
@@ -120,6 +150,8 @@ export default function HeroV2() {
   const vhRef = useRef(window.innerHeight)
 
   const videoStarted = useRef(false)
+  const idleDriftStarted = useRef(false)
+  const idleDriftTweenRef = useRef<gsap.core.Tween | null>(null)
 
   useLayoutEffect(() => {
     registerScrollTrigger()
@@ -135,18 +167,22 @@ export default function HeroV2() {
     // Deterministic initial layer states:
     gsap.set(logoMarkRef.current,    { opacity: 1, scale: 1, z: 0, rotateX: 0, rotateY: 0 })
     gsap.set(brandLockupRef.current, { opacity: 1 })
-    gsap.set(portalImageRef.current, { scale: 1, y: 0, opacity: 1 })
+    gsap.set(portalImageRef.current, { scale: 1.08, y: 0, opacity: 1 })
     gsap.set(videoRef.current,       { scale: 1, y: 0, opacity: 0 })
 
     gsap.set(titleMainRef.current,   { opacity: 0, x: -18 })
     gsap.set(titleSubRef.current,    { opacity: 0, x: -12 })
     gsap.set(titleCtaRef.current,    { opacity: 0, x: -8 })
 
-    // ── Single ScrollTrigger (Fast 200% runway = ~2 mouse-wheel scrolls) ──
+    // ── Single ScrollTrigger (Fast 200% runway = ~2 mouse-wheel scrolls,
+    //    plus a fixed HOLD_PX appreciation hold appended at the end —
+    //    the original 200% runway's timing/easing is untouched; onUpdate
+    //    remaps progress below so every existing p-driven formula still
+    //    sees exactly the same p over exactly the same scroll distance) ──
     const st = ScrollTrigger.create({
       trigger: heroRef.current,
       start: 'top top',
-      end: '+=200%',
+      end: () => '+=' + ((heroRef.current?.offsetHeight ?? window.innerHeight) * 2 + HOLD_PX),
       scrub: 0.7,
       pin: true,
       invalidateOnRefresh: true,
@@ -157,7 +193,28 @@ export default function HeroV2() {
       },
 
       onUpdate: (self) => {
-        const p  = self.progress
+        const originalSpanPx = (heroRef.current?.offsetHeight ?? vhRef.current) * 2
+        const totalSpanPx    = self.end - self.start
+        let p = Math.min(1, self.progress * totalSpanPx / originalSpanPx)
+
+        // ── Reverse-scroll clamp (fires only after breakthrough has
+        //    completed once this page session) ──────────────────────
+        if (heroBreakthroughCompleted) {
+          if (p < BREAKTHROUGH_COMPLETE_P) {
+            self.scroll(self.start + BREAKTHROUGH_COMPLETE_P * originalSpanPx)
+            p = BREAKTHROUGH_COMPLETE_P
+          }
+        } else if (p >= BREAKTHROUGH_COMPLETE_P) {
+          heroBreakthroughCompleted = true
+        }
+
+        // ── Start the ambient breathing loop once, the first time the
+        //    world is fully revealed (independent of scroll from here) ──
+        if (!idleDriftStarted.current && p >= BREAKTHROUGH_COMPLETE_P) {
+          idleDriftStarted.current = true
+          idleDriftTweenRef.current = startWorldBreathing(portalImageRef.current)
+        }
+
         const vw = vwRef.current
         const vh = vhRef.current
 
@@ -182,7 +239,6 @@ export default function HeroV2() {
 
         // ── UNIFIED STEADICAM DOLLY & IMPERCEPTIBLE PARALLAX ──────────
         let frameScale = 1.00
-        let worldScale = 1.00
         let worldY = 0
         let centerYLerp = 0
         let tz = 0
@@ -195,7 +251,6 @@ export default function HeroV2() {
           // Continuous Steadicam Dolly
           const dollyP = Math.pow(p / 0.38, 3.6)
           frameScale = 1.00 + dollyP * (maxScale - 1.00)
-          worldScale = 1.00
           worldY = 0
           centerYLerp = dollyP
           tz = dollyP * 190
@@ -206,7 +261,6 @@ export default function HeroV2() {
         } else if (p > 0.38 && p < 0.48) {
           // Arrival hold (zero text, visitor admires $500M render)
           frameScale = maxScale
-          worldScale = 1.00
           worldY = 0
           centerYLerp = 1.0
           tz = 190
@@ -215,14 +269,16 @@ export default function HeroV2() {
           posX = 68
           posY = 45
         } else {
-          // Imperceptible living camera drift (capped < 1% scale, subtle object-position parallax pan)
-          const driftP = remap(p, 0.48, 1.00)
-          const easeDrift = (1 - Math.cos(driftP * Math.PI)) / 2
+          // Post-arrival: camera holds perfectly steady on scroll — no
+          // parallax pan, no object float. Ambient "breathing" life is
+          // handled separately by the independent, time-based idle tween
+          // directly on portalImageRef's scale (see startWorldBreathing) —
+          // onUpdate never assigns scale to it past this point, so the
+          // two can never fight.
           frameScale = maxScale
-          worldScale = 1.00 + 0.008 * easeDrift // Capped 0.8% scale
-          worldY = -5 * easeDrift               // Micro 5px float
-          posX = 68 - 1.5 * easeDrift           // Micro 1.5% parallax shift across negative space
-          posY = 45 - 1.0 * easeDrift
+          worldY = 0
+          posX = 68
+          posY = 45
           centerYLerp = 1.0
           tz = 190
           rxDeg = -0.35
@@ -244,8 +300,10 @@ export default function HeroV2() {
         })
 
         // Master World Render with Micro Parallax
+        // (scale is intentionally NOT set here — see the idle breathing
+        // tween above, which owns portalImageRef's scale exclusively
+        // once the world is fully revealed)
         gsap.set(portalImageRef.current, {
-          scale: worldScale,
           y: worldY,
           opacity: 1,
         })
@@ -291,6 +349,7 @@ export default function HeroV2() {
 
     return () => {
       st.kill()
+      idleDriftTweenRef.current?.kill()
     }
   }, [])
 
@@ -333,6 +392,9 @@ export default function HeroV2() {
 
         {/* Dark vignette inside viewport */}
         <div className={styles.portalOverlay} aria-hidden="true" />
+
+        {/* Cinematic left-side scrim — feathers out well before the building, never touches it */}
+        <div className={styles.editorialScrim} aria-hidden="true" />
       </div>
 
       {/* ── SVG Outline Frame (Inline SVG with vector-effect="non-scaling-stroke") ── */}
@@ -388,13 +450,24 @@ export default function HeroV2() {
         />
       </svg>
 
-      {/* ── Fullscreen Title Overlay (Layered Staging) ── */}
+      {/* ── Fullscreen Title Overlay (FINDD Editorial Layout) ── */}
       <div className={styles.fullTitleWrap} style={{ zIndex: 6 }}>
-        <h1 ref={titleMainRef} className={styles.fullTitle}>Serene Heights</h1>
-        <p ref={titleSubRef} className={styles.fullSubtitle}>Hotel &amp; Residences &nbsp;·&nbsp; Nathia Gali</p>
+        <h1 ref={titleMainRef} className={styles.fullTitle}>
+          <span className={styles.titleLine}>SERENE</span>
+          <span className={styles.titleLine}>HEIGHTS</span>
+        </h1>
+        <p ref={titleSubRef} className={styles.fullSubtitle}>
+          HOTEL &amp; RESIDENCES &nbsp;·&nbsp; NATHIA GALI
+        </p>
         <div ref={titleCtaRef} className={styles.heroCtaWrap}>
-          <span className={styles.heroCtaLabel}>EXPLORE RESIDENCES</span>
-          <div className={styles.heroCtaLine} />
+          <div className={styles.subtitleDivider} aria-hidden="true" />
+          <div className={styles.heroCtaGroup}>
+            <div className={styles.heroCtaRow}>
+              <span className={styles.heroCtaLabel}>EXPLORE RESIDENCES</span>
+              <span className={styles.heroCtaArrow} aria-hidden="true">→</span>
+            </div>
+            <div className={styles.heroCtaLine} />
+          </div>
         </div>
       </div>
 

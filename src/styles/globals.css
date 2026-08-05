@@ -1,6 +1,8 @@
 @import '@fontsource-variable/cormorant-garamond';
 @import '@fontsource-variable/cormorant-garamond/wght-italic.css';
 @import '@fontsource-variable/inter';
+@import '@fontsource-variable/inter-tight';
+@import '@fontsource-variable/bodoni-moda';
 
 :root {
   /* Brand colors */
@@ -33,6 +35,8 @@
 
   /* Luxury Hospitality Editorial Typography System — Aman / Rosewood Benchmarks */
   --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', Georgia, serif;
+  --font-hero-display: 'Bodoni Moda Variable', 'Bodoni Moda', Didot, 'Times New Roman', serif;
+  --font-hero-sans: 'Inter Tight Variable', 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   --text-hero-display: clamp(2.4rem, 1.9rem + 2.8vw, 4.5rem);
