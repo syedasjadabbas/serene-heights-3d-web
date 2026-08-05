@@ -30,7 +30,7 @@
   background: radial-gradient(
     ellipse 70% 60% at 50% 40%,
     rgba(206, 162, 92, 0.04) 0%,
-    rgba(10, 17, 13, 0.96) 75%
+    rgba(10, 17, 13, 0.32) 75%
   );
   pointer-events: none;
   z-index: 0;
