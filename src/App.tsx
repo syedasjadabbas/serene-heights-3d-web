@@ -3,6 +3,7 @@ import Navigation from './components/navigation/Navigation'
 // import MasterVisualStage from './components/stage/MasterVisualStage' // backup
 // import Hero from './sections/Hero/Hero' // backup
 import HeroV2 from './sections/Hero/HeroV2'
+import Deconstruction from './sections/Deconstruction/Deconstruction'
 import SectionTwo from './sections/SectionTwo/SectionTwo'
 import SectionThree from './sections/SectionThree/SectionThree'
 import SectionFour from './sections/SectionFour/SectionFour'
@@ -42,6 +43,7 @@ function App() {
       <Navigation />
       <main>
         <HeroV2 />
+        <Deconstruction />
         <SectionTwo />
         <SectionThree />
         <SectionFour />

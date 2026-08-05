@@ -1,0 +1,38 @@
+.section {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 560px;
+  background: #0a1410;
+  overflow: clip;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Continuity anchor — the Hero's own photo, same crop/position as Hero's
+   resting frame, so the Hero -> Deconstruction pin handoff is invisible. */
+.heroAnchor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 68% 45%;
+  will-change: opacity, transform;
+}
+
+/* The deconstruction clip's own framing */
+.videoLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 45% 46%;
+  will-change: opacity;
+}

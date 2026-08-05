@@ -70,20 +70,17 @@ let heroBreakthroughCompleted = false
 // at the fully-revealed hero before Section 2 arrives.
 const HOLD_PX = 400
 
-// ── Ambient "breathing" — independent of scroll, starts once the
-// world is fully revealed. Runs on portalImageRef's scale exclusively
-// (onUpdate never assigns scale to it past breakthrough — see below),
-// so it can never be fought/reset by the scroll-driven logic.
-function startWorldBreathing(el: HTMLImageElement | null): gsap.core.Tween | null {
-  if (!el) return null
-  return gsap.to(el, {
-    scale: 1.11,
-    duration: 7,
-    ease: 'sine.inOut',
-    yoyo: true,
-    repeat: -1,
-  })
-}
+// ── Cinematic camera push — pure f(scroll progress p), same architecture
+// as everything else here. An optical dolly (translateZ under a real CSS
+// perspective, see .worldLayer/.portalImage) rather than a CSS scale() —
+// perspective projection gives it the non-linear growth curve of an
+// actual lens moving through space instead of a flat digital zoom.
+// Begins the instant the world is fully revealed (BREAKTHROUGH_COMPLETE_P)
+// and reaches its final value exactly at p=1, i.e. exactly when the Hero
+// "ends" — a deterministic final frame to hand off from, regardless of
+// how fast the user scrolled to get there.
+const WORLD_PUSH_Z_START = 89  // ~1.08x apparent scale at perspective:1200px — matches the prior resting crop
+const WORLD_PUSH_Z_END   = 124 // ~1.115x apparent — almost invisible, extremely subtle push
 
 function computeClipAttrs(
   p: number,
@@ -150,8 +147,6 @@ export default function HeroV2() {
   const vhRef = useRef(window.innerHeight)
 
   const videoStarted = useRef(false)
-  const idleDriftStarted = useRef(false)
-  const idleDriftTweenRef = useRef<gsap.core.Tween | null>(null)
 
   useLayoutEffect(() => {
     registerScrollTrigger()
@@ -167,7 +162,7 @@ export default function HeroV2() {
     // Deterministic initial layer states:
     gsap.set(logoMarkRef.current,    { opacity: 1, scale: 1, z: 0, rotateX: 0, rotateY: 0 })
     gsap.set(brandLockupRef.current, { opacity: 1 })
-    gsap.set(portalImageRef.current, { scale: 1.08, y: 0, opacity: 1 })
+    gsap.set(portalImageRef.current, { z: WORLD_PUSH_Z_START, y: 0, opacity: 1 })
     gsap.set(videoRef.current,       { scale: 1, y: 0, opacity: 0 })
 
     gsap.set(titleMainRef.current,   { opacity: 0, x: -18 })
@@ -208,13 +203,6 @@ export default function HeroV2() {
           heroBreakthroughCompleted = true
         }
 
-        // ── Start the ambient breathing loop once, the first time the
-        //    world is fully revealed (independent of scroll from here) ──
-        if (!idleDriftStarted.current && p >= BREAKTHROUGH_COMPLETE_P) {
-          idleDriftStarted.current = true
-          idleDriftTweenRef.current = startWorldBreathing(portalImageRef.current)
-        }
-
         const vw = vwRef.current
         const vh = vhRef.current
 
@@ -239,6 +227,7 @@ export default function HeroV2() {
 
         // ── UNIFIED STEADICAM DOLLY & IMPERCEPTIBLE PARALLAX ──────────
         let frameScale = 1.00
+        let worldZ = WORLD_PUSH_Z_START
         let worldY = 0
         let centerYLerp = 0
         let tz = 0
@@ -251,6 +240,7 @@ export default function HeroV2() {
           // Continuous Steadicam Dolly
           const dollyP = Math.pow(p / 0.38, 3.6)
           frameScale = 1.00 + dollyP * (maxScale - 1.00)
+          worldZ = WORLD_PUSH_Z_START
           worldY = 0
           centerYLerp = dollyP
           tz = dollyP * 190
@@ -261,6 +251,7 @@ export default function HeroV2() {
         } else if (p > 0.38 && p < 0.48) {
           // Arrival hold (zero text, visitor admires $500M render)
           frameScale = maxScale
+          worldZ = WORLD_PUSH_Z_START
           worldY = 0
           centerYLerp = 1.0
           tz = 190
@@ -269,12 +260,13 @@ export default function HeroV2() {
           posX = 68
           posY = 45
         } else {
-          // Post-arrival: camera holds perfectly steady on scroll — no
-          // parallax pan, no object float. Ambient "breathing" life is
-          // handled separately by the independent, time-based idle tween
-          // directly on portalImageRef's scale (see startWorldBreathing) —
-          // onUpdate never assigns scale to it past this point, so the
-          // two can never fight.
+          // Post-arrival: camera holds perfectly steady — no parallax pan,
+          // no object float, no independent building movement. The ONLY
+          // thing that moves is a slow, continuous optical push (translateZ
+          // under perspective — see .worldLayer), pure f(p) like everything
+          // else: starts the instant the world is fully revealed and lands
+          // on its final value exactly at p=1, so the Hero always hands off
+          // from the same frame.
           frameScale = maxScale
           worldY = 0
           posX = 68
@@ -283,6 +275,8 @@ export default function HeroV2() {
           tz = 190
           rxDeg = -0.35
           ryDeg = 0.25
+          const pushP = (1 - Math.cos(remap(p, BREAKTHROUGH_COMPLETE_P, 1.0) * Math.PI)) / 2
+          worldZ = WORLD_PUSH_Z_START + (WORLD_PUSH_Z_END - WORLD_PUSH_Z_START) * pushP
         }
 
         // NO ARTIFICIAL ON-SCREEN FADING:
@@ -299,11 +293,11 @@ export default function HeroV2() {
           opacity: Math.max(0, 1 - outlineFade),
         })
 
-        // Master World Render with Micro Parallax
-        // (scale is intentionally NOT set here — see the idle breathing
-        // tween above, which owns portalImageRef's scale exclusively
-        // once the world is fully revealed)
+        // Master World Render — z is the optical camera push, pure f(p).
+        // No scale anywhere on this element — perspective (see .worldLayer)
+        // does the growth, the way a real lens does.
         gsap.set(portalImageRef.current, {
+          z: worldZ,
           y: worldY,
           opacity: 1,
         })
@@ -349,7 +343,6 @@ export default function HeroV2() {
 
     return () => {
       st.kill()
-      idleDriftTweenRef.current?.kill()
     }
   }, [])
 

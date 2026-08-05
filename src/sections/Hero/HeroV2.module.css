@@ -28,6 +28,10 @@
 
 
 /* ─── 1. World Layer (Fullscreen world clipped to capsule viewport) ─── */
+/* perspective/perspective-origin establish a true 3D viewing frustum for
+   portalImage's own translateZ push — an optical camera move (perspective
+   projection) rather than a flat CSS scale(). Vanishing point sits at the
+   image's own focal point so the push reads as moving toward the hotel. */
 .worldLayer {
   position: absolute;
   inset: 0;
@@ -36,6 +40,8 @@
   z-index: 3;
   clip-path: url(#heroPortalClip);
   transform: translateZ(0);
+  perspective: 1200px;
+  perspective-origin: 68% 45%;
 }
 
 /* Hero still image inside world layer */
@@ -48,6 +54,7 @@
   object-position: 65% 45%;
   transform-origin: 65% 45%;
   will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 /* SVG outline frame attached to viewport aperture at 45% vh */
