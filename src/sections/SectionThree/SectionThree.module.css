@@ -1,7 +1,7 @@
 .section {
   position: relative;
   z-index: 2;
-  background: rgba(8, 15, 12, 0.3);
+  background: transparent;
   padding-block: clamp(120px, 16vh, 220px);
   overflow: hidden;
   transform: translateZ(0);

@@ -2,66 +2,76 @@ import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
 import { setHeroProgress } from '../../components/stage/masterVisualStageState'
+import { HERO_HOLD_PX } from '../Hero/HeroV2'
 import heroImageSrc from '../../assets/hero/scene-01-establish.webp'
 import heroStyles from '../Hero/HeroV2.module.css'
 import styles from './Deconstruction.module.css'
 
 /**
- * Deconstruction — scroll-scrubbed video, pinned second act after the Hero.
+ * Deconstruction — the deconstruction video as the fixed, global background
+ * of the entire rest of the site: it never pins its own scroll distance
+ * (position:fixed, zero layout height), it just sits behind Hero and every
+ * section, driven by the page's own natural scroll from "Hero ends" to
+ * "footer reached".
  *
- * ─── Sequence ───────────────────────────────────────────────────
- *   Hero (locked) → Hero appreciation hold → [this section] → Section 2
+ * ─── Continuity (unchanged) ───────────────────────────────────────
+ *   The anchor is the Hero's OWN photo at opacity 1 the instant Hero's pin
+ *   releases — pixel-identical handoff, then a short cross-dissolve into
+ *   the live video (anchor still very slightly pushing in through the
+ *   blend so motion never flat-lines and restarts).
  *
- * ─── Continuity ─────────────────────────────────────────────────
- *   The anchor is the Hero's OWN photo (not a re-crop of the video) at
- *   opacity 1 from the very first pixel of scroll — so the instant Hero's
- *   pin releases and this section's pin engages, nothing on screen
- *   visibly changes. Only then does a short, deliberate cross-dissolve
- *   blend the Hero image into the video's live first frame, with the
- *   anchor still very slightly pushing in during that blend so motion
- *   never flat-lines and restarts — one continuous camera move, not a cut.
+ * ─── Two progress values ──────────────────────────────────────────
+ *   videoP  — 0 at Hero-end, 1 at the footer. Drives video.currentTime
+ *             across the ENTIRE rest of the page, capped short of the
+ *             clip's true final frame so ~10-15% of the structure is
+ *             still standing by the time the footer is reached.
+ *   localP  — 0 at Hero-end, 1 after a short fixed reference distance
+ *             (LOCAL_REFERENCE_VH). Drives the crossfade, the navbar
+ *             reveal, and the typography's fade-out — i.e. the SAME
+ *             absolute-distance timing/feel as before, just no longer
+ *             tied to a section that consumes its own scroll space.
  *
- * ─── Typography ─────────────────────────────────────────────────
- *   Reuses HeroV2's exact classes/content (read-only import, HeroV2 itself
- *   untouched) so it reads as "the same text, still there" the instant
- *   the Hero hands off — fully visible for almost the entire scrub, only
- *   dissolving out right at the end, just before Section 2.
- *
- * ─── Navbar ─────────────────────────────────────────────────────
- *   Feeds the existing (otherwise-dormant) setHeroProgress() so
- *   Navigation's own built-in 0.78->0.84 fade-in activates shortly after
- *   the crossfade completes — i.e. only once inside the video, never
- *   during the Hero. Navigation's own code is untouched.
- *
- * ─── Scrub contract ─────────────────────────────────────────────
- *   video.currentTime is a pure function of scroll progress — no
- *   .play()/.pause() calls, ever. Scrolling down/up therefore plays the
- *   deconstruction forward/backward with zero drift, exactly mirroring
- *   HeroV2's own "ONE ScrollTrigger · pure f(progress)" architecture.
+ * ─── Typography / navbar (unchanged mechanics) ────────────────────
+ *   Reuses HeroV2's exact classes/content. .fullTitle/.fullSubtitle/
+ *   .heroCtaWrap default to opacity:0 in the stylesheet (Hero overrides
+ *   that via inline style on those exact elements) — this component sets
+ *   opacity directly on those three refs, never on the outer wrapper,
+ *   and never touches x/scale on them — perfectly static until the fade.
+ *   Navbar: feeds the existing (otherwise-dormant) setHeroProgress() so
+ *   Navigation's own built-in 0.78->0.84 fade-in fires the instant the
+ *   crossfade completes. Navigation's own code is untouched.
  */
 
 const VIDEO_SRC = '/media/serene-heights/hero/deconstruction/serene-heights-v2-scrub.mp4'
 
-const SCRUB_SPAN_MULTIPLIER = 2.5 // ~2.5 viewport heights of scroll to play the clip through
-const HOLD_PX = 300               // short hold on the final frame before Section 2
-const CROSSFADE_P = 0.08          // Hero image -> video dissolve, over the first 8% of local progress
-const ANCHOR_PUSH_SCALE = 1.015   // tiny continued push on the anchor during the crossfade only
+// How far into its own timeline the video is ever allowed to play, even at
+// the footer — leaves ~13% of the clip (and so ~13% of the structure)
+// unplayed/standing, per "don't let it fully disappear".
+const VIDEO_PROGRESS_CAP = 0.87
 
-const NAV_REVEAL_START = 0.11 // navbar starts appearing shortly after the crossfade completes
-const NAV_REVEAL_END   = 0.17
+// Fixed reference distance (independent of the new, much longer, whole-page
+// video range) that the crossfade/navbar/typography-fade timing is keyed
+// to — preserves their original absolute-distance feel from when this was
+// a short, self-contained pinned section.
+const LOCAL_REFERENCE_VH = 1.2
 
-const TYPOGRAPHY_FADE_START = 0.90 // typography stays put until right near the end
-const TYPOGRAPHY_FADE_END   = 1.00
+const CROSSFADE_LOCAL_P = 0.08        // Hero image -> video dissolve
+const ANCHOR_PUSH_SCALE = 1.015       // tiny continued push on the anchor during the crossfade only
+const NAV_REVEAL_LOCAL_START = CROSSFADE_LOCAL_P
+const NAV_REVEAL_LOCAL_END   = CROSSFADE_LOCAL_P + 0.05
+const TYPE_FADE_LOCAL_START = 0.75
+const TYPE_FADE_LOCAL_END   = 1.00
 
 function remap(p: number, inMin: number, inMax: number): number {
   return Math.max(0, Math.min(1, (p - inMin) / (inMax - inMin)))
 }
 
 export default function Deconstruction() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const anchorRef  = useRef<HTMLImageElement>(null)
-  const videoRef   = useRef<HTMLVideoElement>(null)
-  const typeRef    = useRef<HTMLDivElement>(null)
+  const anchorRef     = useRef<HTMLImageElement>(null)
+  const videoRef       = useRef<HTMLVideoElement>(null)
+  const typeTitleRef   = useRef<HTMLHeadingElement>(null)
+  const typeSubRef     = useRef<HTMLParagraphElement>(null)
+  const typeCtaRef     = useRef<HTMLDivElement>(null)
 
   const videoReady      = useRef(false)
   const pendingProgress = useRef(0)
@@ -74,12 +84,12 @@ export default function Deconstruction() {
 
     gsap.set(anchorRef.current, { opacity: 1, scale: 1 })
     gsap.set(videoRef.current,  { opacity: 0 })
-    gsap.set(typeRef.current,   { opacity: 1 })
+    gsap.set([typeTitleRef.current, typeSubRef.current, typeCtaRef.current], { opacity: 1, x: 0 })
 
     const applyVideoTime = (p: number) => {
       pendingProgress.current = p
       if (video && videoReady.current && video.duration) {
-        video.currentTime = p * video.duration
+        video.currentTime = p * VIDEO_PROGRESS_CAP * video.duration
       }
     }
 
@@ -90,39 +100,42 @@ export default function Deconstruction() {
     video?.addEventListener('loadedmetadata', onLoadedMetadata)
     video?.load()
 
+    const heroEndPx = () => {
+      const heroEl = document.getElementById('top')
+      return heroEl ? heroEl.offsetTop + heroEl.offsetHeight * 2 + HERO_HOLD_PX : 0
+    }
+
     const st = ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: 'top top',
-      end: () => '+=' + ((sectionRef.current?.offsetHeight ?? window.innerHeight) * SCRUB_SPAN_MULTIPLIER + HOLD_PX),
+      start: heroEndPx,
+      end: () => ScrollTrigger.maxScroll(window),
       scrub: 0.6,
-      pin: true,
       invalidateOnRefresh: true,
 
       onUpdate: (self) => {
-        const originalSpanPx = (sectionRef.current?.offsetHeight ?? window.innerHeight) * SCRUB_SPAN_MULTIPLIER
-        const totalSpanPx    = self.end - self.start
-        const p = Math.min(1, self.progress * totalSpanPx / originalSpanPx)
+        const videoP = self.progress
 
-        // Hero image -> video dissolve, only at the very start of this
-        // section's own pin (Hero is already fully off-screen by then).
-        // The anchor keeps very slightly pushing in throughout the blend
-        // so the camera never visibly stops-then-restarts.
-        const crossfade = Math.min(1, p / CROSSFADE_P)
+        const localSpanPx = window.innerHeight * LOCAL_REFERENCE_VH
+        const localP = Math.min(1, (self.progress * (self.end - self.start)) / localSpanPx)
+
+        // Hero image -> video dissolve, right at the handoff — Hero is
+        // already fully off-screen by the time this fires.
+        const crossfade = Math.min(1, localP / CROSSFADE_LOCAL_P)
         gsap.set(anchorRef.current, {
           opacity: 1 - crossfade,
           scale: 1 + (ANCHOR_PUSH_SCALE - 1) * crossfade,
         })
         gsap.set(videoRef.current, { opacity: crossfade })
 
-        applyVideoTime(p)
+        applyVideoTime(videoP)
 
         // Navbar — only once inside the video, never during the Hero.
-        const navP = remap(p, NAV_REVEAL_START, NAV_REVEAL_END)
+        const navP = remap(localP, NAV_REVEAL_LOCAL_START, NAV_REVEAL_LOCAL_END)
         setHeroProgress(0.78 + navP * 0.06)
 
-        // Typography persists over the video, fading only right at the end.
-        const typeFade = 1 - remap(p, TYPOGRAPHY_FADE_START, TYPOGRAPHY_FADE_END)
-        gsap.set(typeRef.current, { opacity: typeFade })
+        // Typography persists briefly over the video, completely static,
+        // then fades — same absolute timing/feel as before.
+        const typeFade = 1 - remap(localP, TYPE_FADE_LOCAL_START, TYPE_FADE_LOCAL_END)
+        gsap.set([typeTitleRef.current, typeSubRef.current, typeCtaRef.current], { opacity: typeFade })
       },
     })
 
@@ -133,7 +146,7 @@ export default function Deconstruction() {
   }, [])
 
   return (
-    <section ref={sectionRef} className={styles.section}>
+    <div className={styles.section}>
       <div className={styles.stage}>
         <img
           ref={anchorRef}
@@ -156,15 +169,15 @@ export default function Deconstruction() {
 
       {/* Static typography — identical markup/classes to HeroV2's resting
           state, so it reads as "the same text, still there" over the video. */}
-      <div ref={typeRef} className={heroStyles.fullTitleWrap} style={{ zIndex: 6 }}>
-        <h1 className={heroStyles.fullTitle}>
+      <div className={heroStyles.fullTitleWrap} style={{ zIndex: 6 }}>
+        <h1 ref={typeTitleRef} className={heroStyles.fullTitle}>
           <span className={heroStyles.titleLine}>SERENE</span>
           <span className={heroStyles.titleLine}>HEIGHTS</span>
         </h1>
-        <p className={heroStyles.fullSubtitle}>
+        <p ref={typeSubRef} className={heroStyles.fullSubtitle}>
           HOTEL &amp; RESIDENCES &nbsp;·&nbsp; NATHIA GALI
         </p>
-        <div className={heroStyles.heroCtaWrap}>
+        <div ref={typeCtaRef} className={heroStyles.heroCtaWrap}>
           <div className={heroStyles.subtitleDivider} aria-hidden="true" />
           <div className={heroStyles.heroCtaGroup}>
             <div className={heroStyles.heroCtaRow}>
@@ -175,6 +188,6 @@ export default function Deconstruction() {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   )
 }

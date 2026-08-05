@@ -68,7 +68,9 @@ let heroBreakthroughCompleted = false
 // Short extra pinned scroll distance appended AFTER the original
 // capsule+reveal runway (unchanged) — just enough of a beat to look
 // at the fully-revealed hero before Section 2 arrives.
-const HOLD_PX = 400
+// Exported: Deconstruction reads this to compute exactly where the
+// global background video begins, without duplicating the constant.
+export const HERO_HOLD_PX = 400
 
 // ── Cinematic camera push — pure f(scroll progress p), same architecture
 // as everything else here. An optical dolly (translateZ under a real CSS
@@ -177,7 +179,7 @@ export default function HeroV2() {
     const st = ScrollTrigger.create({
       trigger: heroRef.current,
       start: 'top top',
-      end: () => '+=' + ((heroRef.current?.offsetHeight ?? window.innerHeight) * 2 + HOLD_PX),
+      end: () => '+=' + ((heroRef.current?.offsetHeight ?? window.innerHeight) * 2 + HERO_HOLD_PX),
       scrub: 0.7,
       pin: true,
       invalidateOnRefresh: true,
@@ -386,8 +388,6 @@ export default function HeroV2() {
         {/* Dark vignette inside viewport */}
         <div className={styles.portalOverlay} aria-hidden="true" />
 
-        {/* Cinematic left-side scrim — feathers out well before the building, never touches it */}
-        <div className={styles.editorialScrim} aria-hidden="true" />
       </div>
 
       {/* ── SVG Outline Frame (Inline SVG with vector-effect="non-scaling-stroke") ── */}

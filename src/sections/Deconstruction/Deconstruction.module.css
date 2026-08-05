@@ -1,10 +1,16 @@
+/* Global fixed background — zero layout footprint (no height, out of normal
+   flow) so it never adds its own scroll distance. Sits behind Hero (z-index
+   2) and behind every normal-flow section (default stacking, later DOM
+   order paints over it), visible only wherever nothing opaque covers it. */
 .section {
-  position: relative;
-  height: 100vh;
-  height: 100svh;
-  min-height: 560px;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   background: #0a1410;
   overflow: clip;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .stage {
