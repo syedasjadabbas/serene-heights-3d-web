@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-block: clamp(104px, 13vh, 148px) clamp(20px, 2.5vh, 40px);
+  padding-block: clamp(84px, 10vh, 120px) clamp(20px, 2.5vh, 40px);
   padding-inline: clamp(28px, 5vw, 84px);
 }
 
@@ -41,7 +41,7 @@
   text-align: left;
   max-width: 720px;
   margin-inline: 0;
-  margin-bottom: clamp(28px, 4vh, 44px);
+  margin-bottom: clamp(24px, 3.5vh, 40px);
   flex-shrink: 0;
   background: transparent;
   padding: 0;
@@ -100,13 +100,13 @@
 .galleryTrack {
   display: flex;
   align-items: center;
-  gap: clamp(32px, 3.5vw, 56px);
+  gap: clamp(28px, 3vw, 48px);
   padding-inline: clamp(32px, 6vw, 100px);
   will-change: transform;
   flex-wrap: nowrap;
 }
 
-/* --- Curated Architectural Slab Cards (82% Image Dominance) --- */
+/* --- Curated Architectural Slab Cards (Uniform Baseline Alignment) --- */
 
 .card {
   position: relative;
@@ -139,20 +139,20 @@
     0 0 1px rgba(243, 212, 152, 0.4);
 }
 
-/* Curated Architectural Exhibition Dimensions (Balanced 55vw / 46vw / 40vw Layout) */
+/* Uniform Height Architectural Exhibition Cards — Shared Visual Baseline */
 .cardLarge {
-  width: clamp(540px, 55vw, 840px);
-  height: clamp(440px, 64vh, 620px);
+  width: clamp(520px, 52vw, 800px);
+  height: clamp(380px, 50vh, 500px);
 }
 
 .cardMedium {
-  width: clamp(480px, 46vw, 760px);
-  height: clamp(410px, 61vh, 580px);
+  width: clamp(460px, 44vw, 700px);
+  height: clamp(380px, 50vh, 500px);
 }
 
 .cardSmall {
-  width: clamp(440px, 40vw, 700px);
-  height: clamp(380px, 58vh, 550px);
+  width: clamp(420px, 40vw, 640px);
+  height: clamp(380px, 50vh, 500px);
 }
 
 /* Soft lighting sweep radial overlay */
