@@ -166,7 +166,8 @@
   font-weight: 500;
   letter-spacing: 0.20em;
   color: rgba(244, 239, 228, 0.7);
-  transition: color 0.3s ease;
+  text-transform: uppercase;
+  transition: color 0.45s var(--ease-premium);
 }
 
 .navLink:hover {

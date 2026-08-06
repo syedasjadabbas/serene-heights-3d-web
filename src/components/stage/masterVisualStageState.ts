@@ -25,6 +25,31 @@ export function subscribeHeroProgress(fn: Listener): () => void {
   }
 }
 
+/**
+ * Hero typography opacity — single source of truth shared between
+ * HeroV2 (drives it up as text fades in) and Deconstruction (drives
+ * it down as the handoff completes). Neither section hardcodes the
+ * other's timing; they both read/write this single value.
+ */
+let heroTypographyOpacity = 0
+const typographyListeners = new Set<Listener>()
+
+export function setHeroTypographyOpacity(value: number) {
+  heroTypographyOpacity = Math.min(1, Math.max(0, value))
+  typographyListeners.forEach((fn) => fn(heroTypographyOpacity))
+}
+
+export function getHeroTypographyOpacity(): number {
+  return heroTypographyOpacity
+}
+
+export function subscribeHeroTypographyOpacity(fn: Listener): () => void {
+  typographyListeners.add(fn)
+  return () => {
+    typographyListeners.delete(fn)
+  }
+}
+
 /** Returns the frame index (0..68) for Hero Cinematic */
 export function mapProgressToFrame(progressOverride?: number): number {
   const p = progressOverride !== undefined ? progressOverride : heroProgress

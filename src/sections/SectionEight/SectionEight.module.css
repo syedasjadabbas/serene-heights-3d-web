@@ -126,7 +126,9 @@
   color: rgba(244, 239, 228, 0.45);
   cursor: pointer;
   padding: 4px 8px;
-  transition: color 0.4s ease;
+  transition:
+    color 0.45s var(--ease-premium),
+    opacity 0.45s var(--ease-premium);
 }
 
 .seasonNavItem:hover {
@@ -143,7 +145,7 @@
   bottom: -1px;
   height: 2px;
   background: var(--color-accent-gold);
-  transition: left 0.4s var(--ease-out-soft), width 0.4s var(--ease-out-soft);
+  transition: left 0.55s var(--ease-premium), width 0.55s var(--ease-premium);
 }
 
 /* Seasonal Visual & Story Stage Frame (Editorial 4:5 Print Proportion) */

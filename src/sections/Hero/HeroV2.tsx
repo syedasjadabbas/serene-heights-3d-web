@@ -5,6 +5,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
+import { setHeroTypographyOpacity } from '../../components/stage/masterVisualStageState'
 import logoSvg from '../../assets/common/logo.svg'
 import heroImageSrc from '../../assets/hero/hero-main.webp'
 import styles from './HeroV2.module.css'
@@ -337,7 +338,13 @@ export default function HeroV2() {
         gsap.set(titleCtaRef.current, {
           opacity: ctaFade,
           x: ctaX,
+          pointerEvents: ctaFade > 0.1 ? 'auto' : 'none',
         })
+
+        // Publish the highest-faded element's opacity as the shared
+        // typography state — Deconstruction reads this to know where
+        // to start its own fade-out from, with no magic numbers.
+        setHeroTypographyOpacity(Math.max(mainFade, subFade, ctaFade))
 
         // ── Video pre-start ───────────────────────────────────────
         if (p > 0.65 && !videoStarted.current && videoRef.current) {

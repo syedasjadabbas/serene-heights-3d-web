@@ -264,7 +264,7 @@
   height: 3px;
   background: rgba(244, 239, 228, 0.2);
   border-radius: 2px;
-  transition: background 0.4s ease, width 0.4s ease;
+  transition: background 0.55s var(--ease-premium), width 0.55s var(--ease-premium);
 }
 
 .dotActive {

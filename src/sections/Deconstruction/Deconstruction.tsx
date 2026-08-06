@@ -5,7 +5,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
-import { setHeroProgress } from '../../components/stage/masterVisualStageState'
+import { setHeroProgress, getHeroTypographyOpacity } from '../../components/stage/masterVisualStageState'
 import { HERO_HOLD_PX } from '../Hero/HeroV2'
 import heroImageSrc from '../../assets/hero/hero-main.webp'
 import heroStyles from '../Hero/HeroV2.module.css'
@@ -63,8 +63,28 @@ const CROSSFADE_LOCAL_P = 0.08        // Hero image -> video dissolve
 const ANCHOR_PUSH_SCALE = 1.015       // tiny continued push on the anchor during the crossfade only
 const NAV_REVEAL_LOCAL_START = CROSSFADE_LOCAL_P
 const NAV_REVEAL_LOCAL_END   = CROSSFADE_LOCAL_P + 0.05
-const TYPE_FADE_LOCAL_START = 0.75
-const TYPE_FADE_LOCAL_END   = 1.00
+
+// Typography fade: no hardcoded progress values.
+// Computed each frame from the real DOM: the fade must complete exactly
+// when Section 2's top edge reaches the viewport top, so the typography
+// disappears the moment Section 2 becomes the active foreground.
+function computeTypeFadeWindow(heroEndPx: number): { start: number; end: number } {
+  const section2El = document.getElementById('about')
+  const totalScrollRange = ScrollTrigger.maxScroll(window) - heroEndPx
+  if (!section2El || totalScrollRange <= 0) {
+    // Graceful fallback if DOM isn't ready: fade quickly over 40% of reference
+    return { start: 0, end: 0.4 }
+  }
+  // Section 2's top edge in page coordinates
+  const section2Top = section2El.getBoundingClientRect().top + window.scrollY
+  // Fade must complete (typography = 0) when Section 2 top reaches viewport top,
+  // i.e. when scrollY = section2Top. Express that as a fraction of Deconstruction's total range.
+  const fadeEndScrollPx  = Math.max(0, section2Top - heroEndPx)
+  const fadeEndFrac      = Math.min(0.9, fadeEndScrollPx / totalScrollRange)
+  // Start fading once Hero fully hands off (right at crossfade completion)
+  const fadeStartFrac    = CROSSFADE_LOCAL_P
+  return { start: fadeStartFrac, end: Math.max(fadeStartFrac + 0.05, fadeEndFrac) }
+}
 
 function remap(p: number, inMin: number, inMax: number): number {
   return Math.max(0, Math.min(1, (p - inMin) / (inMax - inMin)))
@@ -86,9 +106,16 @@ export default function Deconstruction() {
     const video = videoRef.current
     video?.pause()
 
+    // Initialise typography from the shared state — whatever opacity Hero left it at
+    const initTypographyOpacity = getHeroTypographyOpacity()
     gsap.set(anchorRef.current, { opacity: 1, scale: 1 })
     gsap.set(videoRef.current,  { opacity: 0 })
-    gsap.set([typeTitleRef.current, typeSubRef.current, typeCtaRef.current], { opacity: 1, x: 0 })
+    gsap.set([typeTitleRef.current, typeSubRef.current, typeCtaRef.current], {
+      opacity: initTypographyOpacity,
+      x: 0,
+      visibility: initTypographyOpacity > 0.01 ? 'visible' : 'hidden',
+      pointerEvents: 'none',
+    })
 
     const applyVideoTime = (p: number) => {
       pendingProgress.current = p
@@ -136,10 +163,21 @@ export default function Deconstruction() {
         const navP = remap(localP, NAV_REVEAL_LOCAL_START, NAV_REVEAL_LOCAL_END)
         setHeroProgress(0.78 + navP * 0.06)
 
-        // Typography persists briefly over the video, completely static,
-        // then fades — same absolute timing/feel as before.
-        const typeFade = 1 - remap(localP, TYPE_FADE_LOCAL_START, TYPE_FADE_LOCAL_END)
-        gsap.set([typeTitleRef.current, typeSubRef.current, typeCtaRef.current], { opacity: typeFade })
+        // ── Typography fade-out: computed from Section 2's real DOM position
+        // so the fade stays aligned if Hero timing or section padding changes.
+        const heroEnd = heroEndPx()
+        const { start: typeFadeStart, end: typeFadeEnd } = computeTypeFadeWindow(heroEnd)
+        const scrolledPx = self.progress * (self.end - self.start)
+        const localFrac  = Math.min(1, scrolledPx / (self.end - heroEnd))
+        const typeFade   = 1 - Math.max(0, Math.min(1,
+          (localFrac - typeFadeStart) / Math.max(0.001, typeFadeEnd - typeFadeStart)
+        ))
+        const typeVisible = typeFade > 0.01
+        gsap.set([typeTitleRef.current, typeSubRef.current, typeCtaRef.current], {
+          opacity: typeFade,
+          visibility: typeVisible ? 'visible' : 'hidden',
+          pointerEvents: 'none',
+        })
       },
     })
 

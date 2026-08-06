@@ -271,7 +271,18 @@
   box-shadow:
     inset 0 1px 0 rgba(244, 239, 228, 0.14),
     0 24px 60px -20px rgba(0, 0, 0, 0.8);
-  will-change: transform;
+  will-change: transform, box-shadow;
+  transition:
+    transform 0.55s var(--ease-premium),
+    box-shadow 0.55s var(--ease-premium),
+    border-color 0.55s var(--ease-premium);
+}
+
+.exhibitCard:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 1px 0 rgba(244, 239, 228, 0.18),
+    0 36px 80px -18px rgba(0, 0, 0, 0.9);
 }
 
 .cardTall {

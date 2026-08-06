@@ -169,7 +169,7 @@
   );
   z-index: 1;
   opacity: var(--light-opacity, 0);
-  transition: opacity 0.3s ease;
+  transition: opacity 0.55s var(--ease-premium);
 }
 
 .cardHovered .cardLight {
@@ -195,7 +195,9 @@
 }
 
 .cardHovered .cardImage {
-  transform: scale(1.04);
+  transform: scale(1.05);
+  filter: brightness(0.75) contrast(0.93) saturate(0.95);
+  transition: transform 0.75s var(--ease-premium), filter 0.75s var(--ease-premium);
 }
 
 .imageOverlay {

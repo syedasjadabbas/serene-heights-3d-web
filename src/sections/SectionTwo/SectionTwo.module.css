@@ -113,9 +113,9 @@
   transform-style: preserve-3d;
   transform: translate3d(0, 0, 0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateZ(var(--translate-z, 0px));
   transition:
-    transform 0.12s var(--ease-premium),
-    box-shadow 0.12s var(--ease-premium),
-    border-color 0.4s var(--ease-premium);
+    transform 0.18s var(--ease-premium),
+    box-shadow 0.55s var(--ease-premium),
+    border-color 0.55s var(--ease-premium);
   overflow: hidden;
 }
 
@@ -260,11 +260,14 @@
   border-radius: var(--radius-md);
   padding: 8px 12px;
   box-shadow: 0 12px 24px -16px rgba(0, 0, 0, 0.45);
-  transition: transform 0.3s var(--ease-out-soft);
+  transition:
+    transform 0.45s var(--ease-premium),
+    box-shadow 0.45s var(--ease-premium);
 }
 
 .factCard:hover {
-  transform: translateX(4px);
+  transform: translateX(5px);
+  box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.55);
 }
 
 .factIcon {
@@ -417,11 +420,14 @@
   border-radius: var(--radius-lg);
   transform: rotate(5deg);
   box-shadow: 0 28px 48px -20px rgba(0, 0, 0, 0.65);
-  transition: transform 0.4s var(--ease-out-soft);
+  transition:
+    transform 0.55s var(--ease-premium),
+    box-shadow 0.55s var(--ease-premium);
 }
 
 .unitCard:hover {
-  transform: rotate(0deg) scale(1.02);
+  transform: rotate(0deg) scale(1.03) translateY(-4px);
+  box-shadow: 0 36px 64px -24px rgba(0, 0, 0, 0.75);
 }
 
 .unitHeader {
@@ -534,12 +540,14 @@
   color: var(--color-black);
   z-index: 3;
   transition:
-    transform 0.35s var(--ease-out-soft),
-    background-color 0.35s var(--ease-out-soft);
+    transform 0.45s var(--ease-premium),
+    box-shadow 0.45s var(--ease-premium),
+    background-color 0.45s var(--ease-premium);
 }
 
 .cta:hover {
-  transform: scale(1.1);
+  transform: scale(1.12);
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
 }
 
 .ctaGold {
