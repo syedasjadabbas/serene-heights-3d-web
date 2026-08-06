@@ -481,13 +481,9 @@ export default function HeroV2() {
           HOTEL &amp; RESIDENCES &nbsp;·&nbsp; NATHIA GALI
         </p>
         <div ref={titleCtaRef} className={styles.heroCtaWrap}>
-          <div className={styles.subtitleDivider} aria-hidden="true" />
           <div className={styles.heroCtaGroup}>
-            <div className={styles.heroCtaRow}>
-              <span className={styles.heroCtaLabel}>EXPLORE RESIDENCES</span>
-              <span className={styles.heroCtaArrow} aria-hidden="true">→</span>
-            </div>
-            <div className={styles.heroCtaLine} />
+            <span className={styles.heroCtaLabel}>EXPLORE RESIDENCES</span>
+            <span className={styles.heroCtaArrow} aria-hidden="true">→</span>
           </div>
         </div>
       </div>

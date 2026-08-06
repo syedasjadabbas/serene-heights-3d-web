@@ -89,7 +89,7 @@
   max-width: 18ch;
   margin-inline: 0;
   margin-bottom: var(--space-3);
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85), 0 2px 8px rgba(0, 0, 0, 0.7);
   text-wrap: balance;
 }
 
@@ -142,9 +142,9 @@
   transform-style: preserve-3d;
   transform: perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateZ(var(--translate-z, 0px));
   transition:
-    transform 0.18s var(--ease-premium),
-    box-shadow 0.55s var(--ease-premium),
-    border-color 0.55s var(--ease-premium);
+    transform 0.35s var(--ease-premium),
+    box-shadow 0.35s var(--ease-premium),
+    border-color 0.35s var(--ease-premium);
   overflow: hidden;
 }
 
@@ -177,12 +177,12 @@
   border-radius: inherit;
   background: radial-gradient(
     650px circle at var(--light-x, 50%) var(--light-y, 50%),
-    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.14),
     transparent 55%
   );
   z-index: 1;
   opacity: var(--light-opacity, 0);
-  transition: opacity 0.3s ease;
+  transition: opacity 0.35s ease;
 }
 
 .cardHovered .cardLight {
@@ -190,13 +190,15 @@
 }
 
 .cardHovered {
-  border-top-color: rgba(244, 239, 228, 0.38);
-  border-right-color: rgba(206, 162, 92, 0.30);
+  border-left-color: #f3d498 !important;
+  border-top-color: rgba(243, 212, 152, 0.65) !important;
+  border-right-color: rgba(206, 162, 92, 0.40) !important;
+  transform: perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateZ(24px) translateY(-6px) scale(1.01) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.20),
-    inset 1px 0 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.88),
-    0 44px 96px -22px rgba(0, 0, 0, 0.98);
+    inset 0 1px 0 rgba(243, 212, 152, 0.42),
+    inset 1px 0 0 rgba(255, 255, 255, 0.15),
+    0 40px 95px -18px rgba(0, 0, 0, 0.98),
+    0 0 32px rgba(243, 212, 152, 0.24) !important;
 }
 
 .cardWatermark {

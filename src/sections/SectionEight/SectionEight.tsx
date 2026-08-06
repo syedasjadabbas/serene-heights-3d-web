@@ -85,6 +85,14 @@ const SEASONS: SeasonData[] = [
   },
 ]
 
+// Preload season imagery eagerly to eliminate any asset loading delay
+SEASONS.forEach((s) => {
+  if (typeof window !== 'undefined') {
+    const img = new Image()
+    img.src = s.imageUrl
+  }
+})
+
 export default function SectionEight() {
   const sectionRef = useRef<HTMLElement>(null)
   const ambientGlowRef = useRef<HTMLDivElement>(null)
@@ -114,19 +122,30 @@ export default function SectionEight() {
         const numSeasons = 4
         const stepWindow = 1 / numSeasons
 
-        // Keynote Pacing: Arrival (15%) -> Unhurried 70% Reading Plateau Hold -> Exit (15%)
         SEASONS.forEach((seasonData, idx) => {
-          const stepStart = idx * stepWindow
-          const relProgress = (progress - stepStart) / stepWindow
-
           let focus = 0
-          if (relProgress >= 0 && relProgress <= 1) {
-            if (relProgress < 0.15) {
-              focus = relProgress / 0.15
-            } else if (relProgress <= 0.85) {
+
+          if (idx === 0) {
+            // Starting season (Winter) is 100% IMMEDIATELY visible at progress 0
+            if (progress <= 0.20) {
               focus = 1.0
+            } else if (progress < 0.25) {
+              focus = (0.25 - progress) / 0.05
             } else {
-              focus = (1.0 - relProgress) / 0.15
+              focus = 0
+            }
+          } else {
+            // Subsequent seasons: smooth crossfade entrance & exit
+            const stepStart = idx * stepWindow
+            const relProgress = (progress - stepStart) / stepWindow
+            if (relProgress >= 0 && relProgress <= 1) {
+              if (relProgress < 0.15) {
+                focus = relProgress / 0.15
+              } else if (relProgress <= 0.85) {
+                focus = 1.0
+              } else {
+                focus = (1.0 - relProgress) / 0.15
+              }
             }
           }
 
@@ -210,7 +229,6 @@ export default function SectionEight() {
             indicatorRef.current.style.width = `${activeNavBtn.offsetWidth}px`
           }
 
-          // Trigger metric counter animation once user scrolls into Section 8
           if (progress >= 0.10 && !metricsAnimatedRef.current) {
             triggerMetricCounters()
           }
@@ -256,10 +274,10 @@ export default function SectionEight() {
         invalidateOnRefresh: true,
         onUpdate: (self) => updateSeasonProgress(self.progress),
         onRefresh: (self) => updateSeasonProgress(self.progress),
-        onEnter: () => triggerMetricCounters(),
+        onEnter: () => updateSeasonProgress(0),
       })
 
-      // Initial state
+      // Immediate synchronous render for frame 0
       updateSeasonProgress(0)
 
       return () => st.kill()

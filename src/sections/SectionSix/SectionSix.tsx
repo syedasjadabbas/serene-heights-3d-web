@@ -105,37 +105,43 @@ export default function SectionSix() {
       ctx = gsap.context(() => {
         registerScrollTrigger()
 
-        const getScrollAmount = () => Math.max(1, track.scrollWidth - window.innerWidth)
+        const getStartX = () => {
+          const card1 = cards[0]
+          if (!card1) return 0
+          const c1Center = card1.offsetLeft + card1.offsetWidth / 2
+          return window.innerWidth / 2 - c1Center
+        }
 
-        // Premium focus interpolation — drives scale, opacity, brightness,
-        // shadow depth and gold edge lighting based on distance to viewport center.
-        // No vertical lift. Dominance comes from composition and light.
+        const getEndX = () => {
+          const cardLast = cards[cards.length - 1]
+          if (!cardLast) return 0
+          const cLastCenter = cardLast.offsetLeft + cardLast.offsetWidth / 2
+          return window.innerWidth / 2 - cLastCenter
+        }
+
+        const getScrollDistance = () => Math.abs(getStartX() - getEndX())
+
+        // Progress-Driven Exhibition Focus Algorithm — Centered Geometry Math
         const updateCardFocus = () => {
-          const viewportCenter = window.innerWidth / 2
-          const trackX = (gsap.getProperty(track, 'x') as number) || 0
-          const maxScroll = getScrollAmount()
-          const scrollProgress = maxScroll > 0 ? Math.min(1, Math.max(0, -trackX / maxScroll)) : 0
+          const startX = getStartX()
+          const endX = getEndX()
+          const totalDist = Math.abs(startX - endX)
+          const trackX = (gsap.getProperty(track, 'x') as number) || startX
+          const scrollProgress = totalDist > 0 ? Math.min(1, Math.max(0, (startX - trackX) / totalDist)) : 0
+          const numCards = cards.length
 
           cards.forEach((card, idx) => {
-            const cardCenter = trackX + card.offsetLeft + card.offsetWidth / 2
-            const dist = Math.abs(cardCenter - viewportCenter)
-            
-            // Normalize focus distance: for end cards (idx >= 3), account for track end boundary
-            const maxDistance = window.innerWidth * 0.45
-            let normDist = dist / maxDistance
+            // Symmetrical progress target for card idx across 0.0 to 1.0
+            const targetProgress = numCards > 1 ? idx / (numCards - 1) : 0
+            const progressDist = Math.abs(scrollProgress - targetProgress)
 
-            // Special clamp for cards near track end when scrollProgress > 0.75
-            if (idx >= 3 && scrollProgress > 0.75) {
-              const endCardFocus = (scrollProgress - 0.75) / 0.25
-              normDist = Math.min(normDist, 1 - endCardFocus * 0.85)
-            }
-
+            // Symmetrical focus plateau curve
             let fp = 0
-            if (normDist < 0.20) {
+            if (progressDist < 0.06) {
               fp = 1.0
             } else {
-              const falloff = 1 - Math.min(1, (normDist - 0.20) / 0.80)
-              fp = Math.pow(falloff, 1.4)
+              const normDist = (progressDist - 0.06) / 0.22
+              fp = Math.max(0, Math.pow(1 - Math.min(1, normDist), 1.5))
             }
 
             const scale = 0.96 + 0.04 * fp
@@ -143,9 +149,9 @@ export default function SectionSix() {
             const borderTop = 0.14 + 0.28 * fp
             const shadowDepth = 0.45 + 0.40 * fp
 
-            // Subtle architectural image parallax panning (-18px to +18px)
-            const rawOffset = (cardCenter - viewportCenter) / (window.innerWidth / 2)
-            const parallaxX = Math.max(-18, Math.min(18, rawOffset * -18))
+            // Symmetrical image parallax pan (-18px to +18px)
+            const relProgress = (scrollProgress - targetProgress) * 4
+            const parallaxX = Math.max(-18, Math.min(18, relProgress * 18))
 
             const img = card.querySelector(`.${styles.cardImage}`) as HTMLElement | null
 
@@ -167,26 +173,30 @@ export default function SectionSix() {
           })
         }
 
-        // Canonical GSAP pinned-horizontal-scroll pattern.
-        // DO NOT MODIFY — scroll mechanics are locked.
-        gsap.to(track, {
-          x: () => -getScrollAmount(),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: section,
-            pin: true,
-            pinSpacing: true,
-            anticipatePin: 1,
-            scrub: true,
-            start: 'top top',
-            end: () => `+=${getScrollAmount()}`,
-            invalidateOnRefresh: true,
-            onUpdate: () => {
-              updateCardFocus()
+        // Horizontal Gallery Scrub: Translates trackX from getStartX() to getEndX()
+        // so Card 1 starts 100% centered, and Card 5 ends 100% centered with equal margins.
+        gsap.fromTo(
+          track,
+          { x: () => getStartX() },
+          {
+            x: () => getEndX(),
+            ease: 'none',
+            scrollTrigger: {
+              trigger: section,
+              pin: true,
+              pinSpacing: true,
+              anticipatePin: 1,
+              scrub: true,
+              start: 'top top',
+              end: () => `+=${getScrollDistance()}`,
+              invalidateOnRefresh: true,
+              onUpdate: () => {
+                updateCardFocus()
+              },
+              onRefresh: updateCardFocus,
             },
-            onRefresh: updateCardFocus,
-          },
-        })
+          }
+        )
 
         updateCardFocus()
       }, section)
@@ -220,18 +230,19 @@ export default function SectionSix() {
     rafIdRef.current = requestAnimationFrame(() => {
       const px = (clientX - rect.left) / rect.width
       const py = (clientY - rect.top) / rect.height
-      const rotateX = (0.5 - py) * 8
-      const rotateY = (px - 0.5) * 8
-      const shadowX = (0.5 - px) * 16
-      const shadowY = (py - 0.5) * 16 + 28
-      const parallaxX = (px - 0.5) * 6
-      const parallaxY = (py - 0.5) * 6
+      const rotateX = (0.5 - py) * 14
+      const rotateY = (px - 0.5) * 16
+      const shadowX = (0.5 - px) * 18
+      const shadowY = (py - 0.5) * 18 + 28
+      const parallaxX = (px - 0.5) * 8
+      const parallaxY = (py - 0.5) * 8
 
       card.style.setProperty('--rotate-x', `${rotateX}deg`)
       card.style.setProperty('--rotate-y', `${rotateY}deg`)
-      card.style.setProperty('--translate-z', '12px')
+      card.style.setProperty('--translate-z', '18px')
       card.style.setProperty('--light-x', `${px * 100}%`)
       card.style.setProperty('--light-y', `${py * 100}%`)
+      card.style.setProperty('--light-opacity', '1')
       card.style.setProperty('--shadow-x', `${shadowX}px`)
       card.style.setProperty('--shadow-y', `${shadowY}px`)
       card.style.setProperty('--parallax-x', `${parallaxX}px`)
@@ -256,7 +267,7 @@ export default function SectionSix() {
   }
 
   return (
-    <section ref={sectionRef} id="smart-unit" data-alias="gallery" className={styles.section}>
+    <section ref={sectionRef} id="floor-plans" data-alias="smart-unit" className={styles.section}>
       {/* 3D Exhibition Canvas Stage */}
       <SectionSixCanvas />
 

@@ -174,8 +174,8 @@ export default function SectionFive() {
     rafIdRef.current = requestAnimationFrame(() => {
       const px = (clientX - rect.left) / rect.width
       const py = (clientY - rect.top) / rect.height
-      const rotateX = (0.5 - py) * 10
-      const rotateY = (px - 0.5) * 10
+      const rotateX = (0.5 - py) * 14
+      const rotateY = (px - 0.5) * 16
       const shadowX = (0.5 - px) * 18
       const shadowY = (py - 0.5) * 18 + 32
       const parallaxX = (px - 0.5) * 8
@@ -183,9 +183,10 @@ export default function SectionFive() {
 
       card.style.setProperty('--rotate-x', `${rotateX}deg`)
       card.style.setProperty('--rotate-y', `${rotateY}deg`)
-      card.style.setProperty('--translate-z', '12px')
+      card.style.setProperty('--translate-z', '18px')
       card.style.setProperty('--light-x', `${px * 100}%`)
       card.style.setProperty('--light-y', `${py * 100}%`)
+      card.style.setProperty('--light-opacity', '1')
       card.style.setProperty('--shadow-x', `${shadowX}px`)
       card.style.setProperty('--shadow-y', `${shadowY}px`)
       card.style.setProperty('--parallax-x', `${parallaxX}px`)

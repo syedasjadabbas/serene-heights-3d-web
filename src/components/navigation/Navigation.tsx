@@ -24,6 +24,7 @@ export default function Navigation() {
   const barRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const [activeSectionId, setActiveSectionId] = useState<string>('about')
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -32,7 +33,6 @@ export default function Navigation() {
       const renderNavState = (rawProgress: number) => {
         if (!barRef.current) return
 
-        // Throughout Hero & Hero appreciation hold: rawProgress === 0 (Navbar strictly hidden)
         if (rawProgress <= 0) {
           gsap.set(barRef.current, {
             y: -10,
@@ -42,7 +42,6 @@ export default function Navigation() {
           return
         }
 
-        // Premium power3 ease curve (~500ms equivalent fluid reveal)
         const easeProgress = 1 - Math.pow(1 - rawProgress, 3.4)
         const translateY = -12 * (1 - easeProgress)
 
@@ -53,10 +52,8 @@ export default function Navigation() {
         })
       }
 
-      // Subscribe to the shared navbar release event state
       const unsub = subscribeNavVisibilityProgress((progress) => renderNavState(progress))
 
-      // Initial check on mount
       renderNavState(getNavVisibilityProgress())
 
       ScrollTrigger.create({
@@ -69,6 +66,31 @@ export default function Navigation() {
     }, navRef)
 
     return () => ctx.revert()
+  }, [])
+
+  // Active section scroll tracking
+  useEffect(() => {
+    const sectionIds = ['about', 'lifestyle', 'amenities', 'floor-plans', 'smart-unit', 'payment-plan', 'progress', 'contact']
+
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + window.innerHeight * 0.35
+
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const id = sectionIds[i]
+        const el = document.getElementById(id)
+        if (el) {
+          const top = el.offsetTop
+          if (scrollPos >= top) {
+            setActiveSectionId(id)
+            break
+          }
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   useEffect(() => {
@@ -94,27 +116,46 @@ export default function Navigation() {
     }
   }, [isOpen])
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault()
+    const targetId = href.replace('#', '')
+    if (targetId === 'top' || targetId === 'hero') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    const targetEl = document.getElementById(targetId)
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
     <header ref={navRef} className={styles.nav}>
       <div ref={barRef} className={styles.bar}>
-        <a href="#top" className={styles.brand} aria-label="Serene Heights, home">
+        <a href="#top" onClick={(e) => handleNavClick(e, '#top')} className={styles.brand} aria-label="Serene Heights, home">
           <Logo />
         </a>
 
         <nav className={styles.linksCenter} aria-label="Primary Navigation">
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className={`${styles.link} ${item.extra ? styles.desktopExtra : ''}`}
-            >
-              <span>{item.label}</span>
-            </a>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const targetId = item.href.replace('#', '')
+            const isActive = activeSectionId === targetId
+
+            return (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={(e) => handleNavClick(e, item.href)}
+                className={`${styles.link} ${isActive ? styles.activeLink : ''} ${item.extra ? styles.desktopExtra : ''}`}
+              >
+                <span>{item.label}</span>
+              </a>
+            )
+          })}
         </nav>
 
         <div className={styles.actions}>
-          <Button href="#enquire" variant="primary" className={styles.cta}>
+          <Button href="#contact" onClick={(e) => handleNavClick(e, '#contact')} variant="primary" className={styles.cta}>
             ENQUIRE NOW
           </Button>
 
@@ -140,14 +181,24 @@ export default function Navigation() {
               key={item.label}
               href={item.href}
               className={styles.mobileLink}
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => {
+                setIsOpen(false)
+                handleNavClick(e, item.href)
+              }}
             >
               {item.label}
             </a>
           ))}
         </div>
         <div className={styles.mobileCtaWrap}>
-          <Button href="#enquire" variant="primary" onClick={() => setIsOpen(false)}>
+          <Button
+            href="#contact"
+            variant="primary"
+            onClick={(e) => {
+              setIsOpen(false)
+              handleNavClick(e, '#contact')
+            }}
+          >
             ENQUIRE NOW
           </Button>
         </div>

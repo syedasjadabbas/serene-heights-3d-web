@@ -217,18 +217,36 @@
   will-change: opacity, transform;
 }
 
-/* CTA group — short gold divider, then label + arrow underlined edge-to-edge */
+/* CTA group — Luxury glass badge CTA with deep drop shadow & gold border */
 .heroCtaWrap {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: clamp(40px, 5.5vh, 64px);
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  background: rgba(10, 20, 16, 0.88);
+  border: 1px solid rgba(243, 212, 152, 0.55);
+  border-radius: var(--radius-pill);
+  box-shadow:
+    0 16px 36px -6px rgba(0, 0, 0, 0.88),
+    0 0 20px rgba(243, 212, 152, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   opacity: 0;
   will-change: opacity, transform;
-  /* Enable hover interaction for the CTA only — the rest of the
-     typography overlay stays pointer-events:none for scroll. */
   pointer-events: auto;
   cursor: pointer;
+  transition: transform 0.4s var(--ease-premium), background-color 0.4s var(--ease-premium), border-color 0.4s var(--ease-premium), box-shadow 0.4s var(--ease-premium);
+}
+
+.heroCtaWrap:hover {
+  background: rgba(18, 34, 26, 0.95);
+  border-color: rgba(243, 212, 152, 0.85);
+  transform: translateY(-2px);
+  box-shadow:
+    0 20px 45px -6px rgba(0, 0, 0, 0.95),
+    0 0 28px rgba(243, 212, 152, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .subtitleDivider {
@@ -237,13 +255,10 @@
   background: rgba(206, 162, 92, 0.7);
 }
 
-/* Inline-flex + stretch: the underline below always matches the exact
-   width of the label + arrow, whatever their rendered width is. */
 .heroCtaGroup {
   display: inline-flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
 }
 
 .heroCtaRow {
@@ -254,48 +269,34 @@
 
 .heroCtaLabel {
   font-family: var(--font-hero-sans);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.32em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(255, 250, 240, 0.96);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
   white-space: nowrap;
   transition: color 0.35s ease, text-shadow 0.35s ease;
 }
 
 .heroCtaArrow {
   font-family: var(--font-hero-sans);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: rgba(255, 250, 240, 0.96);
+  color: #f3d498;
   line-height: 1;
   display: inline-block;
   transition: color 0.35s ease, transform 0.35s ease;
 }
 
-.heroCtaLine {
-  width: 100%;
-  height: 1px;
-  background: rgba(245, 238, 224, 0.45);
-  transition: background 0.35s ease, box-shadow 0.35s ease;
-}
-
-/* Golden, shiny hover — reads as an interactive action without adopting
-   a boxed default-button look. */
 .heroCtaWrap:hover .heroCtaLabel {
   color: #f3d498;
   text-shadow: 0 0 14px rgba(243, 212, 152, 0.6), 0 1px 2px rgba(0, 0, 0, 0.18);
 }
 
 .heroCtaWrap:hover .heroCtaArrow {
-  color: #f3d498;
-  transform: translateX(5px);
-}
-
-.heroCtaWrap:hover .heroCtaLine {
-  background: linear-gradient(to right, #f3d498, rgba(243, 212, 152, 0.15));
-  box-shadow: 0 0 10px rgba(243, 212, 152, 0.5);
+  color: #ffffff;
+  transform: translateX(4px);
 }
 
 /* ─── Responsive ─────────────────────────────────────────────── */

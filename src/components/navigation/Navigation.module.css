@@ -60,16 +60,17 @@
   position: relative;
   font-family: var(--font-sans);
   font-size: clamp(0.68rem, 0.62rem + 0.22vw, 0.76rem);
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(244, 239, 228, 0.82);
+  color: rgba(244, 239, 228, 0.75);
   padding: 6px 14px;
   border-radius: var(--radius-pill);
   transition:
-    color 0.3s var(--ease-premium),
-    background-color 0.3s var(--ease-premium),
-    border-color 0.3s var(--ease-premium);
+    color 0.35s var(--ease-premium),
+    background-color 0.35s var(--ease-premium),
+    border-color 0.35s var(--ease-premium),
+    box-shadow 0.35s var(--ease-premium);
   white-space: nowrap;
   text-decoration: none;
   border: 1px solid transparent;
@@ -77,8 +78,32 @@
 
 .link:hover {
   color: #ffffff;
-  background: rgba(244, 239, 228, 0.08);
-  border-color: rgba(244, 239, 228, 0.15);
+  background: rgba(244, 239, 228, 0.12);
+  border-color: rgba(244, 239, 228, 0.22);
+}
+
+.activeLink {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  background: linear-gradient(135deg, rgba(243, 212, 152, 0.22) 0%, rgba(206, 162, 92, 0.12) 100%) !important;
+  border-color: rgba(243, 212, 152, 0.55) !important;
+  box-shadow:
+    0 4px 14px -2px rgba(0, 0, 0, 0.6),
+    0 0 12px rgba(243, 212, 152, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.activeLink::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 2px;
+  background: #f3d498;
+  border-radius: 2px;
+  box-shadow: 0 0 6px #f3d498;
 }
 
 .actions {
@@ -92,7 +117,14 @@
   font-size: 0.74rem;
   padding: 0.75em 1.5em;
   letter-spacing: 0.14em;
-  font-weight: 600;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #f3d498 100%) !important;
+  color: #08100c !important;
+  border-color: rgba(243, 212, 152, 0.8) !important;
+  box-shadow:
+    0 10px 24px -4px rgba(0, 0, 0, 0.7),
+    0 0 12px rgba(243, 212, 152, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
 
 .menuToggle {
