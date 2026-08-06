@@ -102,10 +102,12 @@ export default function SectionEight() {
   const scenesRef = useRef<(HTMLDivElement | null)[]>([])
   const navItemsRef = useRef<(HTMLButtonElement | null)[]>([])
   const indicatorRef = useRef<HTMLDivElement>(null)
-  const conclusionRef = useRef<HTMLHeadingElement>(null)
   const metricsRef = useRef<HTMLDivElement>(null)
   const metricValRefs = useRef<(HTMLDivElement | null)[]>([])
   const metricsAnimatedRef = useRef(false)
+
+  const rectCacheRef = useRef<Map<HTMLDivElement, DOMRect>>(new Map())
+  const rafIdRef = useRef<number | null>(null)
 
   const [activeSeason, setActiveSeason] = useState(0)
   const activeSeasonRef = useRef(-1)
@@ -126,7 +128,6 @@ export default function SectionEight() {
           let focus = 0
 
           if (idx === 0) {
-            // Starting season (Winter) is 100% IMMEDIATELY visible at progress <= 0.20
             if (progress <= 0.20) {
               focus = 1.0
             } else if (progress < 0.25) {
@@ -152,9 +153,7 @@ export default function SectionEight() {
           if (!scene) return
 
           const img = scene.querySelector(`.${styles.sceneImage}`) as HTMLElement | null
-          const headline = scene.querySelector(`.${styles.sceneHeadline}`) as HTMLElement | null
-          const story = scene.querySelector(`.${styles.sceneStory}`) as HTMLElement | null
-          const stat = scene.querySelector(`.${styles.sceneStat}`) as HTMLElement | null
+          const content = scene.querySelector(`.${styles.sceneContent}`) as HTMLElement | null
 
           if (focus > 0) {
             scene.classList.add(styles.sceneActive)
@@ -167,16 +166,8 @@ export default function SectionEight() {
               })
             }
 
-            if (headline) {
-              gsap.set(headline, { opacity: focus, y: 16 * (1 - focus) })
-            }
-
-            if (story) {
-              gsap.set(story, { opacity: focus, y: 12 * (1 - focus) })
-            }
-
-            if (stat) {
-              gsap.set(stat, { opacity: focus, y: 10 * (1 - focus) })
+            if (content) {
+              gsap.set(content, { opacity: focus, y: 16 * (1 - focus) })
             }
           } else {
             scene.classList.remove(styles.sceneActive)
@@ -219,7 +210,10 @@ export default function SectionEight() {
           }
 
           if (stageFrameRef.current) {
-            stageFrameRef.current.style.borderTopColor = SEASONS[activeIdx].borderTop
+            const inner = stageFrameRef.current.querySelector(`.${styles.stageInner}`) as HTMLElement | null
+            if (inner) {
+              inner.style.borderTopColor = SEASONS[activeIdx].borderTop
+            }
           }
 
           const activeNavBtn = navItemsRef.current[activeIdx]
@@ -305,6 +299,43 @@ export default function SectionEight() {
     }
   }
 
+  const handleStageMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const frame = e.currentTarget
+    rectCacheRef.current.set(frame, frame.getBoundingClientRect())
+  }
+
+  const handleStageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const frame = e.currentTarget
+    let rect = rectCacheRef.current.get(frame)
+    if (!rect) {
+      rect = frame.getBoundingClientRect()
+      rectCacheRef.current.set(frame, rect)
+    }
+
+    const px = (e.clientX - rect.left) / rect.width
+    const py = (e.clientY - rect.top) / rect.height
+    const tiltX = (0.5 - py) * 14
+    const tiltY = (px - 0.5) * 16
+
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+
+    rafIdRef.current = requestAnimationFrame(() => {
+      frame.style.setProperty('--stage-tilt-x', `${tiltX}deg`)
+      frame.style.setProperty('--stage-tilt-y', `${tiltY}deg`)
+      frame.style.setProperty('--stage-light-x', `${px * 100}%`)
+      frame.style.setProperty('--stage-light-y', `${py * 100}%`)
+    })
+  }
+
+  const handleStageMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const frame = e.currentTarget
+    rectCacheRef.current.delete(frame)
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+
+    frame.style.setProperty('--stage-tilt-x', '0deg')
+    frame.style.setProperty('--stage-tilt-y', '0deg')
+  }
+
   return (
     <section ref={sectionRef} id="progress" data-alias="seasons" className={styles.section}>
       {/* 3D Seasonal Canvas particles */}
@@ -316,73 +347,84 @@ export default function SectionEight() {
       <div ref={sunbeamRef} className={styles.sunbeamOverlay} aria-hidden="true" />
       <div ref={frostHazeRef} className={styles.frostHazeOverlay} aria-hidden="true" />
 
-      {/* Section Header */}
-      <div className={styles.header}>
-        <p className={styles.eyebrow}>
-          <span className={styles.eyebrowNum}>08</span>
-          <span className={styles.eyebrowDivider}>/</span>
-          <span>THE SEASONAL EXPERIENCE</span>
-        </p>
-        <h2 className={styles.headerTitle}>A Sanctuary for Every Season.</h2>
-      </div>
+      <div className={styles.sectionInner}>
+        {/* Section Header */}
+        <div className={styles.header}>
+          <p className={styles.eyebrow}>
+            <span className={styles.eyebrowNum}>08</span>
+            <span className={styles.eyebrowDivider}>/</span>
+            <span>THE SEASONAL EXPERIENCE</span>
+          </p>
+          <h2 className={styles.headerTitle}>A Sanctuary for Every Season.</h2>
+        </div>
 
-      {/* Minimalist Editorial Season Selector */}
-      <div className={styles.seasonNav} role="tablist">
-        {SEASONS.map((s, idx) => (
-          <button
-            key={s.id}
-            ref={(el) => { navItemsRef.current[idx] = el }}
-            role="tab"
-            aria-selected={activeSeason === idx}
-            className={`${styles.seasonNavItem} ${activeSeason === idx ? styles.seasonNavItemActive : ''}`}
-            onClick={() => handleNavClick(idx)}
-          >
-            {s.num} {s.label}
-          </button>
-        ))}
-        <div ref={indicatorRef} className={styles.seasonIndicator} aria-hidden="true" />
-      </div>
+        {/* Minimalist Editorial Season Selector */}
+        <div className={styles.seasonNav} role="tablist">
+          {SEASONS.map((s, idx) => (
+            <button
+              key={s.id}
+              ref={(el) => { navItemsRef.current[idx] = el }}
+              role="tab"
+              aria-selected={activeSeason === idx}
+              className={`${styles.seasonNavItem} ${activeSeason === idx ? styles.seasonNavItemActive : ''}`}
+              onClick={() => handleNavClick(idx)}
+            >
+              {s.num} {s.label}
+            </button>
+          ))}
+          <div ref={indicatorRef} className={styles.seasonIndicator} aria-hidden="true" />
+        </div>
 
-      {/* Seasonal Image & Story Stage */}
-      <div ref={stageFrameRef} className={styles.stageFrame}>
-        {SEASONS.map((s, idx) => (
-          <div
-            key={s.id}
-            ref={(el) => { scenesRef.current[idx] = el }}
-            className={`${styles.seasonScene} ${activeSeason === idx ? styles.sceneActive : ''}`}
-          >
-            <img src={s.imageUrl} alt={s.title} className={styles.sceneImage} />
-            <div className={styles.sceneOverlay} aria-hidden="true" />
-            <div className={styles.sceneContent}>
-              <h3 className={styles.sceneHeadline}>{s.title}</h3>
-              <p className={styles.sceneStory}>{s.story}</p>
-              <div className={styles.sceneStat}>{s.stat}</div>
-            </div>
+        {/* Expansive 3D Architectural Viewport Stage */}
+        <div
+          ref={stageFrameRef}
+          className={styles.stageFrame}
+          onMouseEnter={handleStageMouseEnter}
+          onMouseMove={handleStageMouseMove}
+          onMouseLeave={handleStageMouseLeave}
+        >
+          <div className={styles.stageInner}>
+            <div className={styles.cardLight} aria-hidden="true" />
+
+            {SEASONS.map((s, idx) => (
+              <div
+                key={s.id}
+                ref={(el) => { scenesRef.current[idx] = el }}
+                className={`${styles.seasonScene} ${activeSeason === idx ? styles.sceneActive : ''}`}
+              >
+                <img src={s.imageUrl} alt={s.title} className={styles.sceneImage} />
+                <div className={styles.sceneOverlay} aria-hidden="true" />
+                <div className={styles.sceneContent}>
+                  <div className={styles.sceneHeaderTag}>
+                    <span>SEASON {s.num}</span>
+                    <span className={styles.tagDot}>•</span>
+                    <span>NATHIA GALI</span>
+                  </div>
+                  <h3 className={styles.sceneHeadline}>{s.title}</h3>
+                  <p className={styles.sceneStory}>{s.story}</p>
+                  <div className={styles.sceneStat}>{s.stat}</div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* Staggered Conclusion & Metrics Strip */}
-      <div className={styles.conclusionContainer}>
-        <h3 ref={conclusionRef} className={styles.conclusionStatement}>
-          365 Days. One Destination. Endless Reasons To Return.
-        </h3>
-
+        {/* Metrics Grid Strip */}
         <div ref={metricsRef} className={styles.metricsGrid}>
           <div className={styles.metricItem}>
-            <div ref={(el) => { metricValRefs.current[0] = el }} className={styles.metricVal}>0 FT</div>
+            <div ref={(el) => { metricValRefs.current[0] = el }} className={styles.metricVal}>7,906 FT</div>
             <div className={styles.metricLabel}>ELEVATION</div>
           </div>
           <div className={styles.metricItem}>
-            <div ref={(el) => { metricValRefs.current[1] = el }} className={styles.metricVal}>0</div>
+            <div ref={(el) => { metricValRefs.current[1] = el }} className={styles.metricVal}>FOUR</div>
             <div className={styles.metricLabel}>SEASONS</div>
           </div>
           <div className={styles.metricItem}>
-            <div ref={(el) => { metricValRefs.current[2] = el }} className={styles.metricVal}>0 DAYS</div>
+            <div ref={(el) => { metricValRefs.current[2] = el }} className={styles.metricVal}>365 DAYS</div>
             <div className={styles.metricLabel}>YEAR-ROUND APPEAL</div>
           </div>
           <div className={styles.metricItem}>
-            <div ref={(el) => { metricValRefs.current[3] = el }} className={styles.metricVal}>0%</div>
+            <div ref={(el) => { metricValRefs.current[3] = el }} className={styles.metricVal}>13–15%</div>
             <div className={styles.metricLabel}>PROJECTED ROI</div>
           </div>
         </div>
