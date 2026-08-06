@@ -112,30 +112,36 @@ export default function SectionSix() {
         // No vertical lift. Dominance comes from composition and light.
         const updateCardFocus = () => {
           const viewportCenter = window.innerWidth / 2
-          const maxDistance = window.innerWidth * 0.48
           const trackX = (gsap.getProperty(track, 'x') as number) || 0
+          const maxScroll = getScrollAmount()
+          const scrollProgress = maxScroll > 0 ? Math.min(1, Math.max(0, -trackX / maxScroll)) : 0
 
-          cards.forEach((card) => {
+          cards.forEach((card, idx) => {
             const cardCenter = trackX + card.offsetLeft + card.offsetWidth / 2
             const dist = Math.abs(cardCenter - viewportCenter)
-            const normDist = dist / maxDistance
+            
+            // Normalize focus distance: for end cards (idx >= 3), account for track end boundary
+            const maxDistance = window.innerWidth * 0.45
+            let normDist = dist / maxDistance
 
-            // Exhibition Presentation Rhythm: Smooth focus transition across viewport
-            let fp = 0
-            if (normDist < 0.18) {
-              fp = 1.0
-            } else {
-              const falloff = 1 - Math.min(1, (normDist - 0.18) / 0.82)
-              fp = Math.pow(falloff, 1.6) // Smooth gentle curve, no aggressive drop
+            // Special clamp for cards near track end when scrollProgress > 0.75
+            if (idx >= 3 && scrollProgress > 0.75) {
+              const endCardFocus = (scrollProgress - 0.75) / 0.25
+              normDist = Math.min(normDist, 1 - endCardFocus * 0.85)
             }
 
-            const scale = 0.95 + 0.05 * fp
-            const brightness = 0.88 + 0.15 * fp
-            const contrast = 0.96 + 0.07 * fp
-            const saturate = 0.96 + 0.08 * fp
-            const borderGold = 0.20 + 0.65 * fp
-            const borderTop = 0.12 + 0.30 * fp
-            const shadowDepth = 0.40 + 0.45 * fp
+            let fp = 0
+            if (normDist < 0.20) {
+              fp = 1.0
+            } else {
+              const falloff = 1 - Math.min(1, (normDist - 0.20) / 0.80)
+              fp = Math.pow(falloff, 1.4)
+            }
+
+            const scale = 0.96 + 0.04 * fp
+            const borderGold = 0.25 + 0.60 * fp
+            const borderTop = 0.14 + 0.28 * fp
+            const shadowDepth = 0.45 + 0.40 * fp
 
             // Subtle architectural image parallax panning (-18px to +18px)
             const rawOffset = (cardCenter - viewportCenter) / (window.innerWidth / 2)
@@ -148,14 +154,14 @@ export default function SectionSix() {
               opacity: 1,
               borderLeftColor: `rgba(243, 212, 152, ${borderGold})`,
               borderTopColor: `rgba(243, 212, 152, ${borderTop})`,
-              boxShadow: `inset 0 1px 0 rgba(243, 212, 152, ${0.12 + 0.20 * fp}), 0 ${16 + 20 * fp}px ${35 + 45 * fp}px -15px rgba(0, 0, 0, ${shadowDepth})`,
+              boxShadow: `inset 0 1px 0 rgba(243, 212, 152, ${0.14 + 0.18 * fp}), 0 ${18 + 18 * fp}px ${40 + 40 * fp}px -15px rgba(0, 0, 0, ${shadowDepth})`,
               zIndex: Math.round(1 + fp * 10),
             })
 
             if (img) {
               gsap.set(img, {
                 x: parallaxX,
-                filter: `brightness(${brightness.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${saturate.toFixed(2)})`,
+                opacity: 1,
               })
             }
           })
