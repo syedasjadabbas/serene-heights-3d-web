@@ -18,8 +18,8 @@
     linear-gradient(rgba(244, 239, 228, 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(244, 239, 228, 0.025) 1px, transparent 1px);
   background-size: 40px 40px;
-  mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
-  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
+  mask-image: radial-gradient(circle at 50% 50%, black 45%, transparent 90%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 45%, transparent 90%);
   pointer-events: none;
   z-index: 0;
 }
@@ -29,6 +29,11 @@
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 40%,
+    rgba(220, 238, 245, 0.14) 0%,
+    rgba(10, 17, 13, 0.58) 85%
+  );
   transition: background 0.9s var(--ease-out-soft);
 }
 
@@ -46,7 +51,8 @@
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  opacity: 0;
+  opacity: 0.45;
+  box-shadow: inset 0 0 45px rgba(220, 238, 245, 0.06);
   transition: opacity 0.9s var(--ease-out-soft), box-shadow 0.9s var(--ease-out-soft);
 }
 
@@ -170,7 +176,7 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.25),
     inset 1px 0 0 rgba(255, 255, 255, 0.08),
-    0 36px 90px -20px rgba(0, 0, 0, 0.95),
+    0 24px 60px -20px rgba(0, 0, 0, 0.75),
     0 0 40px rgba(206, 162, 92, 0.12);
   margin-bottom: clamp(48px, 6vh, 84px);
   z-index: 2;
@@ -197,7 +203,7 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: brightness(0.82);
+  filter: brightness(0.96);
   will-change: filter, transform;
 }
 
@@ -206,9 +212,9 @@
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(10, 17, 13, 0.1) 0%,
-    rgba(10, 17, 13, 0.50) 65%,
-    rgba(10, 17, 13, 0.95) 100%
+    rgba(10, 17, 13, 0.02) 0%,
+    rgba(10, 17, 13, 0.20) 65%,
+    rgba(10, 17, 13, 0.45) 100%
   );
 }
 
@@ -228,16 +234,17 @@
   line-height: 1.1;
   color: var(--color-cream);
   margin-bottom: 8px;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.75);
 }
 
 .sceneStory {
   font-family: var(--font-sans);
   font-size: clamp(0.84375rem, 0.8rem + 0.18vw, 1.0rem);
   line-height: 1.48;
-  color: rgba(244, 239, 228, 0.85);
+  color: rgba(244, 239, 228, 0.90);
   max-width: 48ch;
   margin-bottom: 14px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
 }
 
 .sceneStat {

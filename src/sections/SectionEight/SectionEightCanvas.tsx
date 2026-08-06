@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
 
 interface SectionEightCanvasProps {
   activeSeason: number // 0: Winter, 1: Spring, 2: Summer, 3: Autumn
@@ -17,11 +18,61 @@ interface Particle {
 }
 
 export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasProps) {
+  const { containerRef, isVisible } = useCanvasVisibility({ rootMargin: '300px 0px' })
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const particlesRef = useRef<Particle[]>([])
+  const isInitializedRef = useRef(false)
   const activeSeasonRef = useRef(activeSeason)
   activeSeasonRef.current = activeSeason
 
+  // Initialize particle pool ONCE on component mount
   useEffect(() => {
+    if (isInitializedRef.current) return
+
+    const width = window.innerWidth
+    const height = window.innerHeight
+    const numParticles = 75
+    const particles: Particle[] = []
+
+    for (let i = 0; i < numParticles; i++) {
+      const isEdge = i < Math.floor(numParticles * 0.65)
+      particles.push({
+        x: isEdge
+          ? Math.random() > 0.5
+            ? Math.random() * (width * 0.28)
+            : width * 0.72 + Math.random() * (width * 0.28)
+          : Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: 0.4 + Math.random() * 1.0,
+        size: 4 + Math.random() * 7,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.035,
+        alpha: 0.70 + Math.random() * 0.28,
+        isEdge,
+      })
+    }
+
+    // Warm-up particle simulation by 150 frames ONCE so particles exist in mid-air
+    for (let step = 0; step < 150; step++) {
+      particles.forEach((p) => {
+        p.x += p.vx + Math.sin(step * 0.0012 + p.y * 0.008) * 0.4
+        p.y += p.vy
+        p.rotation += p.rotSpeed
+        if (p.y > height + 25) {
+          p.y = -25
+        }
+      })
+    }
+
+    particlesRef.current = particles
+    isInitializedRef.current = true
+  }, [])
+
+  // Visibility-gated render loop: Pauses offscreen, resumes instantaneously on re-entry with zero object recreation
+  useEffect(() => {
+    if (!isVisible) return
+
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -38,33 +89,11 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
     }
     window.addEventListener('resize', handleResize)
 
-    // Particle count: 68
-    const numParticles = 68
-    const particles: Particle[] = []
-
-    for (let i = 0; i < numParticles; i++) {
-      const isEdge = i < Math.floor(numParticles * 0.7)
-      particles.push({
-        x: isEdge
-          ? Math.random() > 0.5
-            ? Math.random() * (width * 0.24)
-            : width * 0.76 + Math.random() * (width * 0.24)
-          : Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.7,
-        vy: 0.4 + Math.random() * 0.9,
-        size: 4 + Math.random() * 7,
-        rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.035,
-        alpha: 0.65 + Math.random() * 0.32,
-        isEdge,
-      })
-    }
+    const particles = particlesRef.current
 
     const render = (now: number) => {
-
       ctx.clearRect(0, 0, width, height)
-      const targetIdx = activeSeasonRef.current
+      const targetIdx = activeSeasonRef.current < 0 ? 0 : activeSeasonRef.current
 
       // Render living seasonal particles with high visibility & soft glow
       particles.forEach((p) => {
@@ -77,8 +106,8 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
           p.y = -25
           p.x = p.isEdge
             ? Math.random() > 0.5
-              ? Math.random() * (width * 0.24)
-              : width * 0.76 + Math.random() * (width * 0.24)
+              ? Math.random() * (width * 0.28)
+              : width * 0.72 + Math.random() * (width * 0.28)
             : Math.random() * width
         }
 
@@ -129,18 +158,18 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
       animId = requestAnimationFrame(render)
     }
 
-    animId = requestAnimationFrame(render)
+    // Synchronous initial frame render
+    render(performance.now())
 
     return () => {
       window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(animId)
     }
-  }, [])
+  }, [isVisible])
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
+    <div
+      ref={containerRef}
       style={{
         position: 'absolute',
         inset: 0,
@@ -149,6 +178,18 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
         pointerEvents: 'none',
         zIndex: 1,
       }}
-    />
+    >
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+        }}
+      />
+    </div>
   )
 }

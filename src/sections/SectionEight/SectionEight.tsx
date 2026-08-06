@@ -1,5 +1,5 @@
 /**
- * Section: Location
+ * Section: SectionEight (The Seasonal Experience)
  * Assets: src/assets/location/
  */
 import { useLayoutEffect, useRef, useState } from 'react'
@@ -34,8 +34,8 @@ const SEASONS: SeasonData[] = [
     imageUrl:
       'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop',
     glowGradient:
-      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(220, 238, 245, 0.12) 0%, rgba(10, 17, 13, 0.96) 75%)',
-    imgFilter: 'brightness(0.85) contrast(1.02) saturate(0.88)',
+      'radial-gradient(ellipse 80% 70% at 50% 40%, rgba(220, 238, 245, 0.14) 0%, rgba(10, 17, 13, 0.58) 85%)',
+    imgFilter: 'brightness(0.96) contrast(1.02) saturate(0.92)',
     borderTop: 'rgba(220, 238, 245, 0.40)',
   },
   {
@@ -49,8 +49,8 @@ const SEASONS: SeasonData[] = [
     imageUrl:
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600&auto=format&fit=crop',
     glowGradient:
-      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(122, 168, 133, 0.14) 0%, rgba(10, 17, 13, 0.96) 75%)',
-    imgFilter: 'brightness(0.95) contrast(1.04) saturate(1.05)',
+      'radial-gradient(ellipse 80% 70% at 50% 40%, rgba(122, 168, 133, 0.16) 0%, rgba(10, 17, 13, 0.58) 85%)',
+    imgFilter: 'brightness(1.02) contrast(1.04) saturate(1.05)',
     borderTop: 'rgba(122, 168, 133, 0.40)',
   },
   {
@@ -64,8 +64,8 @@ const SEASONS: SeasonData[] = [
     imageUrl:
       'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
     glowGradient:
-      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(243, 212, 152, 0.16) 0%, rgba(10, 17, 13, 0.96) 75%)',
-    imgFilter: 'brightness(1.02) contrast(1.06) saturate(1.12)',
+      'radial-gradient(ellipse 80% 70% at 50% 40%, rgba(243, 212, 152, 0.18) 0%, rgba(10, 17, 13, 0.58) 85%)',
+    imgFilter: 'brightness(1.08) contrast(1.06) saturate(1.10)',
     borderTop: 'rgba(243, 212, 152, 0.50)',
   },
   {
@@ -79,8 +79,8 @@ const SEASONS: SeasonData[] = [
     imageUrl:
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop',
     glowGradient:
-      'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(216, 138, 66, 0.15) 0%, rgba(10, 17, 13, 0.96) 75%)',
-    imgFilter: 'brightness(0.92) contrast(1.04) saturate(1.08)',
+      'radial-gradient(ellipse 80% 70% at 50% 40%, rgba(216, 138, 66, 0.16) 0%, rgba(10, 17, 13, 0.58) 85%)',
+    imgFilter: 'brightness(1.00) contrast(1.04) saturate(1.08)',
     borderTop: 'rgba(216, 138, 66, 0.45)',
   },
 ]
@@ -108,7 +108,7 @@ export default function SectionEight() {
   const metricsAnimatedRef = useRef(false)
 
   const [activeSeason, setActiveSeason] = useState(0)
-  const activeSeasonRef = useRef(0)
+  const activeSeasonRef = useRef(-1)
 
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
@@ -126,7 +126,7 @@ export default function SectionEight() {
           let focus = 0
 
           if (idx === 0) {
-            // Starting season (Winter) is 100% IMMEDIATELY visible at progress 0
+            // Starting season (Winter) is 100% IMMEDIATELY visible at progress <= 0.20
             if (progress <= 0.20) {
               focus = 1.0
             } else if (progress < 0.25) {
@@ -135,7 +135,6 @@ export default function SectionEight() {
               focus = 0
             }
           } else {
-            // Subsequent seasons: smooth crossfade entrance & exit
             const stepStart = idx * stepWindow
             const relProgress = (progress - stepStart) / stepWindow
             if (relProgress >= 0 && relProgress <= 1) {
@@ -197,11 +196,11 @@ export default function SectionEight() {
 
           if (sunbeamRef.current) {
             if (activeIdx === 2) {
-              sunbeamRef.current.style.opacity = '0.65'
-              sunbeamRef.current.style.background = 'linear-gradient(135deg, rgba(243, 212, 152, 0.18) 0%, transparent 65%)'
+              sunbeamRef.current.style.opacity = '0.55'
+              sunbeamRef.current.style.background = 'linear-gradient(135deg, rgba(243, 212, 152, 0.15) 0%, transparent 65%)'
             } else if (activeIdx === 3) {
-              sunbeamRef.current.style.opacity = '0.48'
-              sunbeamRef.current.style.background = 'linear-gradient(135deg, rgba(216, 138, 66, 0.15) 0%, transparent 65%)'
+              sunbeamRef.current.style.opacity = '0.40'
+              sunbeamRef.current.style.background = 'linear-gradient(135deg, rgba(216, 138, 66, 0.12) 0%, transparent 65%)'
             } else {
               sunbeamRef.current.style.opacity = '0'
             }
@@ -209,11 +208,11 @@ export default function SectionEight() {
 
           if (frostHazeRef.current) {
             if (activeIdx === 0) {
-              frostHazeRef.current.style.opacity = '0.75'
-              frostHazeRef.current.style.boxShadow = 'inset 0 0 110px rgba(220, 238, 245, 0.12)'
+              frostHazeRef.current.style.opacity = '0.45'
+              frostHazeRef.current.style.boxShadow = 'inset 0 0 45px rgba(220, 238, 245, 0.06)'
             } else if (activeIdx === 1) {
-              frostHazeRef.current.style.opacity = '0.55'
-              frostHazeRef.current.style.boxShadow = 'inset 0 0 110px rgba(122, 168, 133, 0.10)'
+              frostHazeRef.current.style.opacity = '0.35'
+              frostHazeRef.current.style.boxShadow = 'inset 0 0 45px rgba(122, 168, 133, 0.05)'
             } else {
               frostHazeRef.current.style.opacity = '0'
             }
@@ -262,8 +261,16 @@ export default function SectionEight() {
         })
       }
 
+      // Pre-warm / pre-trigger viewport entry lookahead so effects are ALREADY active when section enters screen
+      const entryST = ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top bottom',
+        onEnter: () => updateSeasonProgress(0),
+        onEnterBack: () => updateSeasonProgress(0),
+      })
+
       // Pin Section 8 for continuous unhurried keynote presentation runway
-      const st = ScrollTrigger.create({
+      const mainST = ScrollTrigger.create({
         trigger: sectionRef.current,
         pin: true,
         pinSpacing: true,
@@ -277,10 +284,13 @@ export default function SectionEight() {
         onEnter: () => updateSeasonProgress(0),
       })
 
-      // Immediate synchronous render for frame 0
+      // Immediate synchronous initial render on mount
       updateSeasonProgress(0)
 
-      return () => st.kill()
+      return () => {
+        entryST.kill()
+        mainST.kill()
+      }
     }, sectionRef)
 
     return () => ctx.revert()

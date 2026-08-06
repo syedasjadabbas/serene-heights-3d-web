@@ -8,8 +8,9 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-block: clamp(24px, 3vh, 48px);
+  padding-block: clamp(20px, 2.5vh, 40px);
   padding-inline: clamp(28px, 5vw, 84px);
+  box-sizing: border-box;
 }
 
 .blueprintBgGrid {
@@ -30,8 +31,8 @@
   inset: 0;
   background: radial-gradient(
     ellipse 70% 60% at 50% 40%,
-    rgba(206, 162, 92, 0.04) 0%,
-    rgba(10, 17, 13, 0.32) 75%
+    rgba(206, 162, 92, 0.05) 0%,
+    rgba(10, 17, 13, 0.35) 75%
   );
   pointer-events: none;
   z-index: 0;
@@ -42,15 +43,12 @@
   text-align: left;
   max-width: 1120px;
   margin-inline: auto;
-  margin-bottom: clamp(24px, 3.5vh, 48px);
+  margin-bottom: clamp(16px, 2.5vh, 36px);
   flex-shrink: 0;
   position: relative;
   z-index: 2;
   background: transparent;
-  padding: 0;
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
+  width: 100%;
 }
 
 .eyebrow {
@@ -78,11 +76,11 @@
 .headerTitle {
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: clamp(2.0rem, 1.5rem + 2.5vw, 3.6rem);
+  font-size: clamp(2.0rem, 1.5rem + 2.2vw, 3.4rem);
   line-height: 1.08;
   letter-spacing: -0.022em;
   color: var(--color-cream);
-  max-width: 20ch;
+  max-width: 22ch;
   margin-inline: 0;
   text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85), 0 2px 8px rgba(0, 0, 0, 0.7);
   text-wrap: balance;
@@ -93,18 +91,28 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 1.18fr 0.82fr;
-  gap: clamp(24px, 3.2vw, 44px);
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: clamp(24px, 3.2vw, 48px);
   width: 100%;
   max-width: 1120px;
   margin-inline: auto;
-  height: clamp(340px, 48vh, 480px);
+  height: clamp(360px, 50vh, 500px);
   align-items: center;
-  padding-inline: clamp(16px, 3vw, 40px);
+  perspective: 1600px;
+  transform-style: preserve-3d;
 }
 
-/* Left Pane: Continuous Cinematic Visual Scene Stage */
+/* Left Pane: Visual Scene Frame with 3D Depth & Mouse Hover Tilt */
 .visualStageFrame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.visualInner {
   position: relative;
   width: 100%;
   height: 100%;
@@ -116,14 +124,45 @@
     rgba(10, 17, 13, 0.98) 50%,
     rgba(5, 9, 7, 0.99) 100%
   );
-  border-left: 4px solid var(--color-accent-gold);
-  border-top: 1px solid rgba(244, 239, 228, 0.24);
-  border-right: 1px solid rgba(244, 239, 228, 0.12);
-  border-bottom: 1px solid rgba(244, 239, 228, 0.08);
+  border-left: 4px solid #f3d498;
+  border-top: 1px solid rgba(243, 212, 152, 0.35);
+  border-right: 1px solid rgba(244, 239, 228, 0.14);
+  border-bottom: 1px solid rgba(244, 239, 228, 0.10);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(243, 212, 152, 0.35),
+    inset 1px 0 0 rgba(255, 255, 255, 0.12),
     0 32px 80px -20px rgba(0, 0, 0, 0.92);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: rotateX(var(--img-tilt-x, 0deg)) rotateY(var(--img-tilt-y, 0deg)) translateZ(0px);
+}
+
+.visualStageFrame:hover .visualInner {
+  transform: rotateX(var(--img-tilt-x, 0deg)) rotateY(var(--img-tilt-y, 0deg)) translateZ(24px) scale(1.01);
+  box-shadow:
+    inset 0 1px 0 rgba(243, 212, 152, 0.5),
+    inset 1px 0 0 rgba(255, 255, 255, 0.18),
+    0 40px 95px -18px rgba(0, 0, 0, 0.98),
+    0 0 35px rgba(243, 212, 152, 0.22);
+}
+
+.visualStageFrame .cardLight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    650px circle at var(--img-light-x, 50%) var(--img-light-y, 50%),
+    rgba(255, 255, 255, 0.18),
+    transparent 55%
+  );
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.visualStageFrame:hover .cardLight {
+  opacity: 1;
 }
 
 .visualScene {
@@ -132,7 +171,9 @@
   width: 100%;
   height: 100%;
   opacity: 0;
-  will-change: opacity, transform;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 
 .sceneImage {
@@ -140,7 +181,13 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  will-change: filter, transform;
+  will-change: transform, filter;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.5s ease;
+  transform: scale(1.02);
+}
+
+.visualStageFrame:hover .sceneImage {
+  transform: scale(1.08) translateZ(15px);
 }
 
 .sceneOverlay {
@@ -152,38 +199,93 @@
     rgba(10, 17, 13, 0.55) 70%,
     rgba(10, 17, 13, 0.94) 100%
   );
+  pointer-events: none;
 }
 
 .sceneWatermark {
   position: absolute;
-  top: 16px;
-  right: 20px;
+  top: 18px;
+  right: 22px;
   font-family: var(--font-sans);
-  font-size: 0.625rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.25em;
-  color: rgba(244, 239, 228, 0.75);
+  letter-spacing: 0.22em;
+  color: rgba(243, 212, 152, 0.95);
   text-transform: uppercase;
   pointer-events: none;
-  z-index: 3;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  z-index: 4;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+  padding: 5px 12px;
+  border-radius: 4px;
+  background: rgba(10, 17, 13, 0.65);
+  border: 1px solid rgba(243, 212, 152, 0.3);
+  backdrop-filter: blur(6px);
+  transform: translateZ(40px);
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* Right Pane: Clean Editorial Step Cards */
+.visualStageFrame:hover .sceneWatermark {
+  transform: translateZ(50px);
+  border-color: rgba(243, 212, 152, 0.6);
+  box-shadow: 0 0 16px rgba(243, 212, 152, 0.3);
+}
+
+/* Right Pane: 3D Flipping Editorial Stage */
 .editorialStage {
   position: relative;
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
+  perspective: 1600px;
+  transform-style: preserve-3d;
 }
 
 .editorialCard {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  will-change: transform, opacity;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+/* 3D Card Inner (Handles 180° Flip & Hover Tilt) */
+.cardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.75s cubic-bezier(0.34, 1.35, 0.64, 1);
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(0px);
+}
+
+.editorialCard:hover .cardInner {
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(28px);
+}
+
+.cardInner.isFlipped {
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(calc(180deg + var(--tilt-y, 0deg))) translateZ(28px) !important;
+}
+
+/* Front and Back Face Panels */
+.cardFront,
+.cardBack {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  padding: clamp(22px, 2.8vw, 34px);
   background: linear-gradient(
     155deg,
     rgba(18, 30, 24, 0.96) 0%,
@@ -191,29 +293,31 @@
     rgba(5, 9, 7, 0.99) 100%
   );
   border-left: 4px solid #f3d498;
-  border-top: 1px solid rgba(243, 212, 152, 0.32);
+  border-top: 1px solid rgba(243, 212, 152, 0.35);
   border-right: 1px solid rgba(244, 239, 228, 0.14);
   border-bottom: 1px solid rgba(244, 239, 228, 0.10);
-  border-radius: var(--radius-lg);
-  padding: clamp(24px, 3.2vw, 38px);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   box-shadow:
-    inset 0 1px 0 rgba(243, 212, 152, 0.3),
-    inset 1px 0 0 rgba(255, 255, 255, 0.1),
-    0 32px 80px -15px rgba(0, 0, 0, 0.95),
-    0 0 32px rgba(243, 212, 152, 0.15);
-  opacity: 0;
-  will-change: opacity, transform, box-shadow;
-  transform-style: preserve-3d;
-  transform: perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateZ(var(--translate-z, 0px));
-  transition:
-    transform 0.35s var(--ease-premium),
-    box-shadow 0.35s var(--ease-premium),
-    border-color 0.35s var(--ease-premium);
-  pointer-events: none;
+    inset 0 1px 0 rgba(243, 212, 152, 0.35),
+    inset 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 35px 90px -15px rgba(0, 0, 0, 0.95),
+    0 0 40px rgba(243, 212, 152, 0.18);
   box-sizing: border-box;
   overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.cardBack {
+  transform: rotateY(180deg);
+  background: linear-gradient(
+    155deg,
+    rgba(22, 36, 28, 0.98) 0%,
+    rgba(12, 22, 17, 0.99) 60%,
+    rgba(7, 12, 9, 1) 100%
+  );
+  border-left: 4px solid var(--color-accent-gold);
+  border-top: 1px solid rgba(243, 212, 152, 0.45);
 }
 
 .cardLight {
@@ -223,7 +327,7 @@
   border-radius: inherit;
   background: radial-gradient(
     650px circle at var(--light-x, 50%) var(--light-y, 50%),
-    rgba(255, 255, 255, 0.14),
+    rgba(255, 255, 255, 0.15),
     transparent 55%
   );
   z-index: 1;
@@ -235,33 +339,29 @@
   opacity: 1;
 }
 
-.cardHovered {
-  border-left-color: #f3d498 !important;
-  border-top-color: rgba(243, 212, 152, 0.65) !important;
-  border-right-color: rgba(206, 162, 92, 0.40) !important;
-  transform: perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateZ(24px) translateY(-6px) scale(1.01) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(243, 212, 152, 0.45),
-    inset 1px 0 0 rgba(255, 255, 255, 0.15),
-    0 40px 95px -18px rgba(0, 0, 0, 0.98),
-    0 0 36px rgba(243, 212, 152, 0.28) !important;
+.stepHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+  transform: translateZ(30px);
 }
 
-.stepHeader {
+.stepHeaderLeft {
   display: flex;
   align-items: baseline;
   gap: var(--space-3);
-  margin-bottom: var(--space-2);
 }
 
 .giantNumber {
   font-family: var(--font-heading);
-  font-size: clamp(2.5rem, 3.5vw, 4.2rem);
+  font-size: clamp(2.4rem, 3.2vw, 4.0rem);
   font-weight: 800;
   line-height: 0.9;
   color: #f3d498;
   letter-spacing: -0.02em;
-  text-shadow: 0 0 20px rgba(243, 212, 152, 0.4), 0 2px 8px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 0 24px rgba(243, 212, 152, 0.5), 0 2px 8px rgba(0, 0, 0, 0.9);
+  transform: translateZ(45px);
 }
 
 .tagLabel {
@@ -272,25 +372,75 @@
   text-transform: uppercase;
   color: #ffffff;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  transform: translateZ(32px);
+}
+
+/* Flip Trigger Button */
+.flipBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent-gold);
+  background: rgba(243, 212, 152, 0.10);
+  border: 1px solid rgba(243, 212, 152, 0.3);
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: translateZ(40px);
+  backdrop-filter: blur(6px);
+}
+
+.flipBtn:hover {
+  background: rgba(243, 212, 152, 0.24);
+  border-color: rgba(243, 212, 152, 0.6);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(243, 212, 152, 0.3);
+}
+
+.flipIcon {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+  transition: transform 0.4s ease;
+}
+
+.flipBtn:hover .flipIcon {
+  transform: rotate(180deg);
 }
 
 .stageHeadline {
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: clamp(1.4rem, 1.1rem + 1.1vw, 2.2rem);
-  line-height: 1.1;
+  font-size: clamp(1.35rem, 1.05rem + 1.1vw, 2.1rem);
+  line-height: 1.12;
   color: #ffffff;
   margin-bottom: var(--space-2);
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
+  transform: translateZ(38px);
 }
 
 .stageDescription {
   font-family: var(--font-sans);
-  font-size: clamp(0.875rem, 0.82rem + 0.18vw, 0.98rem);
-  line-height: 1.6;
+  font-size: clamp(0.85rem, 0.80rem + 0.18vw, 0.96rem);
+  line-height: 1.55;
   color: rgba(244, 239, 228, 0.92);
   max-width: 44ch;
-  margin-bottom: clamp(14px, 2vh, 22px);
+  margin-bottom: clamp(12px, 1.8vh, 20px);
+  transform: translateZ(26px);
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transform: translateZ(48px);
 }
 
 .statCallout {
@@ -303,7 +453,7 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #f3d498;
-  padding: 8px 16px;
+  padding: 7px 15px;
   border-left: 3px solid #f3d498;
   background: rgba(243, 212, 152, 0.12);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
@@ -314,7 +464,102 @@
   width: fit-content;
 }
 
-/* Progress Step Dots Indicator */
+.flipHint {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 228, 0.45);
+  transition: color 0.3s ease;
+}
+
+.editorialCard:hover .flipHint {
+  color: rgba(243, 212, 152, 0.85);
+}
+
+/* Card Back Face Styling */
+.cardBackHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+  transform: translateZ(30px);
+}
+
+.backTag {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--color-accent-gold);
+  text-transform: uppercase;
+}
+
+.backTitle {
+  font-family: var(--font-heading);
+  font-size: clamp(1.2rem, 1.0rem + 0.8vw, 1.7rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 14px;
+  transform: translateZ(35px);
+}
+
+.specsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  margin-bottom: 16px;
+  transform: translateZ(40px);
+}
+
+.specItem {
+  background: rgba(10, 17, 13, 0.65);
+  border: 1px solid rgba(243, 212, 152, 0.18);
+  border-left: 2px solid var(--color-accent-gold);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.specLabel {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 228, 0.55);
+}
+
+.specValue {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.backFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transform: translateZ(45px);
+}
+
+.backBadge {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--color-accent-gold);
+  background: rgba(243, 212, 152, 0.08);
+  border: 1px solid rgba(243, 212, 152, 0.2);
+  padding: 5px 12px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* Step Navigation Indicators */
 .stepProgressDots {
   position: absolute;
   bottom: 14px;
@@ -322,31 +567,42 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  z-index: 10;
+  z-index: 20;
 }
 
 .dot {
-  width: 24px;
-  height: 3px;
+  width: 22px;
+  height: 4px;
   background: rgba(244, 239, 228, 0.2);
-  border-radius: 2px;
-  transition: background 0.55s var(--ease-premium), width 0.55s var(--ease-premium);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-premium);
+  border: none;
+  padding: 0;
+}
+
+.dot:hover {
+  background: rgba(243, 212, 152, 0.6);
+  width: 32px;
 }
 
 .dotActive {
   background: var(--color-accent-gold);
-  width: 40px;
+  width: 42px;
+  box-shadow: 0 0 12px rgba(243, 212, 152, 0.6);
 }
 
 @media (max-width: 900px) {
   .section {
     height: auto;
+    padding-block: 40px;
   }
 
   .stageContainer {
     grid-template-columns: 1fr;
     height: auto;
     gap: 32px;
+    perspective: none;
   }
 
   .visualStageFrame {
@@ -354,6 +610,16 @@
   }
 
   .editorialStage {
-    height: 260px;
+    height: 320px;
+    perspective: none;
+  }
+
+  .editorialCard {
+    perspective: none;
+  }
+
+  .specsGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 }
