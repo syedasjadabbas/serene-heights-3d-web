@@ -113,13 +113,13 @@
   display: flex;
   flex-direction: column;
   background: #0c1510;
-  border-left: 3px solid rgba(243, 212, 152, 0.45);
-  border-top: 1px solid rgba(243, 212, 152, 0.25);
+  border-left: 3px solid rgba(243, 212, 152, 0.50);
+  border-top: 1px solid rgba(243, 212, 152, 0.28);
   border-right: 1px solid rgba(244, 239, 228, 0.14);
   border-bottom: 1px solid rgba(244, 239, 228, 0.10);
   border-radius: var(--radius-lg);
   box-shadow:
-    inset 0 1px 0 rgba(243, 212, 152, 0.18),
+    inset 0 1px 0 rgba(243, 212, 152, 0.22),
     0 24px 60px -15px rgba(0, 0, 0, 0.82),
     0 8px 24px -8px rgba(0, 0, 0, 0.6);
   will-change: transform, box-shadow;
@@ -134,7 +134,7 @@
 .cardHovered {
   transform: perspective(1200px) scale(0.97) translateY(-4px) !important;
   box-shadow:
-    inset 0 1px 0 rgba(243, 212, 152, 0.35),
+    inset 0 1px 0 rgba(243, 212, 152, 0.38),
     0 36px 90px -22px rgba(0, 0, 0, 0.95),
     0 0 1px rgba(243, 212, 152, 0.4);
 }
@@ -175,20 +175,20 @@
   opacity: 1;
 }
 
-/* High-res Image Background Frame (82% Height Coverage — Edge-to-Edge Bleed) */
+/* High-res Image Background Frame (80% Height Coverage — Edge-to-Edge Bleed) */
 .imageFrame {
   position: relative;
   width: 100%;
-  height: 82%;
+  height: 80%;
   overflow: hidden;
   flex-shrink: 0;
   border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
 }
 
 .cardImage {
-  width: 112%;
+  width: 108%;
   height: 100%;
-  margin-left: -6%;
+  margin-left: -4%;
   object-fit: cover;
   object-position: center;
   opacity: 1;
@@ -229,13 +229,13 @@
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 
-/* Inner Text Content (Sleek Compact 18% Height Panel) */
+/* Inner Text Content (Sleek Compact Panel) */
 .cardContent {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  padding: 10px 18px 12px 18px;
+  padding: 12px 20px 14px 20px;
   flex-grow: 1;
   justify-content: space-between;
 }
@@ -268,8 +268,8 @@
 .cardTitle {
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: clamp(1.2rem, 0.95rem + 0.6vw, 1.6rem);
-  line-height: 1.1;
+  font-size: clamp(1.15rem, 0.92rem + 0.55vw, 1.5rem);
+  line-height: 1.15;
   letter-spacing: -0.015em;
   color: var(--color-cream);
   margin-bottom: 4px;
