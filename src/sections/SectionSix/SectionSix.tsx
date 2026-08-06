@@ -120,22 +120,26 @@ export default function SectionSix() {
             const dist = Math.abs(cardCenter - viewportCenter)
             const normDist = dist / maxDistance
 
-            // Apple Keynote Presentation Rhythm: Arrive -> Center Hold Plateau -> Depart
+            // Apple Keynote / Exhibition Presentation Rhythm: Center Hold Plateau -> Depart
             let fp = 0
-            if (normDist < 0.22) {
+            if (normDist < 0.20) {
               fp = 1.0
             } else {
-              const falloff = 1 - Math.min(1, (normDist - 0.22) / 0.78)
-              fp = Math.pow(falloff, 2.0)
+              const falloff = 1 - Math.min(1, (normDist - 0.20) / 0.80)
+              fp = Math.pow(falloff, 2.2)
             }
 
-            const scale = 0.92 + 0.12 * fp
-            const brightness = 0.96 + 0.06 * fp
-            const contrast = 1.0 + 0.04 * fp
-            const saturate = 1.0 + 0.04 * fp
-            const borderGold = 0.25 + 0.5 * fp
-            const borderTop = 0.12 + 0.28 * fp
-            const shadowDepth = 0.65 + 0.25 * fp
+            const scale = 0.88 + 0.12 * fp
+            const brightness = 0.82 + 0.20 * fp
+            const contrast = 0.96 + 0.08 * fp
+            const saturate = 0.90 + 0.14 * fp
+            const borderGold = 0.15 + 0.65 * fp
+            const borderTop = 0.10 + 0.30 * fp
+            const shadowDepth = 0.40 + 0.50 * fp
+
+            // Subtle architectural image parallax panning (-18px to +18px)
+            const rawOffset = (cardCenter - viewportCenter) / (window.innerWidth / 2)
+            const parallaxX = Math.max(-18, Math.min(18, rawOffset * -18))
 
             const img = card.querySelector(`.${styles.cardImage}`) as HTMLElement | null
 
@@ -144,12 +148,15 @@ export default function SectionSix() {
               opacity: 1,
               borderLeftColor: `rgba(243, 212, 152, ${borderGold})`,
               borderTopColor: `rgba(243, 212, 152, ${borderTop})`,
-              boxShadow: `inset 0 1px 0 rgba(243, 212, 152, ${0.15 + 0.15 * fp}), 0 ${20 + 15 * fp}px ${45 + 25 * fp}px -15px rgba(0, 0, 0, ${shadowDepth})`,
+              boxShadow: `inset 0 1px 0 rgba(243, 212, 152, ${0.12 + 0.18 * fp}), 0 ${16 + 20 * fp}px ${35 + 40 * fp}px -15px rgba(0, 0, 0, ${shadowDepth})`,
               zIndex: Math.round(1 + fp * 10),
             })
 
             if (img) {
-              gsap.set(img, { filter: `brightness(${brightness.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${saturate.toFixed(2)})` })
+              gsap.set(img, {
+                x: parallaxX,
+                filter: `brightness(${brightness.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${saturate.toFixed(2)})`,
+              })
             }
           })
         }
