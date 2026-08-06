@@ -120,26 +120,26 @@ export default function SectionSix() {
             const dist = Math.abs(cardCenter - viewportCenter)
             const normDist = dist / maxDistance
 
-            // Apple Keynote / Exhibition Presentation Rhythm: Center Hold Plateau -> Depart
+            // Exhibition Presentation Rhythm: Smooth focus transition across viewport
             let fp = 0
-            if (normDist < 0.20) {
+            if (normDist < 0.18) {
               fp = 1.0
             } else {
-              const falloff = 1 - Math.min(1, (normDist - 0.20) / 0.80)
-              fp = Math.pow(falloff, 2.2)
+              const falloff = 1 - Math.min(1, (normDist - 0.18) / 0.82)
+              fp = Math.pow(falloff, 1.6) // Smooth gentle curve, no aggressive drop
             }
 
-            const scale = 0.86 + 0.14 * fp
-            const brightness = 0.84 + 0.18 * fp
-            const contrast = 0.96 + 0.09 * fp
-            const saturate = 0.92 + 0.13 * fp
-            const borderGold = 0.15 + 0.70 * fp
-            const borderTop = 0.10 + 0.35 * fp
-            const shadowDepth = 0.40 + 0.50 * fp
+            const scale = 0.95 + 0.05 * fp
+            const brightness = 0.88 + 0.15 * fp
+            const contrast = 0.96 + 0.07 * fp
+            const saturate = 0.96 + 0.08 * fp
+            const borderGold = 0.20 + 0.65 * fp
+            const borderTop = 0.12 + 0.30 * fp
+            const shadowDepth = 0.40 + 0.45 * fp
 
-            // Architectural image parallax panning (-24px to +24px)
+            // Subtle architectural image parallax panning (-18px to +18px)
             const rawOffset = (cardCenter - viewportCenter) / (window.innerWidth / 2)
-            const parallaxX = Math.max(-24, Math.min(24, rawOffset * -24))
+            const parallaxX = Math.max(-18, Math.min(18, rawOffset * -18))
 
             const img = card.querySelector(`.${styles.cardImage}`) as HTMLElement | null
 
@@ -155,7 +155,7 @@ export default function SectionSix() {
             if (img) {
               gsap.set(img, {
                 x: parallaxX,
-                filter: `brightness(${brightness.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${saturate.toFixed(2)}) sepia(0.04)`,
+                filter: `brightness(${brightness.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${saturate.toFixed(2)})`,
               })
             }
           })
