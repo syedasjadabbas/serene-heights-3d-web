@@ -358,7 +358,9 @@ export default function HeroV2() {
         setHeroTypographyOpacity(typographyExitOpacity)
 
         // Throughout Hero & Hero appreciation hold: Navbar is strictly 0% opacity
-        setNavVisibilityProgress(0)
+        if (p < 1.0) {
+          setNavVisibilityProgress(0)
+        }
 
         // ── Video pre-start ───────────────────────────────────────
         if (p > 0.65 && !videoStarted.current && videoRef.current) {
