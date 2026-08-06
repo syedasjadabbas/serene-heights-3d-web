@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
-import { HERO_HOLD_PX } from '../../sections/Hero/HeroV2'
+import {
+  getNavVisibilityProgress,
+  subscribeNavVisibilityProgress,
+} from '../stage/masterVisualStageState'
 import Logo from '../ui/Logo'
 import Button from '../ui/Button'
 import styles from './Navigation.module.css'
@@ -26,21 +29,11 @@ export default function Navigation() {
     const ctx = gsap.context(() => {
       registerScrollTrigger()
 
-      // Calculate the exact pixel position where Hero releases control
-      const getHeroReleasePx = () => {
-        const heroEl = document.getElementById('top')
-        if (!heroEl) return window.innerHeight * 2.5
-        return heroEl.offsetTop + heroEl.offsetHeight * 2 + HERO_HOLD_PX
-      }
-
-      // Synchronized Navbar Reveal (remains strictly hidden until Hero releases)
-      const applyNavProgress = () => {
+      const renderNavState = (rawProgress: number) => {
         if (!barRef.current) return
-        const heroReleasePx = getHeroReleasePx()
-        const currentScroll = window.scrollY || window.pageYOffset || 0
 
-        // Throughout Hero & Hero appreciation hold: Navbar is 100% hidden
-        if (currentScroll < heroReleasePx) {
+        // Throughout Hero & Hero appreciation hold: rawProgress === 0 (Navbar strictly hidden)
+        if (rawProgress <= 0) {
           gsap.set(barRef.current, {
             y: -10,
             opacity: 0,
@@ -49,12 +42,7 @@ export default function Navigation() {
           return
         }
 
-        // As soon as Section 2 begins (Hero releases): smoothly fade navbar in
-        // by the time Section 2 reaches its resting position (35% vh scroll)
-        const revealDistance = window.innerHeight * 0.35
-        const rawProgress = Math.min(1, Math.max(0, (currentScroll - heroReleasePx) / revealDistance))
-
-        // Premium ease curve for fluid scroll fade
+        // As soon as Hero releases: rawProgress increases from 0 -> 1 as Section 2 enters
         const easeProgress = 1 - Math.pow(1 - rawProgress, 3)
         const translateY = -10 * (1 - easeProgress)
 
@@ -65,12 +53,11 @@ export default function Navigation() {
         })
       }
 
-      const st = ScrollTrigger.create({
-        trigger: document.body,
-        start: 'top top',
-        end: 'bottom bottom',
-        onUpdate: applyNavProgress,
-      })
+      // Subscribe to the shared navbar release event state
+      const unsub = subscribeNavVisibilityProgress((progress) => renderNavState(progress))
+
+      // Initial check on mount
+      renderNavState(getNavVisibilityProgress())
 
       ScrollTrigger.create({
         start: 'top -60',
@@ -78,8 +65,7 @@ export default function Navigation() {
         toggleClass: { targets: barRef.current, className: styles.scrolled },
       })
 
-      // Run initial check
-      applyNavProgress()
+      return () => unsub()
     }, navRef)
 
     return () => ctx.revert()

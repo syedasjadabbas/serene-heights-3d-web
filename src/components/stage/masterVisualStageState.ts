@@ -50,6 +50,32 @@ export function subscribeHeroTypographyOpacity(fn: Listener): () => void {
   }
 }
 
+/**
+ * Shared Navbar Visibility Progress — single source of truth for the navbar.
+ * Driven directly by the Hero release event:
+ *   0.0 = Throughout Hero & Hero appreciation hold (navbar strictly hidden)
+ *   0.0 -> 1.0 = As Section 2 enters following Hero release (navbar fades in)
+ *   1.0 = Section 2 active / resting position reached (navbar fully visible)
+ */
+let navVisibilityProgress = 0
+const navListeners = new Set<Listener>()
+
+export function setNavVisibilityProgress(value: number) {
+  navVisibilityProgress = Math.min(1, Math.max(0, value))
+  navListeners.forEach((fn) => fn(navVisibilityProgress))
+}
+
+export function getNavVisibilityProgress(): number {
+  return navVisibilityProgress
+}
+
+export function subscribeNavVisibilityProgress(fn: Listener): () => void {
+  navListeners.add(fn)
+  return () => {
+    navListeners.delete(fn)
+  }
+}
+
 /** Returns the frame index (0..68) for Hero Cinematic */
 export function mapProgressToFrame(progressOverride?: number): number {
   const p = progressOverride !== undefined ? progressOverride : heroProgress

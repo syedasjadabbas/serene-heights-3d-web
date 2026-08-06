@@ -5,7 +5,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
-import { setHeroProgress, getHeroTypographyOpacity } from '../../components/stage/masterVisualStageState'
+import { setHeroProgress, getHeroTypographyOpacity, setNavVisibilityProgress } from '../../components/stage/masterVisualStageState'
 import { HERO_HOLD_PX } from '../Hero/HeroV2'
 import heroImageSrc from '../../assets/hero/hero-main.webp'
 import heroStyles from '../Hero/HeroV2.module.css'
@@ -139,6 +139,11 @@ export default function Deconstruction() {
         gsap.set(videoRef.current, { opacity: crossfade })
 
         applyVideoTime(videoP)
+
+        // ── Navbar reveal: begins the instant Hero releases (localP = 0.0)
+        // and reaches 1.0 (fully visible) as Section 2 enters (localP = 0.25).
+        const navReveal = Math.min(1, localP / 0.25)
+        setNavVisibilityProgress(navReveal)
 
         // ── Typography: Hero has already faded this to 0 during HERO_HOLD_PX.
         // Sync from shared state — always 0 when Deconstruction is active.

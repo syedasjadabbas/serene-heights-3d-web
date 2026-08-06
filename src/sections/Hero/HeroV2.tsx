@@ -5,7 +5,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
-import { setHeroTypographyOpacity } from '../../components/stage/masterVisualStageState'
+import { setHeroTypographyOpacity, setNavVisibilityProgress } from '../../components/stage/masterVisualStageState'
 import logoSvg from '../../assets/common/logo.svg'
 import heroImageSrc from '../../assets/hero/hero-main.webp'
 import styles from './HeroV2.module.css'
@@ -356,6 +356,9 @@ export default function HeroV2() {
         // typography is already at 0 when it takes over. No independent
         // fade logic needed anywhere else.
         setHeroTypographyOpacity(typographyExitOpacity)
+
+        // Throughout Hero & Hero appreciation hold: Navbar is strictly 0% opacity
+        setNavVisibilityProgress(0)
 
         // ── Video pre-start ───────────────────────────────────────
         if (p > 0.65 && !videoStarted.current && videoRef.current) {
