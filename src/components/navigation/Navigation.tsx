@@ -68,29 +68,50 @@ export default function Navigation() {
     return () => ctx.revert()
   }, [])
 
-  // Active section scroll tracking
+  // Active section scroll tracking via getBoundingClientRect (reliable across GSAP pin-spacers)
   useEffect(() => {
-    const sectionIds = ['about', 'lifestyle', 'amenities', 'floor-plans', 'smart-unit', 'payment-plan', 'progress', 'contact']
+    const sectionMap: { [key: string]: string } = {
+      hero: 'about',
+      about: 'about',
+      lifestyle: 'lifestyle',
+      amenities: 'amenities',
+      'floor-plans': 'floor-plans',
+      'smart-unit': 'smart-unit',
+      'payment-plan': 'payment-plan',
+      progress: 'progress',
+      investment: 'payment-plan',
+      contact: 'contact',
+    }
 
-    const handleScroll = () => {
-      const scrollPos = window.scrollY + window.innerHeight * 0.35
+    const checkActiveSection = () => {
+      const viewportMiddle = window.innerHeight * 0.4
+      const sectionElements = Array.from(document.querySelectorAll('section[id], header[id]'))
 
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const id = sectionIds[i]
-        const el = document.getElementById(id)
-        if (el) {
-          const top = el.offsetTop
-          if (scrollPos >= top) {
-            setActiveSectionId(id)
-            break
+      let currentActive = 'about'
+
+      for (const el of sectionElements) {
+        const rect = el.getBoundingClientRect()
+        // If section top is above or near viewport middle AND section bottom is still visible
+        if (rect.top <= viewportMiddle && rect.bottom >= 120) {
+          const rawId = el.id
+          if (sectionMap[rawId]) {
+            currentActive = sectionMap[rawId]
           }
         }
       }
+
+      setActiveSectionId(currentActive)
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', checkActiveSection, { passive: true })
+    checkActiveSection()
+
+    const timer = setInterval(checkActiveSection, 250)
+
+    return () => {
+      window.removeEventListener('scroll', checkActiveSection)
+      clearInterval(timer)
+    }
   }, [])
 
   useEffect(() => {

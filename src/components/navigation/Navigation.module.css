@@ -13,15 +13,15 @@
 .bar {
   pointer-events: auto;
   width: 100%;
-  max-width: 1220px;
-  display: flex;
+  max-width: 1320px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: 8px 12px 8px 24px;
+  gap: clamp(10px, 1.2vw, 20px);
+  padding: 6px 10px 6px 20px;
   border-radius: var(--radius-pill);
   border: 1px solid rgba(244, 239, 228, 0.16);
-  background: rgba(12, 22, 17, 0.55);
+  background: rgba(12, 22, 17, 0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow:
@@ -35,7 +35,7 @@
 }
 
 .bar.scrolled {
-  background: rgba(8, 15, 12, 0.85);
+  background: rgba(8, 15, 12, 0.88);
   border-color: rgba(244, 239, 228, 0.22);
   box-shadow:
     0 20px 48px -12px rgba(0, 0, 0, 0.65),
@@ -53,18 +53,20 @@
 .linksCenter {
   display: flex;
   align-items: center;
-  gap: clamp(4px, 0.8vw, 12px);
+  justify-content: center;
+  gap: clamp(2px, 0.5vw, 8px);
+  width: 100%;
 }
 
 .link {
   position: relative;
   font-family: var(--font-sans);
-  font-size: clamp(0.68rem, 0.62rem + 0.22vw, 0.76rem);
+  font-size: clamp(0.66rem, 0.60rem + 0.20vw, 0.74rem);
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(244, 239, 228, 0.75);
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: var(--radius-pill);
   transition:
     color 0.35s var(--ease-premium),
@@ -85,12 +87,12 @@
 .activeLink {
   color: #ffffff !important;
   font-weight: 700 !important;
-  background: linear-gradient(135deg, rgba(243, 212, 152, 0.22) 0%, rgba(206, 162, 92, 0.12) 100%) !important;
-  border-color: rgba(243, 212, 152, 0.55) !important;
+  background: linear-gradient(135deg, rgba(243, 212, 152, 0.25) 0%, rgba(206, 162, 92, 0.15) 100%) !important;
+  border-color: rgba(243, 212, 152, 0.65) !important;
   box-shadow:
-    0 4px 14px -2px rgba(0, 0, 0, 0.6),
-    0 0 12px rgba(243, 212, 152, 0.30),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    0 4px 16px -2px rgba(0, 0, 0, 0.7),
+    0 0 14px rgba(243, 212, 152, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
 .activeLink::after {
@@ -99,11 +101,11 @@
   bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
-  width: 16px;
+  width: 18px;
   height: 2px;
   background: #f3d498;
   border-radius: 2px;
-  box-shadow: 0 0 6px #f3d498;
+  box-shadow: 0 0 8px #f3d498;
 }
 
 .actions {
