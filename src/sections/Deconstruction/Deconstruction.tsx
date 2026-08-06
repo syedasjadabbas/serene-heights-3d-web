@@ -140,10 +140,6 @@ export default function Deconstruction() {
 
         applyVideoTime(videoP)
 
-        // Navbar — only once inside the video, never during the Hero.
-        const navP = remap(localP, NAV_REVEAL_LOCAL_START, NAV_REVEAL_LOCAL_END)
-        setHeroProgress(0.78 + navP * 0.06)
-
         // ── Typography: Hero has already faded this to 0 during HERO_HOLD_PX.
         // Sync from shared state — always 0 when Deconstruction is active.
         const typographyOpacity = getHeroTypographyOpacity()

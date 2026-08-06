@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
-import { getHeroProgress } from '../stage/masterVisualStageState'
+import { HERO_HOLD_PX } from '../../sections/Hero/HeroV2'
 import Logo from '../ui/Logo'
 import Button from '../ui/Button'
 import styles from './Navigation.module.css'
@@ -26,31 +26,43 @@ export default function Navigation() {
     const ctx = gsap.context(() => {
       registerScrollTrigger()
 
-      // Pure deterministic nav progress (quiet fade in at p >= 0.78 without noticeable sliding)
+      // Calculate the exact pixel position where Hero releases control
+      const getHeroReleasePx = () => {
+        const heroEl = document.getElementById('top')
+        if (!heroEl) return window.innerHeight * 2.5
+        return heroEl.offsetTop + heroEl.offsetHeight * 2 + HERO_HOLD_PX
+      }
+
+      // Synchronized Navbar Reveal (remains strictly hidden until Hero releases)
       const applyNavProgress = () => {
         if (!barRef.current) return
-        const p = getHeroProgress()
+        const heroReleasePx = getHeroReleasePx()
+        const currentScroll = window.scrollY || window.pageYOffset || 0
 
-        if (p < 0.78) {
+        // Throughout Hero & Hero appreciation hold: Navbar is 100% hidden
+        if (currentScroll < heroReleasePx) {
           gsap.set(barRef.current, {
-            yPercent: 0,
+            y: -10,
             opacity: 0,
             pointerEvents: 'none',
           })
-        } else if (p <= 0.84) {
-          const normP = (p - 0.78) / 0.06
-          gsap.set(barRef.current, {
-            yPercent: 0,
-            opacity: normP,
-            pointerEvents: normP > 0.8 ? 'auto' : 'none',
-          })
-        } else {
-          gsap.set(barRef.current, {
-            yPercent: 0,
-            opacity: 1,
-            pointerEvents: 'auto',
-          })
+          return
         }
+
+        // As soon as Section 2 begins (Hero releases): smoothly fade navbar in
+        // by the time Section 2 reaches its resting position (35% vh scroll)
+        const revealDistance = window.innerHeight * 0.35
+        const rawProgress = Math.min(1, Math.max(0, (currentScroll - heroReleasePx) / revealDistance))
+
+        // Premium ease curve for fluid scroll fade
+        const easeProgress = 1 - Math.pow(1 - rawProgress, 3)
+        const translateY = -10 * (1 - easeProgress)
+
+        gsap.set(barRef.current, {
+          y: translateY,
+          opacity: easeProgress,
+          pointerEvents: easeProgress > 0.8 ? 'auto' : 'none',
+        })
       }
 
       const st = ScrollTrigger.create({
