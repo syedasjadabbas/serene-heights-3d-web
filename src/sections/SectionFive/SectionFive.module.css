@@ -89,7 +89,7 @@
   max-width: 18ch;
   margin-inline: 0;
   margin-bottom: var(--space-3);
-  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
   text-wrap: balance;
 }
 

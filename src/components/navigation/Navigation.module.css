@@ -6,14 +6,14 @@
   z-index: 50;
   display: flex;
   justify-content: center;
-  padding: clamp(12px, 2vw, 22px) clamp(16px, 3vw, 32px);
+  padding: clamp(24px, 3vw, 34px) clamp(16px, 3vw, 32px);
   pointer-events: none;
 }
 
 .bar {
   pointer-events: auto;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1220px;
   display: flex;
   align-items: center;
   justify-content: space-between;

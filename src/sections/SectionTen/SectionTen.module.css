@@ -94,7 +94,7 @@
   max-width: 18ch;
   margin-inline: auto;
   margin-bottom: var(--space-5);
-  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
   text-wrap: balance;
 }
 

@@ -91,7 +91,7 @@
   line-height: 1.08;
   letter-spacing: -0.022em;
   color: var(--color-cream);
-  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
   margin-bottom: var(--space-4);
   max-width: 20ch;
   text-wrap: balance;

@@ -42,9 +42,9 @@ export default function Navigation() {
           return
         }
 
-        // As soon as Hero releases: rawProgress increases from 0 -> 1 as Section 2 enters
-        const easeProgress = 1 - Math.pow(1 - rawProgress, 3)
-        const translateY = -10 * (1 - easeProgress)
+        // Premium power3 ease curve (~500ms equivalent fluid reveal)
+        const easeProgress = 1 - Math.pow(1 - rawProgress, 3.4)
+        const translateY = -12 * (1 - easeProgress)
 
         gsap.set(barRef.current, {
           y: translateY,

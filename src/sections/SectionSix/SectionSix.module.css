@@ -82,7 +82,7 @@
   color: var(--color-cream);
   max-width: 20ch;
   margin-inline: 0;
-  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
   text-wrap: balance;
 }
 
