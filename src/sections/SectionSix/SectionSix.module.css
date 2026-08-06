@@ -92,6 +92,8 @@
   width: 100%;
   overflow: hidden;
   position: relative;
+  z-index: 2;
+  isolation: isolate;
   flex-grow: 1;
   display: flex;
   align-items: center;
