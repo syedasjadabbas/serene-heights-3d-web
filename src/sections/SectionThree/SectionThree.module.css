@@ -3,6 +3,7 @@
   z-index: 2;
   background: transparent;
   padding-block: clamp(120px, 16vh, 220px);
+  padding-inline: clamp(28px, 5vw, 84px);
   overflow: hidden;
   transform: translateZ(0);
 }
@@ -46,22 +47,27 @@
 }
 
 .header {
-  max-width: 820px;
+  max-width: 720px;
   margin-bottom: clamp(64px, 9vh, 120px);
   text-align: left;
   margin-inline: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 .headerBadge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.6em;
   font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: rgba(244, 239, 228, 0.92);
   margin-bottom: var(--space-4);
   background: none;
   border: none;
@@ -70,32 +76,36 @@
 }
 
 .badgeNum {
-  color: var(--text-accent);
+  color: var(--color-accent-gold);
+  font-weight: 600;
 }
 
 .badgeDivider {
-  color: rgba(224, 214, 198, 0.4);
+  color: rgba(244, 239, 228, 0.4);
 }
 
 .headline {
-  font-family: var(--font-display);
-  font-weight: 300;
+  font-family: var(--font-heading);
+  font-weight: 800;
   font-size: clamp(2.5rem, 2rem + 3.2vw, 4.5rem);
-  line-height: 1.05;
-  letter-spacing: -0.028em;
-  color: var(--text-primary);
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  color: var(--color-cream);
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
   margin-bottom: var(--space-4);
+  max-width: 20ch;
   text-wrap: balance;
 }
 
 .subcopy {
-  max-width: 48ch;
+  max-width: 510px;
   margin-inline: 0;
   font-family: var(--font-sans);
-  font-size: clamp(0.98rem, 0.92rem + 0.3vw, 1.12rem);
+  font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem);
   font-weight: 400;
-  line-height: 1.6;
-  color: var(--text-secondary);
+  line-height: 1.68;
+  color: rgba(244, 239, 228, 0.88);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
 }
 
 /* --- Editorial Grid Layout (PRYPCO / FINDD Inspiration) --- */
@@ -311,9 +321,9 @@
 }
 
 .cardTitle {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(2rem, 1.6rem + 1.5vw, 2.8rem);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: clamp(1.8rem, 1.4rem + 1.2vw, 2.4rem);
   line-height: 1.08;
   letter-spacing: -0.015em;
   color: var(--color-cream);

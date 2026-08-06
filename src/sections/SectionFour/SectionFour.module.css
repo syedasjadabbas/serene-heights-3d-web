@@ -35,27 +35,33 @@
   flex-direction: column;
   justify-content: flex-end;
   padding-bottom: clamp(60px, 10vh, 120px);
+  padding-inline: clamp(28px, 5vw, 84px);
 }
 
 .overlayInner {
-  max-width: 620px;
+  max-width: 680px;
   text-align: center;
   margin-inline: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.6em;
   font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
-  font-weight: 500;
-  letter-spacing: 0.24em;
+  font-weight: 600;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: rgba(244, 239, 228, 0.92);
   margin-bottom: var(--space-4);
   background: none;
   border: none;
@@ -63,33 +69,36 @@
 }
 
 .eyebrowNum {
-  color: var(--text-accent);
-  font-weight: 500;
+  color: var(--color-accent-gold);
+  font-weight: 600;
 }
 
 .eyebrowDivider {
-  color: rgba(224, 214, 198, 0.4);
+  color: rgba(244, 239, 228, 0.4);
 }
 
 .headline {
-  font-family: var(--font-display);
-  font-weight: 300;
+  font-family: var(--font-heading);
+  font-weight: 800;
   font-size: clamp(2.8rem, 2.2rem + 3.8vw, 5.2rem);
-  line-height: 1.04;
-  letter-spacing: -0.028em;
-  color: var(--text-primary);
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  color: var(--color-cream);
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
   margin-bottom: var(--space-4);
+  max-width: 18ch;
   text-wrap: balance;
 }
 
 .subcopy {
-  max-width: 42ch;
+  max-width: 500px;
   margin-inline: auto;
   font-family: var(--font-sans);
-  font-size: clamp(1rem, 0.94rem + 0.35vw, 1.18rem);
+  font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.22rem);
   font-weight: 400;
-  line-height: 1.6;
-  color: var(--text-secondary);
+  line-height: 1.68;
+  color: rgba(244, 239, 228, 0.88);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
   margin-bottom: var(--space-7);
 }
 

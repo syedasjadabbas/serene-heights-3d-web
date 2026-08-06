@@ -9,6 +9,7 @@
   overflow: hidden;
   padding-top: clamp(120px, 16vh, 200px);
   padding-bottom: var(--space-6);
+  padding-inline: clamp(28px, 5vw, 84px);
 }
 
 .bgWrap {
@@ -31,9 +32,8 @@
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(5, 10, 8, 0.35) 0%,
-    rgba(5, 10, 8, 0.55) 60%,
-    rgba(5, 10, 8, 0.85) 100%
+    rgba(5, 10, 8, 0.45) 0%,
+    rgba(5, 10, 8, 0.75) 100%
   );
 }
 
@@ -48,22 +48,27 @@
 }
 
 .heroScene {
-  max-width: 960px;
+  max-width: 680px;
   margin-inline: auto;
   text-align: center;
   margin-block: auto;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.6em;
   font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
-  font-weight: 500;
-  letter-spacing: 0.24em;
+  font-weight: 600;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: rgba(244, 239, 228, 0.92);
   margin-bottom: var(--space-4);
   background: none;
   border: none;
@@ -71,34 +76,36 @@
 }
 
 .eyebrowNum {
-  color: var(--text-accent);
-  font-weight: 500;
+  color: var(--color-accent-gold);
+  font-weight: 600;
 }
 
 .eyebrowDivider {
-  color: rgba(224, 214, 198, 0.4);
+  color: rgba(244, 239, 228, 0.4);
 }
 
 .headline {
-  font-family: var(--font-display);
-  font-weight: 300;
+  font-family: var(--font-heading);
+  font-weight: 800;
   font-size: clamp(3rem, 2.4rem + 4.2vw, 6rem);
-  line-height: 1.04;
-  letter-spacing: -0.028em;
-  color: var(--text-primary);
-  max-width: 22ch;
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  color: var(--color-cream);
+  max-width: 18ch;
   margin-inline: auto;
   margin-bottom: var(--space-5);
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
   text-wrap: balance;
 }
 
 .subcopy {
   font-family: var(--font-sans);
-  font-size: clamp(1rem, 0.94rem + 0.35vw, 1.25rem);
+  font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
   font-weight: 400;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  max-width: 44ch;
+  line-height: 1.68;
+  color: rgba(244, 239, 228, 0.88);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
+  max-width: 500px;
   margin-inline: auto;
   margin-bottom: clamp(36px, 5vh, 56px);
 }

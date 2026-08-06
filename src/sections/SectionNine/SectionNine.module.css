@@ -5,6 +5,7 @@
   z-index: 2;
   background: transparent;
   padding-block: clamp(120px, 16vh, 220px) clamp(100px, 14vh, 180px);
+  padding-inline: clamp(28px, 5vw, 84px);
   overflow: hidden;
 }
 
@@ -45,11 +46,15 @@
 .header {
   margin-bottom: clamp(64px, 9vh, 120px);
   text-align: left;
-  max-width: 1400px;
-  margin-inline: auto;
-  padding-inline: var(--space-4);
+  max-width: 680px;
+  margin-inline: 0;
   position: relative;
   z-index: 2;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 .headerBadge {
@@ -58,40 +63,43 @@
   gap: 0.6em;
   font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
-  font-weight: 500;
-  letter-spacing: 0.24em;
+  font-weight: 600;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: rgba(244, 239, 228, 0.92);
   margin-bottom: var(--space-3);
 }
 
 .eyebrowNum {
-  color: var(--text-accent);
-  font-weight: 500;
+  color: var(--color-accent-gold);
+  font-weight: 600;
 }
 
 .eyebrowDivider {
-  color: rgba(224, 214, 198, 0.4);
+  color: rgba(244, 239, 228, 0.4);
 }
 
 .headerTitle {
-  font-family: var(--font-display);
-  font-weight: 300;
+  font-family: var(--font-heading);
+  font-weight: 800;
   font-size: clamp(2.8rem, 2.2rem + 3.8vw, 5.2rem);
-  line-height: 1.04;
-  letter-spacing: -0.028em;
-  color: var(--text-primary);
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  color: var(--color-cream);
   margin-bottom: var(--space-3);
+  max-width: 18ch;
   text-wrap: balance;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
 }
 
 .headerSubcopy {
   font-family: var(--font-sans);
-  font-size: clamp(1.0rem, 0.94rem + 0.3vw, 1.2rem);
+  font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.22rem);
   font-weight: 400;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  max-width: 48ch;
+  line-height: 1.68;
+  color: rgba(244, 239, 228, 0.88);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
+  max-width: 500px;
 }
 
 /* --- 2. Dominant Hero Piece (Exhibit 01) --- */

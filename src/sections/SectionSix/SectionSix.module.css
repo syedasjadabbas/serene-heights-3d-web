@@ -9,6 +9,7 @@
   flex-direction: column;
   justify-content: center;
   padding-block: clamp(104px, 13vh, 148px) clamp(20px, 2.5vh, 40px);
+  padding-inline: clamp(28px, 5vw, 84px);
 }
 
 .blueprintBgGrid {
@@ -36,15 +37,17 @@
   z-index: 0;
 }
 
-
-
 .header {
   text-align: left;
-  max-width: 860px;
+  max-width: 720px;
   margin-inline: 0;
-  padding-inline: clamp(16px, 4vw, 60px);
   margin-bottom: clamp(16px, 2.5vh, 28px);
   flex-shrink: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 /* Minimalist Architectural Label */
@@ -54,31 +57,32 @@
   gap: 0.6em;
   font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.68rem + 0.25vw, 0.82rem);
-  font-weight: 500;
-  letter-spacing: 0.24em;
+  font-weight: 600;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: rgba(244, 239, 228, 0.92);
   margin-bottom: 4px;
 }
 
 .eyebrowNum {
-  color: var(--text-accent);
-  font-weight: 500;
+  color: var(--color-accent-gold);
+  font-weight: 600;
 }
 
 .eyebrowDivider {
-  color: rgba(224, 214, 198, 0.4);
+  color: rgba(244, 239, 228, 0.4);
 }
 
 .headerHeadline {
-  font-family: var(--font-display);
-  font-weight: 300;
+  font-family: var(--font-heading);
+  font-weight: 800;
   font-size: clamp(2.0rem, 1.5rem + 2.5vw, 3.6rem);
-  line-height: 1.06;
-  letter-spacing: -0.028em;
-  color: var(--text-primary);
-  max-width: 24ch;
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  color: var(--color-cream);
+  max-width: 20ch;
   margin-inline: 0;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
   text-wrap: balance;
 }
 
@@ -258,10 +262,11 @@
 }
 
 .cardTitle {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(1.3rem, 1.0rem + 0.7vw, 1.8rem);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: clamp(1.2rem, 0.95rem + 0.6vw, 1.6rem);
   line-height: 1.1;
+  letter-spacing: -0.015em;
   color: var(--color-cream);
   margin-bottom: 4px;
 }
