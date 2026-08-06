@@ -175,15 +175,8 @@ export default function SectionSix() {
             start: 'top top',
             end: () => `+=${getScrollAmount()}`,
             invalidateOnRefresh: true,
-            onUpdate: (self) => {
+            onUpdate: () => {
               updateCardFocus()
-              // Subtle exit fade to create visual breathing space as Section 6 finishes
-              if (self.progress > 0.88) {
-                const fade = 1 - (self.progress - 0.88) / 0.12 * 0.55
-                gsap.set([track, section.querySelector(`.${styles.header}`)], { opacity: fade })
-              } else {
-                gsap.set([track, section.querySelector(`.${styles.header}`)], { opacity: 1 })
-              }
             },
             onRefresh: updateCardFocus,
           },
