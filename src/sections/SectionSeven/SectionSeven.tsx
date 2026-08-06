@@ -94,6 +94,9 @@ export default function SectionSeven() {
   const cardsRef = useRef<(HTMLDivElement | null)[]>([])
   const dotsRef = useRef<(HTMLDivElement | null)[]>([])
 
+  const rectCacheRef = useRef<Map<HTMLDivElement, DOMRect>>(new Map())
+  const rafIdRef = useRef<number | null>(null)
+
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
 
@@ -106,7 +109,6 @@ export default function SectionSeven() {
         const numStages = 6
         const stepWindow = 1 / numStages
 
-        // Apple Keynote Pacing: Arrival (0-12%) -> Extended Reading Hold (12-88%) -> Transition Out (88-100%)
         scenesRef.current.forEach((scene, idx) => {
           if (!scene) return
           const stepStart = idx * stepWindow
@@ -162,7 +164,6 @@ export default function SectionSeven() {
           })
         })
 
-        // Active step dot indicator
         const activeIdx = Math.min(5, Math.floor(progress * 5.99))
         dotsRef.current.forEach((dot, idx) => {
           if (!dot) return
@@ -174,7 +175,7 @@ export default function SectionSeven() {
         })
       }
 
-      // Pin section and scrub step progress continuously
+      // Pin section and scrub step progress unhurriedly (5.4x viewport height runway)
       gsap.to(sectionRef.current, {
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -183,19 +184,18 @@ export default function SectionSeven() {
           anticipatePin: 1,
           scrub: true,
           start: 'top top',
-          end: () => `+=${window.innerHeight * 3.2}`,
+          end: () => `+=${window.innerHeight * 5.4}`,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             updateStep(self.progress)
-            // Subtle entrance & exit fade to create visual breathing space into Section 8
             const headerEl = sectionRef.current?.querySelector(`.${styles.header}`)
             const stageEl = sectionRef.current?.querySelector(`.${styles.stageContainer}`)
 
             let fade = 1.0
             if (self.progress < 0.05) {
               fade = 0.5 + (self.progress / 0.05) * 0.5
-            } else if (self.progress > 0.92) {
-              fade = 1.0 - ((self.progress - 0.92) / 0.08) * 0.45
+            } else if (self.progress > 0.94) {
+              fade = 1.0 - ((self.progress - 0.94) / 0.06) * 0.45
             }
 
             if (headerEl && stageEl) {
@@ -206,12 +206,65 @@ export default function SectionSeven() {
         },
       })
 
-      // Initial state
       updateStep(0)
     }, sectionRef)
 
     return () => ctx.revert()
   }, [])
+
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget
+    rectCacheRef.current.set(card, card.getBoundingClientRect())
+  }
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget
+    let rect = rectCacheRef.current.get(card)
+    if (!rect) {
+      rect = card.getBoundingClientRect()
+      rectCacheRef.current.set(card, rect)
+    }
+
+    const px = (e.clientX - rect.left) / rect.width
+    const py = (e.clientY - rect.top) / rect.height
+    const rotateX = (0.5 - py) * 14
+    const rotateY = (px - 0.5) * 16
+    const shadowX = (0.5 - px) * 18
+    const shadowY = (py - 0.5) * 18 + 32
+    const parallaxX = (px - 0.5) * 8
+    const parallaxY = (py - 0.5) * 8
+
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+
+    rafIdRef.current = requestAnimationFrame(() => {
+      card.style.setProperty('--rotate-x', `${rotateX}deg`)
+      card.style.setProperty('--rotate-y', `${rotateY}deg`)
+      card.style.setProperty('--translate-z', '22px')
+      card.style.setProperty('--light-x', `${px * 100}%`)
+      card.style.setProperty('--light-y', `${py * 100}%`)
+      card.style.setProperty('--light-opacity', '1')
+      card.style.setProperty('--shadow-x', `${shadowX}px`)
+      card.style.setProperty('--shadow-y', `${shadowY}px`)
+      card.style.setProperty('--parallax-x', `${parallaxX}px`)
+      card.style.setProperty('--parallax-y', `${parallaxY}px`)
+      card.classList.add(styles.cardHovered)
+    })
+  }
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget
+    rectCacheRef.current.delete(card)
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+
+    card.style.setProperty('--rotate-x', '0deg')
+    card.style.setProperty('--rotate-y', '0deg')
+    card.style.setProperty('--translate-z', '0px')
+    card.style.setProperty('--shadow-x', '0px')
+    card.style.setProperty('--shadow-y', '32px')
+    card.style.setProperty('--parallax-x', '0px')
+    card.style.setProperty('--parallax-y', '0px')
+    card.classList.remove(styles.cardHovered)
+  }
 
   return (
     <section ref={sectionRef} id="payment-plan" data-alias="investment" className={styles.section}>
@@ -244,7 +297,6 @@ export default function SectionSeven() {
             >
               <img src={item.imageUrl} alt={item.title} className={styles.sceneImage} />
               <div className={styles.sceneOverlay} aria-hidden="true" />
-              <span className={styles.sceneWatermark}>{item.stat}</span>
             </div>
           ))}
         </div>
@@ -256,7 +308,11 @@ export default function SectionSeven() {
               key={item.id}
               ref={(el) => { cardsRef.current[idx] = el }}
               className={`${styles.editorialCard} ${idx === 0 ? styles.cardActive : ''}`}
+              onMouseEnter={handleMouseEnter}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
             >
+              <div className={styles.cardLight} aria-hidden="true" />
               <div className={styles.stepHeader}>
                 <span className={styles.giantNumber}>{item.number}</span>
                 <span className={styles.tagLabel}>{item.tag}</span>
