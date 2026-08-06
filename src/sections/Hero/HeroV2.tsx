@@ -315,36 +315,47 @@ export default function HeroV2() {
           opacity: 0,
         })
 
+        // ── TYPOGRAPHY HOLD-EXIT FADE ─────────────────────────────────
+        // The HERO_HOLD_PX appreciation hold (400 px of scroll after the
+        // original 2×100vh run) is the only safe window to fade the
+        // typography: the Hero world is fully revealed, nothing else is
+        // animating, and the pin releases the instant holdExitProgress = 1.
+        // Using only the existing HERO_HOLD_PX constant — no magic fractions.
+        const scrolledPx       = self.progress * totalSpanPx
+        const holdPx           = Math.max(0, scrolledPx - originalSpanPx)
+        const holdExitProgress = Math.min(1, holdPx / HERO_HOLD_PX)
+        const typographyExitOpacity = 1 - easeInOutCubic(holdExitProgress)
+
         // ── EDITORIAL LEFT TYPOGRAPHY STAGING ────────────────────────
         // Main Title SERENE HEIGHTS (p 0.48 → 0.62)
-        const mainFade = remap(p, 0.48, 0.62)
-        const mainX = -18 * (1 - easeInOutCubic(mainFade))
+        const mainFade = remap(p, 0.48, 0.62) * typographyExitOpacity
+        const mainX = -18 * (1 - easeInOutCubic(remap(p, 0.48, 0.62)))
         gsap.set(titleMainRef.current, {
           opacity: mainFade,
           x: mainX,
         })
 
         // Subtitle Hotel & Residences · Nathia Gali (p 0.65 → 0.78)
-        const subFade = remap(p, 0.65, 0.78)
-        const subX = -12 * (1 - easeInOutCubic(subFade))
+        const subFade = remap(p, 0.65, 0.78) * typographyExitOpacity
+        const subX = -12 * (1 - easeInOutCubic(remap(p, 0.65, 0.78)))
         gsap.set(titleSubRef.current, {
           opacity: subFade,
           x: subX,
         })
 
         // Explore CTA Indicator (p 0.82 → 0.95)
-        const ctaFade = remap(p, 0.82, 0.95)
-        const ctaX = -8 * (1 - easeInOutCubic(ctaFade))
+        const ctaFade = remap(p, 0.82, 0.95) * typographyExitOpacity
+        const ctaX = -8 * (1 - easeInOutCubic(remap(p, 0.82, 0.95)))
         gsap.set(titleCtaRef.current, {
           opacity: ctaFade,
           x: ctaX,
-          pointerEvents: ctaFade > 0.1 ? 'auto' : 'none',
+          pointerEvents: ctaFade > 0.05 ? 'auto' : 'none',
         })
 
-        // Publish the highest-faded element's opacity as the shared
-        // typography state — Deconstruction reads this to know where
-        // to start its own fade-out from, with no magic numbers.
-        setHeroTypographyOpacity(Math.max(mainFade, subFade, ctaFade))
+        // Publish to shared state — Deconstruction reads this to know the
+        // typography is already at 0 when it takes over. No independent
+        // fade logic needed anywhere else.
+        setHeroTypographyOpacity(typographyExitOpacity)
 
         // ── Video pre-start ───────────────────────────────────────
         if (p > 0.65 && !videoStarted.current && videoRef.current) {
