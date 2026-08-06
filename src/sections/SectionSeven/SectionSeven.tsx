@@ -1,3 +1,7 @@
+/**
+ * Section: Gallery
+ * Assets: src/assets/gallery/
+ */
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'

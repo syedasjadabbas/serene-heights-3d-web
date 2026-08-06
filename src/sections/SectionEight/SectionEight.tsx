@@ -1,3 +1,7 @@
+/**
+ * Section: Location
+ * Assets: src/assets/location/
+ */
 import { useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'

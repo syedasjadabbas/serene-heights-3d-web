@@ -1,6 +1,6 @@
-import background from '../../assets/hero/background.png'
-import bottom from '../../assets/hero/bottom.png'
-import building from '../../assets/hero/building.png'
+import background from '../../assets/hero/hero-background.png'
+import bottom from '../../assets/hero/hero-bottom.png'
+import building from '../../assets/hero/hero-building.png'
 
 // Source files for the old narrative scene sequence (scene-01..05, plus the
 // foreground occlusion passes timed to their cut points) still live in

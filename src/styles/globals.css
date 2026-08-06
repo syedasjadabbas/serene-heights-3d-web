@@ -13,25 +13,31 @@
   --color-forest-700: #345544;
   --color-forest-600: #45705a;
 
-  --color-cream: #f4efe4;
-  --color-cream-dim: #e9e2d1;
+  /* Editorial Color System */
+  --text-primary: #F4F0E8;
+  --text-secondary: #E0D6C6;
+  --text-accent: #C9A46A;
+  --text-dark: #1F2328;
+
+  --color-cream: var(--text-primary);
+  --color-cream-dim: var(--text-secondary);
   --color-black: #0b0c0a;
 
-  --color-accent-gold: #cea25c;
+  --color-accent-gold: var(--text-accent);
   --color-accent-gold-light: #f3d498;
   --color-accent-sage: #64a078;
   --color-accent-mist: #8ea3bf;
 
-  --color-text-on-dark: var(--color-cream);
-  --color-text-on-dark-muted: rgba(244, 239, 228, 0.72);
-  --color-text-on-light: var(--color-black);
-  --color-text-on-light-muted: rgba(11, 12, 10, 0.58);
+  --color-text-on-dark: var(--text-primary);
+  --color-text-on-dark-muted: var(--text-secondary);
+  --color-text-on-light: var(--text-dark);
+  --color-text-on-light-muted: rgba(31, 35, 40, 0.72);
 
-  --color-border-on-dark: rgba(244, 239, 228, 0.16);
-  --color-border-on-light: rgba(11, 12, 10, 0.12);
+  --color-border-on-dark: rgba(244, 240, 232, 0.16);
+  --color-border-on-light: rgba(31, 35, 40, 0.12);
 
   --color-bg: #0a1410;
-  --color-fg: var(--color-cream);
+  --color-fg: var(--text-primary);
 
   /* Luxury Hospitality Editorial Typography System — Aman / Rosewood Benchmarks */
   --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', Georgia, serif;

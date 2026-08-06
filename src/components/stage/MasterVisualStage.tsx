@@ -15,7 +15,7 @@ import {
   getHeroProgress,
   subscribeHeroProgress,
 } from './masterVisualStageState'
-import heroStillSrc from '../../assets/hero/scene-01-establish.png'
+import heroStillSrc from '../../assets/hero/hero-main.png'
 import styles from './MasterVisualStage.module.css'
 
 const FOCAL_X = 0.15

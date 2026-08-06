@@ -3,7 +3,7 @@ import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
 import { setHeroProgress } from '../../components/stage/masterVisualStageState'
-import logoSvg from '../../assets/branding/serene-heights-logo.svg'
+import logoSvg from '../../assets/common/logo.svg'
 import Logo from '../../components/ui/Logo'
 import styles from './Hero.module.css'
 

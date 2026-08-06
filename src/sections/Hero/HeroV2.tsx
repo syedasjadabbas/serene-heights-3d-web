@@ -1,8 +1,12 @@
+/**
+ * Section: Hero
+ * Assets: src/assets/hero/
+ */
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
-import logoSvg from '../../assets/branding/serene-heights-logo.svg'
-import heroImageSrc from '../../assets/hero/scene-01-establish.webp'
+import logoSvg from '../../assets/common/logo.svg'
+import heroImageSrc from '../../assets/hero/hero-main.webp'
 import styles from './HeroV2.module.css'
 
 /**
@@ -445,6 +449,7 @@ export default function HeroV2() {
 
       {/* ── Fullscreen Title Overlay (FINDD Editorial Layout) ── */}
       <div className={styles.fullTitleWrap} style={{ zIndex: 6 }}>
+        <div className={styles.titleGlassBackdrop} aria-hidden="true" />
         <h1 ref={titleMainRef} className={styles.fullTitle}>
           <span className={styles.titleLine}>SERENE</span>
           <span className={styles.titleLine}>HEIGHTS</span>

@@ -69,17 +69,17 @@
   font-weight: 500;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(244, 239, 228, 0.85);
+  color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
 .eyebrowNum {
-  color: var(--color-accent-gold);
+  color: var(--text-accent);
   font-weight: 500;
 }
 
 .eyebrowDivider {
-  color: rgba(244, 239, 228, 0.35);
+  color: rgba(224, 214, 198, 0.4);
 }
 
 .headerTitle {
@@ -88,10 +88,9 @@
   font-size: clamp(2.0rem, 1.5rem + 2.5vw, 3.6rem);
   line-height: 1.06;
   letter-spacing: -0.028em;
-  color: var(--color-cream);
+  color: var(--text-primary);
   max-width: 22ch;
   margin-inline: auto;
-  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.6);
   text-wrap: balance;
 }
 

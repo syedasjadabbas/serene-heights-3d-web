@@ -1,3 +1,7 @@
+/**
+ * Section: Overview
+ * Assets: src/assets/overview/
+ */
 import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'

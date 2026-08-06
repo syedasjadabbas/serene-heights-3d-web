@@ -56,7 +56,7 @@
   font-weight: 500;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(244, 239, 228, 0.85);
+  color: var(--text-secondary);
   margin-bottom: var(--space-3);
   padding: 0;
   background: none;
@@ -64,12 +64,12 @@
 }
 
 .eyebrowNum {
-  color: var(--color-accent-gold);
+  color: var(--text-accent);
   font-weight: 500;
 }
 
 .eyebrowDivider {
-  color: rgba(244, 239, 228, 0.35);
+  color: rgba(224, 214, 198, 0.4);
 }
 
 /* Asymmetrical Headline & Subcopy Measure */
@@ -79,11 +79,10 @@
   font-size: clamp(2.2rem, 1.6rem + 2.8vw, 4.0rem);
   line-height: 1.06;
   letter-spacing: -0.028em;
-  color: var(--color-cream);
+  color: var(--text-primary);
   max-width: 20ch;
   margin-inline: 0;
   margin-bottom: var(--space-3);
-  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.6);
   text-wrap: balance;
 }
 
@@ -94,7 +93,7 @@
   font-size: clamp(0.9375rem, 0.88rem + 0.25vw, 1.0625rem);
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(244, 239, 228, 0.82);
+  color: var(--text-secondary);
 }
 
 /* --- 3-Column Luxury Investment Slab Grid --- */

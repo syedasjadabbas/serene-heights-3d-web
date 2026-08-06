@@ -1,3 +1,7 @@
+/**
+ * Section: Footer
+ * Assets: src/assets/footer/
+ */
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'

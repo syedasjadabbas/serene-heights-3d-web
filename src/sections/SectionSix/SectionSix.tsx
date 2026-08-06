@@ -1,3 +1,7 @@
+/**
+ * Section: Interiors
+ * Assets: src/assets/interiors/
+ */
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'

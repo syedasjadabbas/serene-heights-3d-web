@@ -1,3 +1,7 @@
+/**
+ * Section: Amenities
+ * Assets: src/assets/amenities/
+ */
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'

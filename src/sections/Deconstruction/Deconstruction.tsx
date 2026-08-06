@@ -1,9 +1,13 @@
+/**
+ * Section: Deconstruction (Masterplan Sequence)
+ * Assets: src/assets/hero/
+ */
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
 import { setHeroProgress } from '../../components/stage/masterVisualStageState'
 import { HERO_HOLD_PX } from '../Hero/HeroV2'
-import heroImageSrc from '../../assets/hero/scene-01-establish.webp'
+import heroImageSrc from '../../assets/hero/hero-main.webp'
 import heroStyles from '../Hero/HeroV2.module.css'
 import styles from './Deconstruction.module.css'
 

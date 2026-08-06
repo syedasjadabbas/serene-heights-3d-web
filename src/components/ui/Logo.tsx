@@ -1,4 +1,4 @@
-import logoSvg from '../../assets/branding/serene-heights-logo.svg'
+import logoSvg from '../../assets/common/logo.svg'
 import styles from './Logo.module.css'
 
 interface LogoProps {
@@ -8,7 +8,7 @@ interface LogoProps {
 
 /**
  * Official Serene Heights Brand Logo Component.
- * Consumes src/assets/branding/serene-heights-logo.svg as the single source of truth.
+ * Consumes src/assets/common/logo.svg as the single source of truth.
  */
 export default function Logo({ className, markOnly = false }: LogoProps) {
   return (

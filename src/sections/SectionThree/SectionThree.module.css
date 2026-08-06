@@ -61,7 +61,7 @@
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(244, 239, 228, 0.88);
+  color: var(--text-secondary);
   margin-bottom: var(--space-4);
   background: none;
   border: none;
@@ -70,11 +70,11 @@
 }
 
 .badgeNum {
-  color: var(--color-accent-gold);
+  color: var(--text-accent);
 }
 
 .badgeDivider {
-  color: rgba(244, 239, 228, 0.35);
+  color: rgba(224, 214, 198, 0.4);
 }
 
 .headline {
@@ -83,8 +83,7 @@
   font-size: clamp(2.5rem, 2rem + 3.2vw, 4.5rem);
   line-height: 1.05;
   letter-spacing: -0.028em;
-  color: var(--color-cream);
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  color: var(--text-primary);
   margin-bottom: var(--space-4);
   text-wrap: balance;
 }
@@ -96,7 +95,7 @@
   font-size: clamp(0.98rem, 0.92rem + 0.3vw, 1.12rem);
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(244, 239, 228, 0.82);
+  color: var(--text-secondary);
 }
 
 /* --- Editorial Grid Layout (PRYPCO / FINDD Inspiration) --- */

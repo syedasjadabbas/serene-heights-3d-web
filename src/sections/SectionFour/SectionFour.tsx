@@ -1,3 +1,7 @@
+/**
+ * Section: Residences
+ * Assets: src/assets/residences/
+ */
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
