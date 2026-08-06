@@ -6,6 +6,9 @@
 }
 
 .mark {
+  height: 28px;
+  width: auto;
+  aspect-ratio: 100 / 136;
   flex-shrink: 0;
   color: currentColor;
 }
