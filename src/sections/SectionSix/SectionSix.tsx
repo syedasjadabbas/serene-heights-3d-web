@@ -129,29 +129,27 @@ export default function SectionSix() {
               fp = Math.pow(falloff, 2.0)
             }
 
-            const scale = 0.84 + 0.26 * fp
-            const opacity = 0.55 + 0.45 * fp
-            const brightness = 0.68 + 0.37 * fp
-            const contrast = 0.92 + 0.12 * fp
-            const saturate = 0.90 + 0.18 * fp
-            const borderGold = 0.25 + 0.6 * fp
-            const borderTop = 0.12 + 0.38 * fp
-            const shadowDepth = 0.5 + 0.45 * fp
-            const goldGlow = 0.22 * fp
+            const scale = 0.92 + 0.12 * fp
+            const brightness = 0.96 + 0.06 * fp
+            const contrast = 1.0 + 0.04 * fp
+            const saturate = 1.0 + 0.04 * fp
+            const borderGold = 0.25 + 0.5 * fp
+            const borderTop = 0.12 + 0.28 * fp
+            const shadowDepth = 0.65 + 0.25 * fp
 
             const img = card.querySelector(`.${styles.cardImage}`) as HTMLElement | null
 
             gsap.set(card, {
               scale,
-              opacity,
+              opacity: 1,
               borderLeftColor: `rgba(243, 212, 152, ${borderGold})`,
               borderTopColor: `rgba(243, 212, 152, ${borderTop})`,
-              boxShadow: `inset 0 1px 0 rgba(243, 212, 152, ${0.12 + 0.22 * fp}), 0 ${22 + 18 * fp}px ${50 + 40 * fp}px -18px rgba(0, 0, 0, ${shadowDepth}), 0 0 ${30 * fp}px rgba(243, 212, 152, ${goldGlow})`,
+              boxShadow: `inset 0 1px 0 rgba(243, 212, 152, ${0.15 + 0.15 * fp}), 0 ${20 + 15 * fp}px ${45 + 25 * fp}px -15px rgba(0, 0, 0, ${shadowDepth})`,
               zIndex: Math.round(1 + fp * 10),
             })
 
             if (img) {
-              gsap.set(img, { filter: `brightness(${brightness}) contrast(${contrast}) saturate(${saturate})` })
+              gsap.set(img, { filter: `brightness(${brightness.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${saturate.toFixed(2)})` })
             }
           })
         }

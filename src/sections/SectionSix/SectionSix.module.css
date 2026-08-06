@@ -112,35 +112,32 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(
-    155deg,
-    rgba(18, 30, 24, 0.96) 0%,
-    rgba(10, 17, 13, 0.98) 50%,
-    rgba(5, 9, 7, 0.99) 100%
-  );
-  border-left: 4px solid rgba(243, 212, 152, 0.45);
-  border-top: 1px solid rgba(243, 212, 152, 0.28);
-  border-right: 1px solid rgba(244, 239, 228, 0.12);
-  border-bottom: 1px solid rgba(244, 239, 228, 0.08);
+  background: #0d1712;
+  border-left: 3px solid rgba(243, 212, 152, 0.45);
+  border-top: 1px solid rgba(243, 212, 152, 0.25);
+  border-right: 1px solid rgba(244, 239, 228, 0.14);
+  border-bottom: 1px solid rgba(244, 239, 228, 0.10);
   border-radius: var(--radius-lg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   box-shadow:
-    inset 0 1px 0 rgba(243, 212, 152, 0.22),
-    inset 1px 0 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.88),
-    0 32px 80px -20px rgba(0, 0, 0, 0.95);
-  will-change: transform, opacity, box-shadow;
+    inset 0 1px 0 rgba(243, 212, 152, 0.15),
+    0 20px 50px -15px rgba(0, 0, 0, 0.75);
+  will-change: transform, box-shadow;
   transform-style: preserve-3d;
-  transform: perspective(1000px) scale(0.93) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateZ(var(--translate-z, 0px));
-  opacity: 0.65;
+  transform: perspective(1000px) scale(0.95);
+  opacity: 1;
   overflow: hidden;
   flex-shrink: 0;
+  transition: transform 0.55s var(--ease-premium), box-shadow 0.55s var(--ease-premium), border-color 0.55s var(--ease-premium);
 }
 
-/* Hero-scale cards: each one is designed to dominate the viewport when active
-   (~75-85vw before the focus scale-up even applies) — narrow editorial rhythm
-   between the three, not the old side-by-side "strip" proportions. */
+.cardHovered {
+  transform: perspective(1000px) scale(0.97) translateY(-4px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(243, 212, 152, 0.3),
+    0 28px 65px -16px rgba(0, 0, 0, 0.88);
+}
+
+/* Hero-scale cards: each one is designed to dominate the viewport when active */
 .cardLarge {
   width: clamp(760px, 82vw, 1180px);
   height: clamp(420px, 64vh, 620px);
@@ -183,6 +180,7 @@
   height: 68%;
   overflow: hidden;
   flex-shrink: 0;
+  border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
 }
 
 .cardImage {
@@ -190,14 +188,15 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: brightness(0.68) contrast(0.92) saturate(0.90);
+  opacity: 1;
+  filter: brightness(0.96) contrast(1.02) saturate(1.02);
+  transition: transform 0.55s var(--ease-premium), filter 0.55s var(--ease-premium);
   will-change: filter, transform;
 }
 
 .cardHovered .cardImage {
-  transform: scale(1.05);
-  filter: brightness(0.75) contrast(0.93) saturate(0.95);
-  transition: transform 0.75s var(--ease-premium), filter 0.75s var(--ease-premium);
+  transform: scale(1.04);
+  filter: brightness(1.02) contrast(1.04) saturate(1.04);
 }
 
 .imageOverlay {
@@ -205,10 +204,10 @@
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(10, 17, 13, 0.15) 0%,
-    rgba(10, 17, 13, 0.50) 70%,
-    rgba(10, 17, 13, 0.92) 100%
+    transparent 55%,
+    rgba(10, 17, 13, 0.75) 100%
   );
+  pointer-events: none;
 }
 
 .cardWatermark {
