@@ -129,17 +129,17 @@ export default function SectionSix() {
               fp = Math.pow(falloff, 2.2)
             }
 
-            const scale = 0.88 + 0.12 * fp
-            const brightness = 0.82 + 0.20 * fp
-            const contrast = 0.96 + 0.08 * fp
-            const saturate = 0.90 + 0.14 * fp
-            const borderGold = 0.15 + 0.65 * fp
-            const borderTop = 0.10 + 0.30 * fp
+            const scale = 0.86 + 0.14 * fp
+            const brightness = 0.84 + 0.18 * fp
+            const contrast = 0.96 + 0.09 * fp
+            const saturate = 0.92 + 0.13 * fp
+            const borderGold = 0.15 + 0.70 * fp
+            const borderTop = 0.10 + 0.35 * fp
             const shadowDepth = 0.40 + 0.50 * fp
 
-            // Subtle architectural image parallax panning (-18px to +18px)
+            // Architectural image parallax panning (-24px to +24px)
             const rawOffset = (cardCenter - viewportCenter) / (window.innerWidth / 2)
-            const parallaxX = Math.max(-18, Math.min(18, rawOffset * -18))
+            const parallaxX = Math.max(-24, Math.min(24, rawOffset * -24))
 
             const img = card.querySelector(`.${styles.cardImage}`) as HTMLElement | null
 
@@ -148,14 +148,14 @@ export default function SectionSix() {
               opacity: 1,
               borderLeftColor: `rgba(243, 212, 152, ${borderGold})`,
               borderTopColor: `rgba(243, 212, 152, ${borderTop})`,
-              boxShadow: `inset 0 1px 0 rgba(243, 212, 152, ${0.12 + 0.18 * fp}), 0 ${16 + 20 * fp}px ${35 + 40 * fp}px -15px rgba(0, 0, 0, ${shadowDepth})`,
+              boxShadow: `inset 0 1px 0 rgba(243, 212, 152, ${0.12 + 0.20 * fp}), 0 ${16 + 20 * fp}px ${35 + 45 * fp}px -15px rgba(0, 0, 0, ${shadowDepth})`,
               zIndex: Math.round(1 + fp * 10),
             })
 
             if (img) {
               gsap.set(img, {
                 x: parallaxX,
-                filter: `brightness(${brightness.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${saturate.toFixed(2)})`,
+                filter: `brightness(${brightness.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${saturate.toFixed(2)}) sepia(0.04)`,
               })
             }
           })
