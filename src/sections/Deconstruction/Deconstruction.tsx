@@ -95,16 +95,7 @@ export default function Deconstruction() {
     const applyVideoTime = (p: number) => {
       pendingProgress.current = p
       if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
-        const targetTime = p * VIDEO_PROGRESS_CAP * video.duration
-        if ('fastSeek' in video && typeof (video as unknown as { fastSeek: (t: number) => void }).fastSeek === 'function') {
-          try {
-            (video as unknown as { fastSeek: (t: number) => void }).fastSeek(targetTime)
-          } catch {
-            video.currentTime = targetTime
-          }
-        } else {
-          video.currentTime = targetTime
-        }
+        video.currentTime = p * VIDEO_PROGRESS_CAP * video.duration
       }
     }
 
@@ -114,7 +105,6 @@ export default function Deconstruction() {
 
     video?.addEventListener('loadedmetadata', onMetadata)
     video?.addEventListener('loadeddata', onMetadata)
-    video?.addEventListener('canplay', onMetadata)
 
     if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration)) {
       applyVideoTime(pendingProgress.current)
@@ -132,18 +122,6 @@ export default function Deconstruction() {
       end: () => ScrollTrigger.maxScroll(window),
       scrub: 0.6,
       invalidateOnRefresh: true,
-
-      onRefresh: (self) => {
-        applyVideoTime(self.progress)
-      },
-      onLeaveBack: () => {
-        applyVideoTime(0)
-        gsap.set(anchorRef.current, { opacity: 1, scale: 1 })
-        gsap.set(videoRef.current, { opacity: 0 })
-      },
-      onEnter: (self) => {
-        applyVideoTime(self.progress)
-      },
 
       onUpdate: (self) => {
         const videoP = self.progress
@@ -182,7 +160,6 @@ export default function Deconstruction() {
       st.kill()
       video?.removeEventListener('loadedmetadata', onMetadata)
       video?.removeEventListener('loadeddata', onMetadata)
-      video?.removeEventListener('canplay', onMetadata)
     }
   }, [])
 
