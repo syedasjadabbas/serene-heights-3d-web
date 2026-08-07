@@ -143,8 +143,14 @@
   transition: color 0.45s var(--ease-premium);
 }
 
-.seasonNavItem:hover {
-  color: rgba(244, 239, 228, 0.85);
+@media (hover: hover) and (pointer: fine) {
+  .seasonNavItem:hover {
+    color: rgba(244, 239, 228, 0.85);
+  }
+}
+
+.seasonNavItem:active {
+  transform: scale(0.95);
 }
 
 .seasonNavItemActive {
