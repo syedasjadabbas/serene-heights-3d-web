@@ -282,7 +282,7 @@ export default function SectionSix() {
           <span className={styles.eyebrowDivider}>/</span>
           <span>ARCHITECTURAL EXHIBITION GALLERY</span>
         </p>
-        <h2 className={styles.headerHeadline}>The Art of Mountain Living.</h2>
+        <h2 className={styles.headerHeadline}>The Art of <span className={styles.headerAccent}>Mountain Living.</span></h2>
       </div>
 
       {/* Horizontal Gallery Viewport */}

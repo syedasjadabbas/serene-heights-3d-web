@@ -442,7 +442,7 @@ export default function SectionSeven() {
           <span className={styles.eyebrowDivider}>/</span>
           <span>THE INVESTMENT PROCESS</span>
         </p>
-        <h2 className={styles.headerTitle}>Your path to alpine asset ownership.</h2>
+        <h2 className={styles.headerTitle}>Your path to <span className={styles.headerAccent}>alpine asset ownership.</span></h2>
       </div>
 
       {/* Pinned Dual-Pane Main Stage */}

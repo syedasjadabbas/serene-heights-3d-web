@@ -75,16 +75,24 @@
 }
 
 .headerHeadline {
-  font-family: var(--font-heading);
-  font-weight: 800;
+  font-family: var(--font-hero-display);
+  font-weight: 300;
   font-size: clamp(2.0rem, 1.5rem + 2.5vw, 3.6rem);
   line-height: 1.08;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.012em;
   color: #ffffff;
   max-width: 20ch;
   margin-inline: 0;
   text-shadow: 0 4px 24px rgba(0, 0, 0, 0.95), 0 2px 6px rgba(0, 0, 0, 0.8);
   text-wrap: balance;
+}
+
+.headerAccent {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: #f3d498;
+  text-shadow: 0 0 20px rgba(243, 212, 152, 0.3);
 }
 
 /* --- Horizontal Gallery Viewport --- */

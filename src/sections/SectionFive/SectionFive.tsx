@@ -230,7 +230,7 @@ export default function SectionFive() {
           <h2 className={styles.headerHeadline}>
             High yield mountain real estate.
             <br />
-            Structured for effortless returns.
+            Structured for <span className={styles.headerAccent}>effortless returns.</span>
           </h2>
           <p className={styles.subcopy}>
             Explore fractional Smart Property Units, whole luxury suites, and turnkey DM Consortium hospitality rental management.
