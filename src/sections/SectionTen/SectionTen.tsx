@@ -2,18 +2,40 @@
  * Section: Footer
  * Assets: src/assets/footer/
  */
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
 import Button from '../../components/ui/Button'
+import section10BgVideo from '../../assets/videos/section10-bg.mp4'
 import styles from './SectionTen.module.css'
 
 export default function SectionTen() {
   const sectionRef = useRef<HTMLElement>(null)
   const bgRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
   const headlineRef = useRef<HTMLHeadingElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const sectionEl = sectionRef.current
+    const videoEl = videoRef.current
+    if (!sectionEl || !videoEl) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          videoEl.play().catch(() => {})
+        } else {
+          videoEl.pause()
+        }
+      },
+      { threshold: 0.05 },
+    )
+
+    observer.observe(sectionEl)
+    return () => observer.disconnect()
+  }, [])
 
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
@@ -86,13 +108,19 @@ export default function SectionTen() {
     <footer ref={sectionRef} id="contact" className={styles.section}>
       {/* Mountain Background Frame */}
       <div className={styles.bgWrap}>
-        <div
-          ref={bgRef}
-          className={styles.bgImage}
-          style={{
-            backgroundImage: `url(https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop)`,
-          }}
-        />
+        <div ref={bgRef} className={styles.bgMediaWrap}>
+          <video
+            ref={videoRef}
+            src={section10BgVideo}
+            className={styles.bgVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+          />
+        </div>
         <div className={styles.bgOverlay} aria-hidden="true" />
       </div>
 

@@ -1,5 +1,5 @@
 /**
- * Section: Investment
+ * Section: SectionNine (Curated Architectural Gallery)
  * Assets: src/assets/investment/
  */
 import { useLayoutEffect, useRef } from 'react'
@@ -79,6 +79,9 @@ export default function SectionNine() {
   const exhibitCardsRef = useRef<(HTMLDivElement | null)[]>([])
   const closingStatementRef = useRef<HTMLDivElement>(null)
 
+  const rectCacheRef = useRef<Map<HTMLDivElement, DOMRect>>(new Map())
+  const rafIdRef = useRef<number | null>(null)
+
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
 
@@ -104,13 +107,30 @@ export default function SectionNine() {
         )
       }
 
-      // 2. Dominant Hero Piece Parallax & Floating Plate Motion
+      // 2. Hero Piece Parallax & 3D Spatial Entrance
       if (heroPieceRef.current && heroImageRef.current && heroCaptionRef.current) {
         gsap.fromTo(
-          heroImageRef.current,
-          { y: -60, scale: 1.1 },
+          heroPieceRef.current,
+          { opacity: 0, rotateX: 18, z: -80 },
           {
-            y: 60,
+            opacity: 1,
+            rotateX: 0,
+            z: 0,
+            duration: 1.2,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: heroPieceRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          },
+        )
+
+        gsap.fromTo(
+          heroImageRef.current,
+          { y: -50, scale: 1.1 },
+          {
+            y: 50,
             scale: 1.0,
             ease: 'none',
             scrollTrigger: {
@@ -121,32 +141,33 @@ export default function SectionNine() {
             },
           },
         )
-
-        gsap.fromTo(
-          heroCaptionRef.current,
-          { opacity: 0, y: 50, scale: 0.96 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1.0,
-            duration: 1.1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: heroPieceRef.current,
-              start: 'top 65%',
-              toggleActions: 'play none none reverse',
-            },
-          },
-        )
       }
 
-      // 3. Staggered Multi-Plane Gallery Reveals
+      // 3. Staggered 3D Multi-Plane Gallery Reveals
       exhibitCardsRef.current.forEach((card, idx) => {
         if (!card) return
         const img = card.querySelector(`.${styles.exhibitImage}`)
         const text = card.querySelector(`.${styles.captionWrap}`)
 
-        const yOffset = (idx % 2 === 0 ? 40 : -40)
+        const yOffset = idx % 2 === 0 ? 35 : -35
+        const initialRotateY = idx % 2 === 0 ? -18 : 18
+
+        gsap.fromTo(
+          card,
+          { opacity: 0, rotateY: initialRotateY, z: -60 },
+          {
+            opacity: 1,
+            rotateY: 0,
+            z: 0,
+            duration: 1.2,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 82%',
+              toggleActions: 'play none none reverse',
+            },
+          },
+        )
 
         if (img) {
           gsap.fromTo(
@@ -169,11 +190,10 @@ export default function SectionNine() {
         if (text) {
           gsap.fromTo(
             text,
-            { opacity: 0, y: 35, scale: 0.97 },
+            { opacity: 0, y: 30 },
             {
               opacity: 1,
               y: 0,
-              scale: 1.0,
               duration: 1.0,
               ease: 'power3.out',
               scrollTrigger: {
@@ -209,6 +229,46 @@ export default function SectionNine() {
     return () => ctx.revert()
   }, [])
 
+  // Mouse 3D Tilt Handlers
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget
+    rectCacheRef.current.set(card, card.getBoundingClientRect())
+  }
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget
+    let rect = rectCacheRef.current.get(card)
+    if (!rect) {
+      rect = card.getBoundingClientRect()
+      rectCacheRef.current.set(card, rect)
+    }
+
+    const px = (e.clientX - rect.left) / rect.width
+    const py = (e.clientY - rect.top) / rect.height
+    const tiltX = (0.5 - py) * 16
+    const tiltY = (px - 0.5) * 18
+
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+
+    rafIdRef.current = requestAnimationFrame(() => {
+      card.style.setProperty('--tilt-x', `${tiltX}deg`)
+      card.style.setProperty('--tilt-y', `${tiltY}deg`)
+      card.style.setProperty('--light-x', `${px * 100}%`)
+      card.style.setProperty('--light-y', `${py * 100}%`)
+      card.classList.add(styles.cardHovered)
+    })
+  }
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget
+    rectCacheRef.current.delete(card)
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+
+    card.style.setProperty('--tilt-x', '0deg')
+    card.style.setProperty('--tilt-y', '0deg')
+    card.classList.remove(styles.cardHovered)
+  }
+
   const ex01 = EXHIBITS[0]
   const ex02 = EXHIBITS[1]
   const ex03 = EXHIBITS[2]
@@ -236,7 +296,14 @@ export default function SectionNine() {
 
       {/* 2. Dominant Hero Piece (Exhibit 01) */}
       <div className={`container ${styles.heroPieceWrap}`}>
-        <div ref={heroPieceRef} className={styles.heroPieceContainer}>
+        <div
+          ref={heroPieceRef}
+          className={styles.heroPieceContainer}
+          onMouseEnter={handleMouseEnter}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className={styles.cardLight} aria-hidden="true" />
           <div className={styles.heroImageFrame}>
             <div
               ref={heroImageRef}
@@ -264,7 +331,11 @@ export default function SectionNine() {
         <div
           ref={(el) => { exhibitCardsRef.current[0] = el }}
           className={`${styles.exhibitCard} ${styles.cardTall}`}
+          onMouseEnter={handleMouseEnter}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
+          <div className={styles.cardLight} aria-hidden="true" />
           <div className={styles.imageFrame}>
             <div
               className={styles.exhibitImage}
@@ -287,7 +358,11 @@ export default function SectionNine() {
         <div
           ref={(el) => { exhibitCardsRef.current[1] = el }}
           className={`${styles.exhibitCard} ${styles.cardWide}`}
+          onMouseEnter={handleMouseEnter}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
+          <div className={styles.cardLight} aria-hidden="true" />
           <div className={styles.imageFrame}>
             <div
               className={styles.exhibitImage}
@@ -313,7 +388,11 @@ export default function SectionNine() {
         <div
           ref={(el) => { exhibitCardsRef.current[2] = el }}
           className={`${styles.exhibitCard} ${styles.cardMedium}`}
+          onMouseEnter={handleMouseEnter}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
+          <div className={styles.cardLight} aria-hidden="true" />
           <div className={styles.imageFrame}>
             <div
               className={styles.exhibitImage}
@@ -336,7 +415,11 @@ export default function SectionNine() {
         <div
           ref={(el) => { exhibitCardsRef.current[3] = el }}
           className={`${styles.exhibitCard} ${styles.cardPanorama}`}
+          onMouseEnter={handleMouseEnter}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
+          <div className={styles.cardLight} aria-hidden="true" />
           <div className={styles.imageFrame}>
             <div
               className={styles.exhibitImage}
@@ -356,7 +439,7 @@ export default function SectionNine() {
         </div>
       </div>
 
-      {/* 5. Closing Exhibition Statement - Seamless Transition into Section 10 */}
+      {/* 5. Closing Exhibition Statement */}
       <div ref={closingStatementRef} className={`container ${styles.closingExhibitionBlock}`}>
         <div className={styles.closingRule} aria-hidden="true" />
         <p className={styles.closingTag}>EXHIBITION CONCLUSION</p>
@@ -367,5 +450,3 @@ export default function SectionNine() {
     </section>
   )
 }
-
-

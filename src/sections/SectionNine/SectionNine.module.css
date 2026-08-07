@@ -102,6 +102,34 @@
   max-width: 500px;
 }
 
+/* Perspective Containers */
+.heroPieceWrap,
+.dualSpreadContainer,
+.climaxSpreadContainer {
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+/* Light Glare Sheen */
+.cardLight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    700px circle at var(--light-x, 50%) var(--light-y, 50%),
+    rgba(255, 255, 255, 0.16),
+    transparent 55%
+  );
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.cardHovered .cardLight {
+  opacity: 1;
+}
+
 /* --- 2. Dominant Hero Piece (Exhibit 01) --- */
 
 .heroPieceWrap {
@@ -119,14 +147,30 @@
   height: clamp(480px, 68vh, 740px);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border-left: 3px solid var(--color-accent-gold);
-  border-top: 1px solid rgba(244, 239, 228, 0.16);
-  border-right: 1px solid rgba(244, 239, 228, 0.1);
-  border-bottom: 1px solid rgba(244, 239, 228, 0.06);
+  border-left: 4px solid #f3d498;
+  border-top: 1px solid rgba(243, 212, 152, 0.35);
+  border-right: 1px solid rgba(244, 239, 228, 0.14);
+  border-bottom: 1px solid rgba(244, 239, 228, 0.10);
   box-shadow:
-    inset 0 1px 0 rgba(244, 239, 228, 0.14),
-    0 32px 80px -20px rgba(0, 0, 0, 0.85);
+    inset 0 1px 0 rgba(243, 212, 152, 0.35),
+    inset 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 32px 85px -20px rgba(0, 0, 0, 0.95),
+    0 0 35px rgba(243, 212, 152, 0.15);
   background: #08110d;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(0px);
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.heroPieceContainer:hover {
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(28px) scale(1.015) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(243, 212, 152, 0.5),
+    inset 1px 0 0 rgba(255, 255, 255, 0.18),
+    0 40px 95px -18px rgba(0, 0, 0, 0.98),
+    0 0 40px rgba(243, 212, 152, 0.25) !important;
 }
 
 .heroImageFrame {
@@ -135,6 +179,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  transform-style: preserve-3d;
 }
 
 .heroExhibitImage {
@@ -142,8 +187,14 @@
   inset: -8%;
   background-size: cover;
   background-position: center;
-  filter: brightness(0.85) contrast(1.02);
+  filter: brightness(0.88) contrast(1.02);
   will-change: transform;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.5s ease;
+  transform: scale(1.02);
+}
+
+.heroPieceContainer:hover .heroExhibitImage {
+  transform: scale(1.08) translateZ(15px);
 }
 
 .heroImageOverlay {
@@ -166,10 +217,23 @@
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.25em;
-  color: rgba(244, 239, 228, 0.75);
+  color: rgba(243, 212, 152, 0.95);
   text-transform: uppercase;
   z-index: 3;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  padding: 5px 12px;
+  border-radius: 4px;
+  background: rgba(10, 17, 13, 0.65);
+  border: 1px solid rgba(243, 212, 152, 0.3);
+  backdrop-filter: blur(6px);
+  transform: translateZ(45px);
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.heroPieceContainer:hover .heroWatermark {
+  transform: translateZ(55px);
+  border-color: rgba(243, 212, 152, 0.6);
+  box-shadow: 0 0 16px rgba(243, 212, 152, 0.3);
 }
 
 .heroCaptionPlate {
@@ -178,33 +242,44 @@
   left: clamp(24px, 4vw, 44px);
   max-width: min(580px, 85vw);
   background: rgba(10, 18, 14, 0.82);
-  border: 1px solid rgba(244, 239, 228, 0.16);
+  border: 1px solid rgba(243, 212, 152, 0.28);
   border-left: 3px solid var(--color-accent-gold);
   border-radius: var(--radius-lg);
   padding: clamp(24px, 3vw, 38px) clamp(24px, 3.2vw, 42px);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow:
-    inset 0 1px 0 rgba(244, 239, 228, 0.14),
+    inset 0 1px 0 rgba(243, 212, 152, 0.25),
     0 24px 60px -15px rgba(0, 0, 0, 0.8);
   z-index: 4;
+  transform-style: preserve-3d;
+  transform: translateZ(35px);
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.heroPieceContainer:hover .heroCaptionPlate {
+  transform: translateZ(50px);
+  border-color: rgba(243, 212, 152, 0.5);
+  box-shadow: 0 28px 65px rgba(0, 0, 0, 0.9);
 }
 
 .heroExhibitTitle {
-  font-family: var(--font-display);
-  font-weight: 300;
+  font-family: var(--font-heading);
+  font-weight: 800;
   font-size: clamp(1.8rem, 1.4rem + 1.4vw, 2.8rem);
   line-height: 1.08;
   letter-spacing: -0.015em;
-  color: var(--color-cream);
+  color: #ffffff;
   margin-bottom: var(--space-2);
+  transform: translateZ(30px);
 }
 
 .heroExhibitCaption {
   font-family: var(--font-sans);
   font-size: clamp(0.9rem, 0.85rem + 0.25vw, 1.05rem);
   line-height: 1.55;
-  color: rgba(244, 239, 228, 0.85);
+  color: rgba(244, 239, 228, 0.90);
+  transform: translateZ(20px);
 }
 
 /* --- Shared Metadata Row --- */
@@ -214,6 +289,7 @@
   align-items: center;
   gap: var(--space-3);
   margin-bottom: var(--space-3);
+  transform: translateZ(15px);
 }
 
 .exhibitNum {
@@ -264,25 +340,30 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: #08110d;
-  border-left: 3px solid var(--color-accent-gold);
-  border-top: 1px solid rgba(244, 239, 228, 0.16);
-  border-right: 1px solid rgba(244, 239, 228, 0.1);
-  border-bottom: 1px solid rgba(244, 239, 228, 0.06);
+  border-left: 4px solid #f3d498;
+  border-top: 1px solid rgba(243, 212, 152, 0.35);
+  border-right: 1px solid rgba(244, 239, 228, 0.14);
+  border-bottom: 1px solid rgba(244, 239, 228, 0.10);
   box-shadow:
-    inset 0 1px 0 rgba(244, 239, 228, 0.14),
-    0 24px 60px -20px rgba(0, 0, 0, 0.8);
+    inset 0 1px 0 rgba(243, 212, 152, 0.35),
+    inset 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 32px 85px -20px rgba(0, 0, 0, 0.95),
+    0 0 35px rgba(243, 212, 152, 0.15);
   will-change: transform, box-shadow;
-  transition:
-    transform 0.55s var(--ease-premium),
-    box-shadow 0.55s var(--ease-premium),
-    border-color 0.55s var(--ease-premium);
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(0px);
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .exhibitCard:hover {
-  transform: translateY(-4px);
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(28px) scale(1.015) !important;
   box-shadow:
-    inset 0 1px 0 rgba(244, 239, 228, 0.18),
-    0 36px 80px -18px rgba(0, 0, 0, 0.9);
+    inset 0 1px 0 rgba(243, 212, 152, 0.5),
+    inset 1px 0 0 rgba(255, 255, 255, 0.18),
+    0 40px 95px -18px rgba(0, 0, 0, 0.98),
+    0 0 40px rgba(243, 212, 152, 0.25) !important;
 }
 
 .cardTall {
@@ -308,6 +389,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  transform-style: preserve-3d;
 }
 
 .exhibitImage {
@@ -315,8 +397,14 @@
   inset: -10%;
   background-size: cover;
   background-position: center;
-  filter: brightness(0.82) contrast(1.0);
+  filter: brightness(0.88) contrast(1.0);
   will-change: transform;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.5s ease;
+  transform: scale(1.02);
+}
+
+.exhibitCard:hover .exhibitImage {
+  transform: scale(1.08) translateZ(15px);
 }
 
 .imageOverlay {
@@ -338,31 +426,42 @@
   right: clamp(16px, 2.5vw, 32px);
   z-index: 3;
   background: rgba(10, 18, 14, 0.82);
-  border: 1px solid rgba(244, 239, 228, 0.14);
+  border: 1px solid rgba(243, 212, 152, 0.25);
   border-left: 3px solid var(--color-accent-gold);
   border-radius: var(--radius-lg);
   padding: clamp(20px, 2.5vw, 32px);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow:
-    inset 0 1px 0 rgba(244, 239, 228, 0.14),
+    inset 0 1px 0 rgba(243, 212, 152, 0.22),
     0 20px 48px -15px rgba(0, 0, 0, 0.75);
+  transform-style: preserve-3d;
+  transform: translateZ(35px);
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.exhibitCard:hover .captionWrap {
+  transform: translateZ(50px);
+  border-color: rgba(243, 212, 152, 0.5);
+  box-shadow: 0 28px 65px rgba(0, 0, 0, 0.9);
 }
 
 .exhibitTitle {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2.3rem);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: clamp(1.4rem, 1.1rem + 1.1vw, 2.2rem);
   line-height: 1.1;
-  color: var(--color-cream);
+  color: #ffffff;
   margin-bottom: var(--space-2);
+  transform: translateZ(30px);
 }
 
 .exhibitCaption {
   font-family: var(--font-sans);
   font-size: clamp(0.84375rem, 0.8rem + 0.18vw, 0.96875rem);
   line-height: 1.5;
-  color: rgba(244, 239, 228, 0.82);
+  color: rgba(244, 239, 228, 0.90);
+  transform: translateZ(20px);
 }
 
 /* --- 5. Closing Exhibition Block --- */
@@ -399,17 +498,14 @@
   font-size: clamp(1.8rem, 1.4rem + 1.8vw, 3.0rem);
   line-height: 1.1;
   color: var(--color-cream);
-  text-wrap: balance;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
 }
 
-/* --- Responsive Adjustments --- */
-
-@media (max-width: 960px) {
+@media (max-width: 900px) {
   .dualSpreadContainer,
   .climaxSpreadContainer {
     grid-template-columns: 1fr;
-    gap: 32px;
-    margin-bottom: 60px;
+    gap: 40px;
   }
 
   .cardWide,
@@ -418,14 +514,7 @@
     margin-bottom: 0;
   }
 
-  .cardTall,
-  .cardWide,
-  .cardMedium,
-  .cardPanorama {
-    height: 420px;
-  }
-
   .heroPieceContainer {
-    height: 440px;
+    height: 420px;
   }
 }
