@@ -203,7 +203,7 @@ export default function MasterVisualStage() {
         className={styles.heroStill}
         alt=""
         aria-hidden="true"
-        fetchpriority="high"
+        fetchPriority="high"
       />
     </div>
   )

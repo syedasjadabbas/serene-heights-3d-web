@@ -197,6 +197,18 @@
   color: var(--color-accent-gold);
 }
 
+.creditLink {
+  color: var(--color-accent-gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.creditLink:hover {
+  color: var(--color-cream);
+  opacity: 0.9;
+}
+
 .copyright {
   font-family: var(--font-sans);
   font-size: 0.625rem;

@@ -267,7 +267,7 @@ export default function SectionSix() {
   }
 
   return (
-    <section ref={sectionRef} id="floor-plans" data-alias="smart-unit" className={styles.section}>
+    <section ref={sectionRef} id="smart-unit" data-alias="smart-unit" className={styles.section}>
       {/* 3D Exhibition Canvas Stage */}
       <SectionSixCanvas />
 

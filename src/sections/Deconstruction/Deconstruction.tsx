@@ -5,7 +5,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
-import { setHeroProgress, getHeroTypographyOpacity, setNavVisibilityProgress } from '../../components/stage/masterVisualStageState'
+import { getHeroTypographyOpacity, setNavVisibilityProgress } from '../../components/stage/masterVisualStageState'
 import { HERO_HOLD_PX } from '../Hero/HeroV2'
 import heroImageSrc from '../../assets/hero/hero-main.webp'
 import heroStyles from '../Hero/HeroV2.module.css'
@@ -61,15 +61,10 @@ const LOCAL_REFERENCE_VH = 1.2
 
 const CROSSFADE_LOCAL_P = 0.08        // Hero image -> video dissolve
 const ANCHOR_PUSH_SCALE = 1.015       // tiny continued push on the anchor during the crossfade only
-const NAV_REVEAL_LOCAL_START = CROSSFADE_LOCAL_P
-const NAV_REVEAL_LOCAL_END   = CROSSFADE_LOCAL_P + 0.05
 // Note: No TYPE_FADE constants here. Hero fades its own typography
 // during the HERO_HOLD_PX appreciation hold, so by the time this
 // section's ScrollTrigger fires, heroTypographyOpacity is already 0.
 
-function remap(p: number, inMin: number, inMax: number): number {
-  return Math.max(0, Math.min(1, (p - inMin) / (inMax - inMin)))
-}
 
 export default function Deconstruction() {
   const anchorRef     = useRef<HTMLImageElement>(null)
@@ -196,13 +191,21 @@ export default function Deconstruction() {
         </p>
         <div ref={typeCtaRef} className={heroStyles.heroCtaWrap}>
           <div className={heroStyles.subtitleDivider} aria-hidden="true" />
-          <div className={heroStyles.heroCtaGroup}>
+          <a
+            href="#about"
+            onClick={(e) => {
+              e.preventDefault()
+              document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className={heroStyles.heroCtaGroup}
+            style={{ cursor: 'pointer', textDecoration: 'none' }}
+          >
             <div className={heroStyles.heroCtaRow}>
               <span className={heroStyles.heroCtaLabel}>EXPLORE RESIDENCES</span>
               <span className={heroStyles.heroCtaArrow} aria-hidden="true">→</span>
             </div>
             <div className={heroStyles.heroCtaLine} />
-          </div>
+          </a>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
 import ResortLighting from './ResortLighting'

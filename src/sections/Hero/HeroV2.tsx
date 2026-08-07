@@ -6,7 +6,6 @@ import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
 import { setHeroTypographyOpacity, setNavVisibilityProgress } from '../../components/stage/masterVisualStageState'
-import logoSvg from '../../assets/common/logo.svg'
 import heroImageSrc from '../../assets/hero/hero-main.webp'
 import styles from './HeroV2.module.css'
 
@@ -45,8 +44,6 @@ function logoNaturalH(w: number): number {
   return w * (136 / 100)
 }
 
-const MARGIN_X  = 3  / 100
-const MARGIN_Y  = 3  / 136
 const CAPSULE_W = 94 / 100
 const CAPSULE_H = 130 / 136
 const RX_FRAC   = 47 / 100
@@ -481,10 +478,18 @@ export default function HeroV2() {
           HOTEL &amp; RESIDENCES &nbsp;·&nbsp; NATHIA GALI
         </p>
         <div ref={titleCtaRef} className={styles.heroCtaWrap}>
-          <div className={styles.heroCtaGroup}>
+          <a
+            href="#about"
+            onClick={(e) => {
+              e.preventDefault()
+              document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className={styles.heroCtaGroup}
+            style={{ cursor: 'pointer', textDecoration: 'none' }}
+          >
             <span className={styles.heroCtaLabel}>EXPLORE RESIDENCES</span>
             <span className={styles.heroCtaArrow} aria-hidden="true">→</span>
-          </div>
+          </a>
         </div>
       </div>
 

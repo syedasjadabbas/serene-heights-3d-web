@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface UseCanvasVisibilityOptions {
   /**
@@ -12,7 +12,7 @@ interface UseCanvasVisibilityOptions {
 
 interface UseCanvasVisibilityResult {
   /** Attach this ref to the wrapper div that contains the <Canvas>. */
-  containerRef: React.RefObject<HTMLDivElement>
+  containerRef: React.RefObject<HTMLDivElement | null>
   /**
    * True when the section is within rootMargin of the viewport.
    * Drive <Canvas frameloop={isVisible ? 'always' : 'never'}> with this.

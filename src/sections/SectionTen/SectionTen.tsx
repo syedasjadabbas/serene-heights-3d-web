@@ -160,16 +160,27 @@ export default function SectionTen() {
           </div>
 
           <div className={styles.navLinks}>
-            <a href="#hero" className={styles.navLink}>OVERVIEW</a>
+            <a href="#about" className={styles.navLink}>OVERVIEW</a>
             <a href="#lifestyle" className={styles.navLink}>LIFESTYLE</a>
             <a href="#amenities" className={styles.navLink}>AMENITIES</a>
-            <a href="#investment" className={styles.navLink}>INVESTMENT</a>
-            <a href="#story" className={styles.navLink}>STORY</a>
-            <a href="#gallery" className={styles.navLink}>EXHIBITION</a>
+            <a href="#floor-plans" className={styles.navLink}>FLOOR PLANS</a>
+            <a href="#smart-unit" className={styles.navLink}>SMART UNIT</a>
+            <a href="#payment-plan" className={styles.navLink}>INVESTMENT</a>
+            <a href="#exhibition" className={styles.navLink}>EXHIBITION</a>
           </div>
 
           <div className={styles.creditLine}>
-            <span className={styles.creditText}>DEVELOPED BY DM CONSORTIUM</span>
+            <span className={styles.creditText}>
+              DEVELOPED BY{' '}
+              <a
+                href="https://www.zeploy.tech"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.creditLink}
+              >
+                ZEPLOY TECH
+              </a>
+            </span>
             <span className={styles.copyright}>© 2026 ALL RIGHTS RESERVED</span>
           </div>
         </div>

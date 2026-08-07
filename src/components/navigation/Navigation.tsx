@@ -9,14 +9,21 @@ import Logo from '../ui/Logo'
 import Button from '../ui/Button'
 import styles from './Navigation.module.css'
 
-const NAV_ITEMS = [
+interface NavItem {
+  label: string
+  href: string
+  extra?: boolean
+}
+
+const NAV_ITEMS: NavItem[] = [
   { label: 'ABOUT', href: '#about' },
   { label: 'LIFESTYLE', href: '#lifestyle' },
   { label: 'AMENITIES', href: '#amenities' },
   { label: 'FLOOR PLANS', href: '#floor-plans' },
-  { label: 'SMART UNIT', href: '#smart-unit', extra: true },
+  { label: 'SMART UNIT', href: '#smart-unit' },
   { label: 'PAYMENT PLAN', href: '#payment-plan' },
   { label: 'PROGRESS', href: '#progress' },
+  { label: 'EXHIBITION', href: '#exhibition' },
 ]
 
 export default function Navigation() {
@@ -79,6 +86,8 @@ export default function Navigation() {
       'smart-unit': 'smart-unit',
       'payment-plan': 'payment-plan',
       progress: 'progress',
+      exhibition: 'exhibition',
+      'curated-exhibits': 'exhibition',
       investment: 'payment-plan',
       contact: 'contact',
     }

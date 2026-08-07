@@ -276,7 +276,7 @@ export default function SectionNine() {
   const ex05 = EXHIBITS[4]
 
   return (
-    <section ref={sectionRef} id="curated-exhibits" className={styles.section}>
+    <section ref={sectionRef} id="exhibition" data-alias="curated-exhibits" className={styles.section}>
       {/* Background Blueprint Mesh & Ambient Radial Lighting */}
       <div className={styles.blueprintBgGrid} aria-hidden="true" />
       <div className={styles.exhibitionAmbientMesh} aria-hidden="true" />
