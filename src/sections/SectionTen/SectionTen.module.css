@@ -194,8 +194,14 @@
   transition: color 0.45s var(--ease-premium);
 }
 
-.navLink:hover {
-  color: var(--color-cream);
+@media (hover: hover) and (pointer: fine) {
+  .navLink:hover {
+    color: var(--color-cream);
+  }
+}
+
+.navLink:active {
+  opacity: 0.7;
 }
 
 .creditLine {

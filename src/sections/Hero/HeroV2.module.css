@@ -240,14 +240,20 @@
   transition: transform 0.4s var(--ease-premium), background-color 0.4s var(--ease-premium), border-color 0.4s var(--ease-premium), box-shadow 0.4s var(--ease-premium);
 }
 
-.heroCtaWrap:hover {
-  background: rgba(18, 34, 26, 0.95);
-  border-color: rgba(243, 212, 152, 0.85);
-  transform: translateY(-2px);
-  box-shadow:
-    0 20px 45px -6px rgba(0, 0, 0, 0.95),
-    0 0 28px rgba(243, 212, 152, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+@media (hover: hover) and (pointer: fine) {
+  .heroCtaWrap:hover {
+    background: rgba(18, 34, 26, 0.95);
+    border-color: rgba(243, 212, 152, 0.85);
+    transform: translateY(-2px);
+    box-shadow:
+      0 20px 45px -6px rgba(0, 0, 0, 0.95),
+      0 0 28px rgba(243, 212, 152, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+.heroCtaWrap:active {
+  transform: scale(0.97);
 }
 
 .subtitleDivider {

@@ -78,10 +78,16 @@
   border: 1px solid transparent;
 }
 
-.link:hover {
-  color: #ffffff;
-  background: rgba(244, 239, 228, 0.12);
-  border-color: rgba(244, 239, 228, 0.22);
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    color: #ffffff;
+    background: rgba(244, 239, 228, 0.12);
+    border-color: rgba(244, 239, 228, 0.22);
+  }
+}
+
+.link:active {
+  transform: scale(0.95);
 }
 
 .activeLink {

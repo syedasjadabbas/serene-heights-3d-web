@@ -545,9 +545,15 @@
     background-color 0.45s var(--ease-premium);
 }
 
-.cta:hover {
-  transform: scale(1.12);
-  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover {
+    transform: scale(1.12);
+    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.cta:active {
+  transform: scale(0.96);
 }
 
 .ctaGold {
