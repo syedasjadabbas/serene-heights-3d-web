@@ -25,7 +25,7 @@ function App() {
     }
 
     if (new URLSearchParams(window.location.search).has('noLenis')) return
-    const { lenis, destroy } = initLenis()
+    const { destroy } = initLenis()
 
     const timer = setTimeout(() => {
       window.scrollTo(0, 0)
