@@ -119,7 +119,7 @@ export default function Deconstruction() {
 
     const st = ScrollTrigger.create({
       start: heroEndPx,
-      end: () => ScrollTrigger.maxScroll(window),
+      end: 'max',
       scrub: 0.6,
       invalidateOnRefresh: true,
 
