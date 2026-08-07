@@ -73,7 +73,6 @@ export default function Deconstruction() {
   const typeSubRef     = useRef<HTMLParagraphElement>(null)
   const typeCtaRef     = useRef<HTMLDivElement>(null)
 
-  const videoReady      = useRef(false)
   const pendingProgress = useRef(0)
 
   useLayoutEffect(() => {
@@ -95,16 +94,22 @@ export default function Deconstruction() {
 
     const applyVideoTime = (p: number) => {
       pendingProgress.current = p
-      if (video && videoReady.current && video.duration) {
+      if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
         video.currentTime = p * VIDEO_PROGRESS_CAP * video.duration
       }
     }
 
-    const onLoadedMetadata = () => {
-      videoReady.current = true
+    const onMetadata = () => {
       applyVideoTime(pendingProgress.current)
     }
-    video?.addEventListener('loadedmetadata', onLoadedMetadata)
+
+    video?.addEventListener('loadedmetadata', onMetadata)
+    video?.addEventListener('loadeddata', onMetadata)
+
+    if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration)) {
+      applyVideoTime(pendingProgress.current)
+    }
+
     video?.load()
 
     const heroEndPx = () => {
@@ -153,7 +158,8 @@ export default function Deconstruction() {
 
     return () => {
       st.kill()
-      video?.removeEventListener('loadedmetadata', onLoadedMetadata)
+      video?.removeEventListener('loadedmetadata', onMetadata)
+      video?.removeEventListener('loadeddata', onMetadata)
     }
   }, [])
 
