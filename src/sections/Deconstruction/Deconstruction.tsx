@@ -95,19 +95,16 @@ export default function Deconstruction() {
     const applyVideoTime = (p: number) => {
       pendingProgress.current = p
       if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
-        if (!video.seeking) {
-          video.currentTime = p * VIDEO_PROGRESS_CAP * video.duration
-        }
+        video.currentTime = p * VIDEO_PROGRESS_CAP * video.duration
       }
     }
 
-    const onMetadataOrSeek = () => {
+    const onMetadata = () => {
       applyVideoTime(pendingProgress.current)
     }
 
-    video?.addEventListener('loadedmetadata', onMetadataOrSeek)
-    video?.addEventListener('loadeddata', onMetadataOrSeek)
-    video?.addEventListener('seeked', onMetadataOrSeek)
+    video?.addEventListener('loadedmetadata', onMetadata)
+    video?.addEventListener('loadeddata', onMetadata)
 
     if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration)) {
       applyVideoTime(pendingProgress.current)
@@ -129,8 +126,11 @@ export default function Deconstruction() {
       onUpdate: (self) => {
         const videoP = self.progress
 
+        const currentScroll = window.scrollY
+        const hEnd = heroEndPx()
+        const scrollPastHero = Math.max(0, currentScroll - hEnd)
         const localSpanPx = window.innerHeight * LOCAL_REFERENCE_VH
-        const localP = Math.min(1, (self.progress * (self.end - self.start)) / localSpanPx)
+        const localP = Math.min(1, scrollPastHero / localSpanPx)
 
         // Hero image -> video dissolve, right at the handoff — Hero is
         // already fully off-screen by the time this fires.
@@ -161,9 +161,8 @@ export default function Deconstruction() {
 
     return () => {
       st.kill()
-      video?.removeEventListener('loadedmetadata', onMetadataOrSeek)
-      video?.removeEventListener('loadeddata', onMetadataOrSeek)
-      video?.removeEventListener('seeked', onMetadataOrSeek)
+      video?.removeEventListener('loadedmetadata', onMetadata)
+      video?.removeEventListener('loadeddata', onMetadata)
     }
   }, [])
 
