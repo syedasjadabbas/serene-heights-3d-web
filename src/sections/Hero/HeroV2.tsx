@@ -404,7 +404,7 @@ export default function HeroV2() {
           aria-hidden="true"
         >
           <source
-            src="/media/serene-heights/hero/deconstruction/Serene%20Heights%20V2.mp4"
+            src="/media/serene-heights/hero/deconstruction/serene-heights-v2.mp4"
             type="video/mp4"
           />
         </video>
