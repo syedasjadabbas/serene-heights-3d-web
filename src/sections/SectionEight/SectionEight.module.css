@@ -412,3 +412,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .stageFrame {
+    height: 300px;
+  }
+
+  .section {
+    padding-inline: clamp(16px, 5vw, 28px);
+  }
+}
+

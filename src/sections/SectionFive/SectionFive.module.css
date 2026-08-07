@@ -360,3 +360,31 @@
     gap: 24px;
   }
 }
+
+@media (max-width: 640px) {
+  .section {
+    padding-block: clamp(48px, 6vh, 80px) clamp(56px, 7vh, 100px);
+    padding-inline: clamp(16px, 5vw, 28px);
+  }
+
+  .headerHeadline {
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
+  }
+
+  .subcopy {
+    font-size: clamp(0.9375rem, 3.5vw, 1.05rem);
+    max-width: 100%;
+  }
+
+  .heroCard {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerHeadline {
+    font-size: clamp(1.6rem, 7.5vw, 2rem);
+  }
+}
+

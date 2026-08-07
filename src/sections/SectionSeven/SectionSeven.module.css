@@ -623,3 +623,33 @@
     gap: 8px;
   }
 }
+
+@media (max-width: 640px) {
+  .section {
+    padding-block: 32px;
+    padding-inline: clamp(16px, 5vw, 28px);
+  }
+
+  .visualStageFrame {
+    height: 220px;
+  }
+
+  .editorialStage {
+    height: 260px;
+  }
+
+  .specVal {
+    font-size: clamp(1.2rem, 5vw, 1.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .visualStageFrame {
+    height: 180px;
+  }
+
+  .editorialStage {
+    height: 220px;
+  }
+}
+

@@ -574,4 +574,73 @@
   }
 }
 
+@media (max-width: 640px) {
+  .section {
+    padding-block: clamp(48px, 6vh, 80px) clamp(56px, 7vh, 100px);
+    padding-inline: clamp(16px, 5vw, 28px);
+  }
+
+  .header {
+    margin-left: 0;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .statement {
+    font-size: clamp(1.8rem, 6.5vw, 2.4rem);
+  }
+
+  .subcopy {
+    font-size: clamp(0.9375rem, 3.5vw, 1.05rem);
+  }
+
+  .paymentFan {
+    height: 180px;
+  }
+
+  .paymentCard {
+    height: 65px;
+  }
+
+  .paymentCardB {
+    top: 52px;
+  }
+
+  .paymentCardC {
+    top: 104px;
+  }
+
+  .column {
+    padding: clamp(16px, 4vw, 24px) clamp(14px, 3.5vw, 20px) clamp(20px, 5vw, 28px);
+  }
+}
+
+@media (max-width: 480px) {
+  .statement {
+    font-size: clamp(1.6rem, 7vw, 2.0rem);
+  }
+
+  .paymentFan {
+    height: 160px;
+  }
+
+  .paymentCard {
+    height: 56px;
+  }
+
+  .paymentCardB {
+    top: 46px;
+  }
+
+  .paymentCardC {
+    top: 92px;
+  }
+
+  .unitCard {
+    transform: none;
+    max-width: 100%;
+  }
+}
+
+
 
