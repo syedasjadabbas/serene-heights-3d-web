@@ -14,7 +14,6 @@ import SectionEight from './sections/SectionEight/SectionEight'
 import SectionNine from './sections/SectionNine/SectionNine'
 import SectionTen from './sections/SectionTen/SectionTen'
 import { initLenis } from './motion/lenis'
-import { ScrollTrigger } from './motion/scrollTrigger'
 
 function App() {
   useEffect(() => {
@@ -32,36 +31,8 @@ function App() {
       window.scrollTo(0, 0)
     }, 50)
 
-    // ── Resize + zoom coordination ──────────────────────────────────
-    // Browser zoom fires a window resize event (window.innerWidth/Height
-    // change in CSS pixels). We must stop Lenis, let ScrollTrigger fully
-    // recompute all pin spacers (invalidateOnRefresh handles the math),
-    // then allow Lenis to resume. Without this, pinSpacing from Sections
-    // 6/7/8 can be stale after zoom, causing layout shifts and wrong
-    // scroll distances at 80/90/110% browser zoom.
-    let resizeTimer: ReturnType<typeof setTimeout>
-
-    const handleResize = () => {
-      clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(() => {
-        // Pause Lenis so it doesn't fight ScrollTrigger during recalculation
-        lenis.stop()
-        // Force a full ScrollTrigger refresh — recalculates all trigger
-        // start/end positions, pin spacer heights, and scroll distances
-        ScrollTrigger.refresh(true)
-        // Resume Lenis after a frame to let the DOM settle
-        requestAnimationFrame(() => {
-          lenis.start()
-        })
-      }, 150)
-    }
-
-    window.addEventListener('resize', handleResize, { passive: true })
-
     return () => {
       clearTimeout(timer)
-      clearTimeout(resizeTimer)
-      window.removeEventListener('resize', handleResize)
       destroy()
     }
   }, [])
