@@ -117,7 +117,7 @@ export default function SectionTen() {
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
             aria-hidden="true"
           />
         </div>

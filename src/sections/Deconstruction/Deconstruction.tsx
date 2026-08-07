@@ -74,6 +74,7 @@ export default function Deconstruction() {
   const typeCtaRef     = useRef<HTMLDivElement>(null)
 
   const pendingProgress = useRef(0)
+  const rafIdRef = useRef<number | null>(null)
 
   useLayoutEffect(() => {
     registerScrollTrigger()
@@ -92,24 +93,37 @@ export default function Deconstruction() {
       pointerEvents: 'none',
     })
 
-    const applyVideoTime = (p: number) => {
-      pendingProgress.current = p
-      if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
-        video.currentTime = p * VIDEO_PROGRESS_CAP * video.duration
+    const ONE_FRAME_SEC = 1 / 24
+
+    const updateVideoTimeLoop = () => {
+      const v = videoRef.current
+      if (
+        v &&
+        v.readyState >= 1 &&
+        v.duration &&
+        !isNaN(v.duration) &&
+        isFinite(v.duration)
+      ) {
+        const targetTime = pendingProgress.current * VIDEO_PROGRESS_CAP * v.duration
+        const diff = Math.abs(v.currentTime - targetTime)
+        if (!v.seeking && diff >= ONE_FRAME_SEC) {
+          v.currentTime = targetTime
+        }
       }
+      rafIdRef.current = requestAnimationFrame(updateVideoTimeLoop)
     }
 
+    rafIdRef.current = requestAnimationFrame(updateVideoTimeLoop)
+
     const onMetadata = () => {
-      applyVideoTime(pendingProgress.current)
+      const v = videoRef.current
+      if (v && v.readyState >= 1 && v.duration && !isNaN(v.duration) && isFinite(v.duration)) {
+        v.currentTime = pendingProgress.current * VIDEO_PROGRESS_CAP * v.duration
+      }
     }
 
     video?.addEventListener('loadedmetadata', onMetadata)
     video?.addEventListener('loadeddata', onMetadata)
-
-    if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration)) {
-      applyVideoTime(pendingProgress.current)
-    }
-
     video?.load()
 
     const heroEndPx = () => {
@@ -125,6 +139,7 @@ export default function Deconstruction() {
 
       onUpdate: (self) => {
         const videoP = self.progress
+        pendingProgress.current = videoP
 
         const currentScroll = window.scrollY
         const hEnd = heroEndPx()
@@ -132,8 +147,7 @@ export default function Deconstruction() {
         const localSpanPx = window.innerHeight * LOCAL_REFERENCE_VH
         const localP = Math.min(1, scrollPastHero / localSpanPx)
 
-        // Hero image -> video dissolve, right at the handoff — Hero is
-        // already fully off-screen by the time this fires.
+        // Hero image -> video dissolve, right at the handoff
         const crossfade = Math.min(1, localP / CROSSFADE_LOCAL_P)
         gsap.set(anchorRef.current, {
           opacity: 1 - crossfade,
@@ -141,15 +155,11 @@ export default function Deconstruction() {
         })
         gsap.set(videoRef.current, { opacity: crossfade })
 
-        applyVideoTime(videoP)
-
-        // ── Navbar reveal: begins the instant Hero releases (localP = 0.0)
-        // and reaches 1.0 (fully visible) as Section 2 enters (localP = 0.25).
+        // ── Navbar reveal
         const navReveal = Math.min(1, localP / 0.25)
         setNavVisibilityProgress(navReveal)
 
-        // ── Typography: Hero has already faded this to 0 during HERO_HOLD_PX.
-        // Sync from shared state — always 0 when Deconstruction is active.
+        // ── Typography
         const typographyOpacity = getHeroTypographyOpacity()
         gsap.set([typeTitleRef.current, typeSubRef.current, typeCtaRef.current], {
           opacity: typographyOpacity,
@@ -160,6 +170,7 @@ export default function Deconstruction() {
     })
 
     return () => {
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
       st.kill()
       video?.removeEventListener('loadedmetadata', onMetadata)
       video?.removeEventListener('loadeddata', onMetadata)
