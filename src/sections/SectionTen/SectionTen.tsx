@@ -135,7 +135,7 @@ export default function SectionTen() {
           </p>
 
           <h2 ref={headlineRef} className={styles.headline}>
-            Your sanctuary above the clouds awaits.
+            Your sanctuary above the <span className={styles.headlineAccent}>clouds awaits.</span>
           </h2>
 
           <p className={styles.subcopy}>
