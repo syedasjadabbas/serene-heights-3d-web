@@ -95,16 +95,19 @@ export default function Deconstruction() {
     const applyVideoTime = (p: number) => {
       pendingProgress.current = p
       if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
-        video.currentTime = p * VIDEO_PROGRESS_CAP * video.duration
+        if (!video.seeking) {
+          video.currentTime = p * VIDEO_PROGRESS_CAP * video.duration
+        }
       }
     }
 
-    const onMetadata = () => {
+    const onMetadataOrSeek = () => {
       applyVideoTime(pendingProgress.current)
     }
 
-    video?.addEventListener('loadedmetadata', onMetadata)
-    video?.addEventListener('loadeddata', onMetadata)
+    video?.addEventListener('loadedmetadata', onMetadataOrSeek)
+    video?.addEventListener('loadeddata', onMetadataOrSeek)
+    video?.addEventListener('seeked', onMetadataOrSeek)
 
     if (video && video.readyState >= 1 && video.duration && !isNaN(video.duration)) {
       applyVideoTime(pendingProgress.current)
@@ -158,8 +161,9 @@ export default function Deconstruction() {
 
     return () => {
       st.kill()
-      video?.removeEventListener('loadedmetadata', onMetadata)
-      video?.removeEventListener('loadeddata', onMetadata)
+      video?.removeEventListener('loadedmetadata', onMetadataOrSeek)
+      video?.removeEventListener('loadeddata', onMetadataOrSeek)
+      video?.removeEventListener('seeked', onMetadataOrSeek)
     }
   }, [])
 
