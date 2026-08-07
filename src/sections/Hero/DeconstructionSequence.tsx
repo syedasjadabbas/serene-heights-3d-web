@@ -72,7 +72,7 @@ const DeconstructionSequence = forwardRef<DeconstructionSequenceHandle>(
 
     if (framesRef.current.length === 0) {
       framesRef.current = Array.from({ length: FRAME_COUNT }, () => ({
-        image: new Image(),
+        image: typeof Image !== 'undefined' ? new Image() : ({} as HTMLImageElement),
         status: 'idle',
       }))
     }

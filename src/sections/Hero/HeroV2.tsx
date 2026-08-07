@@ -147,8 +147,8 @@ export default function HeroV2() {
   const titleSubRef    = useRef<HTMLParagraphElement>(null)
   const titleCtaRef    = useRef<HTMLDivElement>(null)
 
-  const vwRef = useRef(window.innerWidth)
-  const vhRef = useRef(window.innerHeight)
+  const vwRef = useRef(typeof window !== 'undefined' ? window.innerWidth : 1440)
+  const vhRef = useRef(typeof window !== 'undefined' ? window.innerHeight : 900)
 
   const videoStarted = useRef(false)
 
