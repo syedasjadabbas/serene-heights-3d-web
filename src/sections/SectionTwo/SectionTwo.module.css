@@ -54,16 +54,24 @@
 }
 
 .statement {
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: clamp(2.2rem, 1.6rem + 2.5vw, 3.8rem);
+  font-family: var(--font-hero-display);
+  font-weight: 300;
+  font-size: clamp(2.0rem, 1.5rem + 2.2vw, 3.4rem);
   line-height: 1.08;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.012em;
   color: var(--color-cream);
   text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85), 0 2px 8px rgba(0, 0, 0, 0.7);
   margin-bottom: var(--space-4);
-  max-width: 18ch;
+  max-width: 20ch;
   text-wrap: balance;
+}
+
+.statementAccent {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: #f3d498;
+  text-shadow: 0 0 20px rgba(243, 212, 152, 0.3);
 }
 
 .subcopy {

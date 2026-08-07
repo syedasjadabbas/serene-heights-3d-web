@@ -252,7 +252,7 @@ export default function SectionThree() {
           <h2 className={styles.headline}>
             A guided exploration of
             <br />
-            Pakistan’s premier resort.
+            Pakistan’s <span className={styles.headlineAccent}>premier resort.</span>
           </h2>
           <p className={styles.subcopy}>
             Discover the design philosophy, luxury residences, world-class amenities, and turnkey investment model of Serene Heights Nathia Gali.

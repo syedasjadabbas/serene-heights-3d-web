@@ -66,7 +66,7 @@ export default function SectionFour() {
           </p>
 
           <h2 ref={headlineRef} className={styles.headline}>
-            Step inside the sanctuary.
+            Step inside the <span className={styles.headlineAccent}>sanctuary.</span>
           </h2>
 
           <p ref={subcopyRef} className={styles.subcopy}>

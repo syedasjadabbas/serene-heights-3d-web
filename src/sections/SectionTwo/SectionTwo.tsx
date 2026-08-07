@@ -256,7 +256,7 @@ export default function SectionTwo() {
           <h2 ref={statementRef} className={styles.statement}>
             Own your place in the mountains,
             <br />
-            or start with a share of it.
+            or start with a <span className={styles.statementAccent}>share of it.</span>
           </h2>
           <p ref={subcopyRef} className={styles.subcopy}>
             Flexible investment structures tailored for Pakistan’s premier winter resort, backed by complete hospitality management.
