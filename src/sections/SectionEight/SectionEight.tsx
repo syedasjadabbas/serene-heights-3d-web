@@ -2,11 +2,11 @@
  * Section: SectionEight (The Seasonal Experience)
  * Assets: src/assets/location/
  */
-import { useLayoutEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
-import SectionEightCanvas from './SectionEightCanvas'
+const SectionEightCanvas = lazy(() => import('./SectionEightCanvas'))
 import styles from './SectionEight.module.css'
 
 interface SeasonData {
@@ -85,13 +85,7 @@ const SEASONS: SeasonData[] = [
   },
 ]
 
-// Preload season imagery eagerly to eliminate any asset loading delay
-SEASONS.forEach((s) => {
-  if (typeof window !== 'undefined') {
-    const img = new Image()
-    img.src = s.imageUrl
-  }
-})
+
 
 export default function SectionEight() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -339,7 +333,9 @@ export default function SectionEight() {
   return (
     <section ref={sectionRef} id="progress" data-alias="seasons" className={styles.section}>
       {/* 3D Seasonal Canvas particles */}
-      <SectionEightCanvas activeSeason={activeSeason} />
+      <Suspense fallback={null}>
+        <SectionEightCanvas activeSeason={activeSeason} />
+      </Suspense>
 
       {/* Blueprint Grid & Dynamic Ambient Glow */}
       <div className={styles.blueprintBgGrid} aria-hidden="true" />

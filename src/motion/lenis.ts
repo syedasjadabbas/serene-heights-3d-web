@@ -31,7 +31,7 @@ export function initLenis(): { lenis: Lenis; destroy: () => void } {
   }
 
   gsap.ticker.add(onTick)
-  gsap.ticker.lagSmoothing(0)
+  gsap.ticker.lagSmoothing(500, 33)
 
   const handleAnchorClick = (e: MouseEvent) => {
     const target = e.target as HTMLElement | null

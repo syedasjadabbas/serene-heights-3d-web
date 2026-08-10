@@ -2,11 +2,11 @@
  * Section: Amenities
  * Assets: src/assets/amenities/
  */
-import { useLayoutEffect, useRef } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
-import SectionFiveCanvas from './SectionFiveCanvas'
+const SectionFiveCanvas = lazy(() => import('./SectionFiveCanvas'))
 import styles from './SectionFive.module.css'
 
 interface InvestmentTier {
@@ -213,7 +213,9 @@ export default function SectionFive() {
   return (
     <section ref={sectionRef} id="floor-plans" data-alias="residences-suites" className={styles.section}>
       {/* 3D Exhibition Canvas Stage */}
-      <SectionFiveCanvas />
+      <Suspense fallback={null}>
+        <SectionFiveCanvas />
+      </Suspense>
 
       {/* Background Blueprint Grid & Ambient Backdrop */}
       <div className={styles.blueprintBgGrid} aria-hidden="true" />

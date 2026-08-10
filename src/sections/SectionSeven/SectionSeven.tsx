@@ -2,11 +2,11 @@
  * Section: SectionSeven (The Investment Process)
  * 3D Spatial Deck Flipping & Double-Sided Interactive Cards
  */
-import { useLayoutEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
-import SectionSevenCanvas from './SectionSevenCanvas'
+const SectionSevenCanvas = lazy(() => import('./SectionSevenCanvas'))
 import styles from './SectionSeven.module.css'
 
 interface SpecItem {
@@ -429,7 +429,9 @@ export default function SectionSeven() {
   return (
     <section ref={sectionRef} id="payment-plan" data-alias="investment" className={styles.section}>
       {/* 3D Canvas Background */}
-      <SectionSevenCanvas />
+      <Suspense fallback={null}>
+        <SectionSevenCanvas />
+      </Suspense>
 
       {/* Blueprint Grid & Ambient Background */}
       <div className={styles.blueprintBgGrid} aria-hidden="true" />

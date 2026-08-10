@@ -50,7 +50,7 @@ export default function ResortViewer() {
               position: CAMERA_CONFIG.defaultPosition,
               fov: CAMERA_CONFIG.fov,
             }}
-            dpr={[1, 2]}
+            dpr={[1, 1.5]}
             gl={{
               antialias: true,
               alpha: true,

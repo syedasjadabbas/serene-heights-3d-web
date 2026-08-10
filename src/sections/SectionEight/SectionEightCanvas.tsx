@@ -95,6 +95,24 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
       ctx.clearRect(0, 0, width, height)
       const targetIdx = activeSeasonRef.current < 0 ? 0 : activeSeasonRef.current
 
+      if (targetIdx === 0) {
+        ctx.shadowBlur = 8
+        ctx.shadowColor = 'rgba(220, 238, 245, 0.8)'
+        ctx.fillStyle = 'rgba(240, 248, 255, 0.95)'
+      } else if (targetIdx === 1) {
+        ctx.shadowBlur = 6
+        ctx.shadowColor = 'rgba(232, 168, 184, 0.7)'
+        ctx.fillStyle = 'rgba(238, 184, 196, 0.90)'
+      } else if (targetIdx === 2) {
+        ctx.shadowBlur = 8
+        ctx.shadowColor = 'rgba(243, 212, 152, 0.8)'
+        ctx.fillStyle = 'rgba(253, 220, 140, 0.92)'
+      } else {
+        ctx.shadowBlur = 6
+        ctx.shadowColor = 'rgba(216, 138, 66, 0.7)'
+        ctx.fillStyle = 'rgba(228, 152, 76, 0.92)'
+      }
+
       // Render living seasonal particles with high visibility & soft glow
       particles.forEach((p) => {
         p.x += p.vx + Math.sin(now * 0.0012 + p.y * 0.008) * 0.4
@@ -117,34 +135,18 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
         ctx.globalAlpha = p.alpha
 
         if (targetIdx === 0) {
-          // WINTER: Gentle falling snowflakes with icy cold white halo
-          ctx.shadowBlur = 10
-          ctx.shadowColor = 'rgba(220, 238, 245, 0.95)'
-          ctx.fillStyle = 'rgba(240, 248, 255, 0.95)'
           ctx.beginPath()
           ctx.arc(0, 0, p.size * 0.65, 0, Math.PI * 2)
           ctx.fill()
         } else if (targetIdx === 1) {
-          // SPRING: Floating alpine flower petals with soft pink glow
-          ctx.shadowBlur = 8
-          ctx.shadowColor = 'rgba(232, 168, 184, 0.75)'
-          ctx.fillStyle = 'rgba(238, 184, 196, 0.90)'
           ctx.beginPath()
           ctx.ellipse(0, 0, p.size * 0.95, p.size * 0.5, 0, 0, Math.PI * 2)
           ctx.fill()
         } else if (targetIdx === 2) {
-          // SUMMER: Volumetric golden dust shimmering in sunlight
-          ctx.shadowBlur = 12
-          ctx.shadowColor = 'rgba(243, 212, 152, 0.95)'
-          ctx.fillStyle = 'rgba(253, 220, 140, 0.92)'
           ctx.beginPath()
           ctx.arc(0, 0, p.size * 0.75, 0, Math.PI * 2)
           ctx.fill()
         } else {
-          // AUTUMN: Falling rotating amber leaves with warm copper glow
-          ctx.shadowBlur = 8
-          ctx.shadowColor = 'rgba(216, 138, 66, 0.85)'
-          ctx.fillStyle = 'rgba(228, 152, 76, 0.92)'
           ctx.beginPath()
           ctx.moveTo(0, -p.size)
           ctx.quadraticCurveTo(p.size * 0.85, 0, 0, p.size)

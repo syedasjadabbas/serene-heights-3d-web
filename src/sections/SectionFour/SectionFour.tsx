@@ -2,12 +2,12 @@
  * Section: Residences
  * Assets: src/assets/residences/
  */
-import { useLayoutEffect, useRef } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
 import Button from '../../components/ui/Button'
-import ResortViewer from './ResortViewer'
+const ResortViewer = lazy(() => import('./ResortViewer'))
 import styles from './SectionFour.module.css'
 
 export default function SectionFour() {
@@ -50,7 +50,9 @@ export default function SectionFour() {
     <section ref={sectionRef} id="amenities" data-alias="architecture-3d" className={styles.section}>
       {/* 3D Scene Canvas Container */}
       <div className={styles.canvasContainer}>
-        <ResortViewer />
+        <Suspense fallback={null}>
+          <ResortViewer />
+        </Suspense>
       </div>
 
       {/* Dark Gradient Vignette Overlay for Readability */}

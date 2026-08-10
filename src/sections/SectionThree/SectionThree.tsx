@@ -2,11 +2,11 @@
  * Section: Masterplan
  * Assets: src/assets/masterplan/
  */
-import { useLayoutEffect, useRef } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
-import SectionThreeCanvas from './SectionThreeCanvas'
+const SectionThreeCanvas = lazy(() => import('./SectionThreeCanvas'))
 import styles from './SectionThree.module.css'
 
 interface EditorialStage {
@@ -235,7 +235,9 @@ export default function SectionThree() {
   return (
     <section ref={sectionRef} id="lifestyle" data-alias="experience" className={styles.section}>
       {/* 3D Exhibition Canvas Stage */}
-      <SectionThreeCanvas />
+      <Suspense fallback={null}>
+        <SectionThreeCanvas />
+      </Suspense>
 
       {/* Background Architectural Construction Grid & Ambient Mesh */}
       <div className={styles.blueprintBgGrid} aria-hidden="true" />

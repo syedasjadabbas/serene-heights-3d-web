@@ -150,8 +150,6 @@ export default function HeroV2() {
   const vwRef = useRef(typeof window !== 'undefined' ? window.innerWidth : 1440)
   const vhRef = useRef(typeof window !== 'undefined' ? window.innerHeight : 900)
 
-  const videoStarted = useRef(false)
-
   useLayoutEffect(() => {
     registerScrollTrigger()
 
@@ -357,12 +355,6 @@ export default function HeroV2() {
         // Throughout Hero & Hero appreciation hold: Navbar is strictly 0% opacity
         if (p < 1.0) {
           setNavVisibilityProgress(0)
-        }
-
-        // ── Video pre-start ───────────────────────────────────────
-        if (p > 0.65 && !videoStarted.current && videoRef.current) {
-          videoRef.current.play().catch(() => {})
-          videoStarted.current = true
         }
       },
     })

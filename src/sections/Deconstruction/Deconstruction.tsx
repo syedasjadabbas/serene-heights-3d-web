@@ -93,9 +93,11 @@ export default function Deconstruction() {
       pointerEvents: 'none',
     })
 
-    const ONE_FRAME_SEC = 1 / 24
+    const ONE_FRAME_SEC = 1 / 30
+    let lastSetTime = -1
+    let isLoopRunning = false
 
-    const updateVideoTimeLoop = () => {
+    const updateVideoTime = () => {
       const v = videoRef.current
       if (
         v &&
@@ -106,19 +108,33 @@ export default function Deconstruction() {
       ) {
         const targetTime = pendingProgress.current * VIDEO_PROGRESS_CAP * v.duration
         const diff = Math.abs(v.currentTime - targetTime)
-        if (!v.seeking && diff >= ONE_FRAME_SEC) {
+        if (!v.seeking && diff >= ONE_FRAME_SEC && Math.abs(lastSetTime - targetTime) >= ONE_FRAME_SEC / 2) {
           v.currentTime = targetTime
+          lastSetTime = targetTime
+        }
+        if (diff >= ONE_FRAME_SEC) {
+          rafIdRef.current = requestAnimationFrame(updateVideoTime)
+          return
         }
       }
-      rafIdRef.current = requestAnimationFrame(updateVideoTimeLoop)
+      isLoopRunning = false
     }
 
-    rafIdRef.current = requestAnimationFrame(updateVideoTimeLoop)
+    const requestVideoUpdate = () => {
+      if (!isLoopRunning) {
+        isLoopRunning = true
+        rafIdRef.current = requestAnimationFrame(updateVideoTime)
+      }
+    }
+
+    requestVideoUpdate()
 
     const onMetadata = () => {
       const v = videoRef.current
       if (v && v.readyState >= 1 && v.duration && !isNaN(v.duration) && isFinite(v.duration)) {
-        v.currentTime = pendingProgress.current * VIDEO_PROGRESS_CAP * v.duration
+        const targetTime = pendingProgress.current * VIDEO_PROGRESS_CAP * v.duration
+        v.currentTime = targetTime
+        lastSetTime = targetTime
       }
     }
 
@@ -140,6 +156,7 @@ export default function Deconstruction() {
       onUpdate: (self) => {
         const videoP = self.progress
         pendingProgress.current = videoP
+        requestVideoUpdate()
 
         const currentScroll = window.scrollY
         const hEnd = heroEndPx()

@@ -2,11 +2,11 @@
  * Section: Interiors
  * Assets: src/assets/interiors/
  */
-import { useLayoutEffect, useRef } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
-import SectionSixCanvas from './SectionSixCanvas'
+const SectionSixCanvas = lazy(() => import('./SectionSixCanvas'))
 import styles from './SectionSix.module.css'
 
 interface ExhibitionCard {
@@ -269,7 +269,9 @@ export default function SectionSix() {
   return (
     <section ref={sectionRef} id="smart-unit" data-alias="smart-unit" className={styles.section}>
       {/* 3D Exhibition Canvas Stage */}
-      <SectionSixCanvas />
+      <Suspense fallback={null}>
+        <SectionSixCanvas />
+      </Suspense>
 
       {/* Background Architectural Grid & Ambient Backdrop */}
       <div className={styles.blueprintBgGrid} aria-hidden="true" />
