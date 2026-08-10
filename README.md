@@ -2,6 +2,14 @@
 
 # SERENE HEIGHTS
 
+<p align="center">
+  <img src="docs/screenshots/screenshot-1.png" alt="Serene Heights screenshot 1" width="49%">
+  <img src="docs/screenshots/screenshot-2.png" alt="Serene Heights screenshot 2" width="49%">
+  <br>
+  <img src="docs/screenshots/screenshot-3.png" alt="Serene Heights screenshot 3" width="49%">
+  <img src="docs/screenshots/screenshot-4.png" alt="Serene Heights screenshot 4" width="49%">
+</p>
+
 ### A Cinematic 3D Luxury Hospitality Experience
 
 <p>
@@ -36,14 +44,6 @@
 </div>
 
 <br>
-
-<p align="center">
-  <img src="docs/screenshots/hero.webp" alt="Serene Heights cinematic hero" width="100%">
-</p>
-
-<p align="center">
-  <sub>Serene Heights · Cinematic Hero Experience</sub>
-</p>
 
 ---
 
@@ -83,10 +83,6 @@ Architecture remains the visual focus.
 ---
 
 # Cinematic Journey
-
-<p align="center">
-  <img src="docs/gifs/full-experience.gif" alt="Serene Heights full cinematic experience" width="100%">
-</p>
 
 The experience progresses as one continuous visual timeline:
 
@@ -133,10 +129,6 @@ The goal is to make the entire page feel like one continuous scene.
 
 # 01 · Cinematic Hero
 
-<p align="center">
-  <img src="docs/screenshots/hero.webp" alt="Serene Heights Hero" width="100%">
-</p>
-
 The Hero is the primary cinematic entry point.
 
 ### Hero sequence
@@ -180,10 +172,6 @@ The Hero combines:
 
 # 02 · Hero Deconstruction
 
-<p align="center">
-  <img src="docs/gifs/hero-deconstruction.gif" alt="Hero deconstruction animation" width="90%">
-</p>
-
 The Hero-to-Section-2 transition uses a scroll-controlled cinematic sequence.
 
 Instead of treating the video as a normal background video, the implementation maps scroll progress to the cinematic sequence.
@@ -218,10 +206,6 @@ The architecture is designed to avoid unnecessary video seeking during rapid scr
 
 # 03 · Ownership / Investment
 
-<p align="center">
-  <img src="docs/screenshots/section-2.webp" alt="Serene Heights ownership and investment section" width="100%">
-</p>
-
 The second section continues directly from the Hero's final architectural state.
 
 The design focuses on:
@@ -241,10 +225,6 @@ Content supports the environment instead of covering it.
 ---
 
 # 04 · Masterplan
-
-<p align="center">
-  <img src="docs/screenshots/section-3.webp" alt="Serene Heights masterplan" width="100%">
-</p>
 
 The Masterplan transforms architectural information into a scroll-driven journey.
 
@@ -279,10 +259,6 @@ Supporting content introduces:
 
 # 05 · 3D Sanctuary
 
-<p align="center">
-  <img src="docs/gifs/3d-sanctuary.gif" alt="Serene Heights 3D sanctuary experience" width="90%">
-</p>
-
 The Sanctuary experience introduces genuine interactive 3D.
 
 ### Technology
@@ -302,10 +278,6 @@ The viewer becomes one of the major visual moments of the website.
 
 # 06 · Amenities & Investment
 
-<p align="center">
-  <img src="docs/screenshots/section-5.webp" alt="Serene Heights amenities and investment" width="100%">
-</p>
-
 A cinematic presentation of the property's amenities and investment proposition.
 
 The composition uses:
@@ -320,10 +292,6 @@ The composition uses:
 ---
 
 # 07 · Architectural Horizontal Gallery
-
-<p align="center">
-  <img src="docs/gifs/horizontal-gallery.gif" alt="Serene Heights horizontal architectural gallery" width="90%">
-</p>
 
 Vertical scrolling controls horizontal movement.
 
@@ -345,10 +313,6 @@ Each image receives independent movement to create depth inside the gallery.
 
 # 08 · Interactive 3D Stage
 
-<p align="center">
-  <img src="docs/gifs/interactive-stage.gif" alt="Serene Heights interactive 3D stage" width="90%">
-</p>
-
 The Interactive 3D Stage combines:
 
 * WebGL
@@ -364,10 +328,6 @@ The section is also one of the heavier runtime areas, so rendering is controlled
 ---
 
 # 09 · Four Seasons
-
-<p align="center">
-  <img src="docs/screenshots/four-seasons.webp" alt="Serene Heights four seasons experience" width="100%">
-</p>
 
 The Four-Season experience introduces environmental storytelling.
 
@@ -387,10 +347,6 @@ The visual identity remains consistent while the atmosphere changes.
 
 # 10 · Curated Architectural Gallery
 
-<p align="center">
-  <img src="docs/screenshots/gallery.webp" alt="Serene Heights architectural gallery" width="100%">
-</p>
-
 The gallery uses an exhibition-style composition rather than a conventional image grid.
 
 Interactions include:
@@ -407,10 +363,6 @@ The goal is to present the property like a curated architectural collection.
 ---
 
 # 11 · Final Cinematic CTA
-
-<p align="center">
-  <img src="docs/screenshots/footer.webp" alt="Serene Heights final cinematic CTA" width="100%">
-</p>
 
 The experience concludes with a fullscreen mountain scene.
 
@@ -761,39 +713,6 @@ serene-heights-3d-web/
 
 </div>
 
----
-
-# Development
-
-### Clone
-
-```bash
-git clone https://github.com/syedasjadabbas/serene-heights-3d-web.git
-cd serene-heights-3d-web
-```
-
-### Install
-
-```bash
-npm install
-```
-
-### Development server
-
-```bash
-npm run dev
-```
-
-### Production build
-
-```bash
-npm run build
-```
-
-### TypeScript validation
-
-```bash
-npx tsc --noEmit
 ```
 
 ---
@@ -823,34 +742,6 @@ Visual Regression Check
 ```
 
 Performance improvements are accepted only when the experience itself improves.
-
----
-
-# Design References
-
-The project takes structural inspiration from premium interactive web experiences.
-
-### PRYPCO
-
-[PRYPCO](https://prypco.com/?utm_source=chatgpt.com)
-
-PRYPCO is used as a reference for selected section structures, spatial composition, card movement, scroll choreography, pinning, spacing, and transitions.
-
-Its branding and proprietary content are not used as Serene Heights branding.
-
-### Additional Cinematic References
-
-Additional references influence:
-
-* Editorial typography
-* Spatial depth
-* Architectural card treatment
-* Image movement
-* Z-space transitions
-* Motion quality
-* Luxury presentation
-
-The final visual system remains specific to Serene Heights.
 
 ---
 
