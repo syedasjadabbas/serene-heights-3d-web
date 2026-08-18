@@ -39,11 +39,11 @@
 
 <br>
 <p align="center">
-  <img src="docs/screenshots/screenshot-1.png" alt="Serene Heights screenshot 1" width="49%">
-  <img src="docs/screenshots/screenshot-2.png" alt="Serene Heights screenshot 2" width="49%">
+  <img src="docs/screenshots/screenshot-1.webp" alt="Serene Heights screenshot 1" width="49%">
+  <img src="docs/screenshots/screenshot-2.webp" alt="Serene Heights screenshot 2" width="49%">
   <br>
-  <img src="docs/screenshots/screenshot-3.png" alt="Serene Heights screenshot 3" width="49%">
-  <img src="docs/screenshots/screenshot-4.png" alt="Serene Heights screenshot 4" width="49%">
+  <img src="docs/screenshots/screenshot-3.webp" alt="Serene Heights screenshot 3" width="49%">
+  <img src="docs/screenshots/screenshot-4.webp" alt="Serene Heights screenshot 4" width="49%">
 </p>
 
 ---
