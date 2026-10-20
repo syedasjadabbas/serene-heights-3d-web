@@ -17,7 +17,7 @@ source of truth for the *information*.
 > cards, tokenization/mortgage-partner sections). An earlier version of this
 > file was NOT PRYPCO — it showed a different site, "FIND Real Estate" — and
 > the Hero's scroll-driven camera push + outline-wordmark choreography was
-> tuned against that wrong file (see `Hero.tsx` comments).
+> tuned against that wrong file (see the comments in `src/sections/Hero/`).
 >
 > **The Hero is locked regardless of that mix-up.** It was already analyzed
 > and implemented from the earlier PRYPCO Hero reference and is out of scope
@@ -72,21 +72,41 @@ and branding should read as Serene Heights.
 
 ## Hero section — LOCKED
 
-The Hero follows the PRYPCO Hero reference: one photograph, scroll-driven
-camera push via a single ScrollTrigger `onUpdate` → `gsap.set()` transform
-(see `src/sections/Hero/Hero.tsx` for the implementation notes on why
-`gsap.set()` is used directly instead of a timeline or `quickSetter`).
+The live Hero is **`src/sections/Hero/HeroV2.tsx`** (mounted in `App.tsx`).
+Its architecture, documented in the file header:
+
+- One pinned section, one ScrollTrigger, one `onUpdate` that drives every
+  animated property with `gsap.set()` as a pure function of scroll
+  progress `p`. No timelines, tickers, canvas, or extra render loops.
+- One fullscreen world photograph (`src/assets/hero/hero-main.webp`) behind
+  a deep-green cover layer.
+- The gold capsule/mountain logo outline is a viewport aperture (SVG
+  `clipPath` `#heroPortalClip`). The camera dollies through it, the outline
+  leaves the screen, and the same photograph is revealed full-bleed — never
+  swapped or crossfaded for another image.
+- After the reveal comes a slow optical push (`translateZ` under CSS
+  perspective) and staged editorial typography, then a `HERO_HOLD_PX`
+  appreciation hold before the pin releases.
+
+The Hero hands off to **`src/sections/Deconstruction/Deconstruction.tsx`**,
+which is part of the same locked sequence: a fixed, zero-height global
+background that crossfades from the Hero photo into
+`serene-heights-v2-scrub.mp4` and scrubs it across the rest of the page.
+The two share state via `components/stage/masterVisualStageState.ts`
+(typography opacity, navbar visibility), and Deconstruction imports
+`HERO_HOLD_PX` from HeroV2 — change them together or not at all.
 
 Do NOT bring back into the Hero:
 - multi-image slideshow
 - `HeroPhotography` sequence
-- the "V2" deconstruction sequence
-- the R3F placeholder
-- masks
+- the frame-by-frame `DeconstructionSequence` / `deconstructionFrames.ts`
+- the R3F placeholder (`src/three/HeroScene.tsx`, `HeroModel.tsx`)
 
-`HeroPhotography.tsx`, `heroPhotos.ts`, and `deconstructionFrames.ts` ("V2")
-are kept in the repo but unused — they may only be reintroduced later if a
-*different, later* PRYPCO section has an interaction they naturally fit.
+`Hero.tsx` (the earlier single-photo camera-push Hero) is kept as a backup
+but is not mounted. `HeroPhotography.tsx`, `heroPhotos.ts`,
+`DeconstructionSequence.tsx`, and `deconstructionFrames.ts` are also kept
+but unused — they may only be reintroduced later if a *different, later*
+PRYPCO section has an interaction they naturally fit.
 
 ## Building future sections
 

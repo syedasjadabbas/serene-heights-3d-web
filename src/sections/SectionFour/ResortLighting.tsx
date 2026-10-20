@@ -1,4 +1,4 @@
-import { Environment, ContactShadows } from '@react-three/drei'
+import { Environment, ContactShadows, Lightformer } from '@react-three/drei'
 
 export default function ResortLighting() {
   return (
@@ -11,15 +11,6 @@ export default function ResortLighting() {
         position={[14, 22, 12]}
         intensity={2.2}
         color="#fef3d6"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-far={40}
-        shadow-camera-left={-15}
-        shadow-camera-right={15}
-        shadow-camera-top={15}
-        shadow-camera-bottom={-15}
-        shadow-bias={-0.0001}
       />
 
       {/* Secondary Fill Light (Cool Alpine Sky Diffuse) */}
@@ -36,8 +27,14 @@ export default function ResortLighting() {
         color="#e6c687"
       />
 
-      {/* HDRI Environment Preset Shading */}
-      <Environment preset="city" environmentIntensity={0.65} />
+      {/* Locally generated studio environment: no HDR download from a
+          third-party CDN, so the viewer works offline and can't fail on fetch */}
+      <Environment resolution={256} environmentIntensity={0.65}>
+        <Lightformer form="rect" intensity={2} color="#fef3d6" position={[0, 10, 0]} rotation-x={Math.PI / 2} scale={[20, 20, 1]} />
+        <Lightformer form="rect" intensity={1.2} color="#e6c687" position={[10, 3, 4]} rotation-y={-Math.PI / 2} scale={[10, 6, 1]} />
+        <Lightformer form="rect" intensity={0.8} color="#9eb6d4" position={[-10, 3, -4]} rotation-y={Math.PI / 2} scale={[10, 6, 1]} />
+        <Lightformer form="ring" intensity={0.6} color="#ffffff" position={[0, 2, -12]} scale={6} />
+      </Environment>
 
       {/* Floor Soft Contact Shadows */}
       <ContactShadows

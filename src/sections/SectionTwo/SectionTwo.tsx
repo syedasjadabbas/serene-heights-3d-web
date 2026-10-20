@@ -56,9 +56,9 @@ const CTA_TONE_CLASS = {
   mist: styles.ctaMist,
 } as const
 
-function CardCta({ href, tone }: { href: string; tone: keyof typeof CTA_TONE_CLASS }) {
+function CardCta({ href, tone, label }: { href: string; tone: keyof typeof CTA_TONE_CLASS; label: string }) {
   return (
-    <a href={href} className={`${styles.cta} ${CTA_TONE_CLASS[tone]}`} aria-label="Learn more">
+    <a href={href} className={`${styles.cta} ${CTA_TONE_CLASS[tone]}`} aria-label={label}>
       <IconArrow />
     </a>
   )
@@ -114,18 +114,18 @@ function IconPark() {
 }
 
 const RESIDENCE_FACTS: Array<{ icon: ReactNode; headline: string; caption: string }> = [
-  { icon: <IconBuilding />, headline: '150+ Hotel Apartments', caption: 'Across 3 signature alpine towers' },
-  { icon: <IconBalcony />, headline: 'Mountain-Facing Balconies', caption: '180° pristine pine forest vistas' },
-  { icon: <IconConcierge />, headline: '24/7 Concierge Services', caption: 'Turnkey DM Consortium management' },
-  { icon: <IconShield />, headline: 'Zero Owner Maintenance', caption: 'No operational fees or owner hassle' },
-  { icon: <IconLocation />, headline: '7,906 ft Altitude Location', caption: 'Set in pristine Nathia Gali pine forests' },
-  { icon: <IconPark />, headline: 'All-Weather Valet Parking', caption: 'Heavy snow-resistant covered basement parking' },
+  { icon: <IconBuilding />, headline: '150+ Hotel Apartments', caption: 'Across 3 towers on 30+ kanals' },
+  { icon: <IconBalcony />, headline: 'Fully Furnished Suites', caption: '1, 2 and 3 bedroom hotel apartments' },
+  { icon: <IconConcierge />, headline: '24/7 Concierge Services', caption: 'Apartments managed by DM Consortium' },
+  { icon: <IconShield />, headline: 'Zero Owner Maintenance', caption: 'Zero maintenance fees for owners' },
+  { icon: <IconLocation />, headline: '7,906 ft Altitude Location', caption: 'Kala Bagh Air Base Road, Nathia Gali' },
+  { icon: <IconPark />, headline: 'Climate-Controlled Parking', caption: 'A dedicated parking floor within the resort' },
 ]
 
 const PAYMENT_FACTS: Array<{ value: string; label: string; tone: string; rotate: number }> = [
-  { value: 'PKR 37,000', label: 'Per sq ft base valuation', tone: styles.paymentCardA, rotate: -6 },
-  { value: '30%', label: 'Booking initial allocation', tone: styles.paymentCardB, rotate: 4 },
-  { value: '36 Months', label: '0% Interest installment timeline', tone: styles.paymentCardC, rotate: -3 },
+  { value: 'PKR 40,000', label: 'Per sq ft apartment price', tone: styles.paymentCardA, rotate: -6 },
+  { value: '30%', label: 'Minimum booking amount', tone: styles.paymentCardB, rotate: 4 },
+  { value: '36 Months', label: 'Monthly installment plan', tone: styles.paymentCardC, rotate: -3 },
 ]
 
 export default function SectionTwo() {
@@ -259,7 +259,7 @@ export default function SectionTwo() {
             or start with a <span className={styles.statementAccent}>share of it.</span>
           </h2>
           <p ref={subcopyRef} className={styles.subcopy}>
-            Flexible investment structures tailored for Pakistan’s premier winter resort, backed by complete hospitality management.
+            Flexible ownership structures at Pakistan’s #1 Winter Resort, with rentals, maintenance and returns managed by DM Consortium.
           </p>
         </div>
 
@@ -291,7 +291,7 @@ export default function SectionTwo() {
                 </div>
               ))}
             </div>
-            <CardCta href="#floor-plans" tone="gold" />
+            <CardCta href="#floor-plans" tone="gold" label="Learn more about the luxury apartments" />
           </div>
 
           {/* Payment Plan Column */}
@@ -308,7 +308,7 @@ export default function SectionTwo() {
             </div>
             <h3 className={`${styles.heading} ${styles.headingSage}`}>Payment Plan</h3>
             <p className={styles.description}>
-              A straightforward path to ownership: PKR 37,000 per sq ft, booking from 30%, and 36 monthly installments.
+              A straightforward path to ownership: PKR 40,000 per sq ft, booking from 30%, and 36 monthly installments.
             </p>
             <div className={styles.paymentFan}>
               {PAYMENT_FACTS.map((fact) => (
@@ -327,23 +327,23 @@ export default function SectionTwo() {
             <div className={styles.editorialSpecList}>
               <div className={styles.editorialSpecRow}>
                 <span className={styles.editorialSpecLabel}>Construction</span>
-                <span className={styles.editorialSpecVal}>On Schedule · 36 Months</span>
+                <span className={styles.editorialSpecVal}>Progress Update · Apr 2026</span>
               </div>
               <div className={styles.editorialSpecRow}>
                 <span className={styles.editorialSpecLabel}>Inventory</span>
-                <span className={styles.editorialSpecVal}>Towers A, B & C Release</span>
+                <span className={styles.editorialSpecVal}>150+ Apartments · 3 Towers</span>
               </div>
               <div className={styles.editorialSpecRow}>
-                <span className={styles.editorialSpecLabel}>Facade Glass</span>
-                <span className={styles.editorialSpecVal}>Triple-Glazed Thermal</span>
+                <span className={styles.editorialSpecLabel}>Windows</span>
+                <span className={styles.editorialSpecVal}>Double-Glazed UPVC</span>
               </div>
               <div className={styles.editorialSpecRow}>
-                <span className={styles.editorialSpecLabel}>Yield Target</span>
-                <span className={styles.editorialSpecVal}>13–15% Annual ROI</span>
+                <span className={styles.editorialSpecLabel}>Rental Income</span>
+                <span className={styles.editorialSpecVal}>PKR 80K–120K / Month</span>
               </div>
             </div>
 
-            <CardCta href="#payment-plan" tone="sage" />
+            <CardCta href="#payment-plan" tone="sage" label="Learn more about the payment plan" />
           </div>
 
           {/* Smart Property Unit Column */}
@@ -354,9 +354,9 @@ export default function SectionTwo() {
             onMouseLeave={handleMouseLeave}
           >
             <div className={styles.slabLight} aria-hidden="true" />
-            <span className={styles.slabWatermark}>SPEC 03 · FRACTIONAL</span>
+            <span className={styles.slabWatermark}>SPEC 03 · CO-OWNERSHIP</span>
             <div className={styles.columnTagWrap}>
-              <span className={`${styles.columnTag} ${styles.tagMist}`}>FRACTIONAL</span>
+              <span className={`${styles.columnTag} ${styles.tagMist}`}>CO-OWNERSHIP</span>
             </div>
             <h3 className={`${styles.heading} ${styles.headingMist}`}>Smart Property Unit</h3>
             <p className={styles.description}>
@@ -387,8 +387,8 @@ export default function SectionTwo() {
                     <span>PKR 43,750/mo</span>
                   </div>
                   <div className={styles.unitStatRow}>
-                    <span>Projected rental income</span>
-                    <span>~PKR 300,000/yr</span>
+                    <span>Expected rental income</span>
+                    <span>PKR 300,000/yr</span>
                   </div>
                   <div className={styles.unitStatRow}>
                     <span>Annual capital gain*</span>
@@ -405,12 +405,12 @@ export default function SectionTwo() {
             {/* Enriched Supporting Information Chips */}
             <div className={styles.editorialSpecList}>
               <div className={styles.editorialSpecRow}>
-                <span className={styles.editorialSpecLabel}>Approval</span>
-                <span className={styles.editorialSpecVal}>GDA Approved</span>
+                <span className={styles.editorialSpecLabel}>Protection</span>
+                <span className={styles.editorialSpecVal}>Legal Agreements</span>
               </div>
               <div className={styles.editorialSpecRow}>
                 <span className={styles.editorialSpecLabel}>Ownership</span>
-                <span className={styles.editorialSpecVal}>100% Freehold Title</span>
+                <span className={styles.editorialSpecVal}>Fixed 50 sq ft Units</span>
               </div>
               <div className={styles.editorialSpecRow}>
                 <span className={styles.editorialSpecLabel}>Operator</span>
@@ -423,7 +423,7 @@ export default function SectionTwo() {
             </div>
 
             <p className={styles.disclaimer}>*Projected figures provided by developer, not guaranteed returns.</p>
-            <CardCta href="#smart-unit" tone="mist" />
+            <CardCta href="#smart-unit" tone="mist" label="Learn more about Smart Property Units" />
           </div>
         </div>
       </div>

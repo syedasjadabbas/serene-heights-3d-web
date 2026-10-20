@@ -1,17 +1,21 @@
-import { useEffect, useRef } from 'react'
-import { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
+import { useEffect, useState } from 'react'
 import { OrbitControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { CAMERA_CONFIG } from './config'
 
 export default function ResortCameraControls() {
-  const controlsRef = useRef<OrbitControlsImpl>(null)
   const { camera } = useThree()
+  const [finePointer] = useState(() => window.matchMedia('(hover: hover) and (pointer: fine)').matches)
 
-  // Adjust camera distance responsively on screen resize
+  // Frame the model per breakpoint. Only re-frames when the breakpoint
+  // actually changes, so mobile URL-bar resizes don't wipe the user's view.
   useEffect(() => {
+    let lastBucket = ''
     const handleResize = () => {
       const w = window.innerWidth
+      const bucket = w < 768 ? 'mobile' : w < 1024 ? 'tablet' : 'desktop'
+      if (bucket === lastBucket) return
+      lastBucket = bucket
       if (w < 768) {
         // Mobile view: Move camera further back to frame model
         camera.position.set(0, 6, 20)
@@ -32,7 +36,6 @@ export default function ResortCameraControls() {
 
   return (
     <OrbitControls
-      ref={controlsRef}
       enableDamping
       dampingFactor={CAMERA_CONFIG.dampingFactor}
       minDistance={CAMERA_CONFIG.minDistance}
@@ -40,6 +43,11 @@ export default function ResortCameraControls() {
       minPolarAngle={CAMERA_CONFIG.minPolarAngle}
       maxPolarAngle={CAMERA_CONFIG.maxPolarAngle}
       target={CAMERA_CONFIG.defaultTarget}
+      // The wheel keeps scrolling the page; drag orbits. On touch screens a
+      // one-finger drag must scroll the page, so orbiting is mouse/trackpad only.
+      enableZoom={false}
+      enablePan={false}
+      enabled={finePointer}
       makeDefault
     />
   )

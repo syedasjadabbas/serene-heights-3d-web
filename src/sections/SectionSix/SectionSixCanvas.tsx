@@ -91,7 +91,7 @@ function FloatingGoldParticles() {
 }
 
 export default function SectionSixCanvas() {
-  const { containerRef, isVisible } = useCanvasVisibility()
+  const { containerRef, isVisible, shouldMount } = useCanvasVisibility()
 
   return (
     <div
@@ -104,20 +104,22 @@ export default function SectionSixCanvas() {
         overflow: 'hidden',
       }}
     >
-      <Canvas
-        camera={{ position: [0, 0, 9], fov: 45 }}
-        gl={{ alpha: true, antialias: true }}
-        dpr={[1, 1.5]}
-        frameloop={isVisible ? 'always' : 'never'}
-      >
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 8, 5]} intensity={0.6} color="#f3d498" />
+      {shouldMount && (
+        <Canvas
+          camera={{ position: [0, 0, 9], fov: 45 }}
+          gl={{ alpha: true, antialias: true }}
+          dpr={[1, 1.5]}
+          frameloop={isVisible ? 'always' : 'never'}
+        >
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[5, 8, 5]} intensity={0.6} color="#f3d498" />
 
-        <FloatingGalleryWireframes />
-        <FloatingGoldParticles />
+          <FloatingGalleryWireframes />
+          <FloatingGoldParticles />
 
-        <fog attach="fog" args={['#0a1410', 6, 22]} />
-      </Canvas>
+          <fog attach="fog" args={['#0a1410', 6, 22]} />
+        </Canvas>
+      )}
     </div>
   )
 }

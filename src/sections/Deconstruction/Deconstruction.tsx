@@ -5,6 +5,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
+import { scrollToId } from '../../motion/lenis'
 import { getHeroTypographyOpacity, setNavVisibilityProgress } from '../../components/stage/masterVisualStageState'
 import { HERO_HOLD_PX } from '../Hero/HeroV2'
 import heroImageSrc from '../../assets/hero/hero-main.webp'
@@ -47,6 +48,14 @@ import styles from './Deconstruction.module.css'
  */
 
 const VIDEO_SRC = '/media/serene-heights/hero/deconstruction/serene-heights-v2-scrub.mp4'
+// Same 192 all-keyframe frames at 1280×720 (~12 MB instead of ~36 MB) for
+// phones, small tablets and data-saver connections.
+const VIDEO_SRC_SMALL = '/media/serene-heights/hero/deconstruction/serene-heights-v2-scrub-720.mp4'
+
+function pickVideoSrc(): string {
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData
+  return saveData || window.matchMedia('(max-width: 900px)').matches ? VIDEO_SRC_SMALL : VIDEO_SRC
+}
 
 // How far into its own timeline the video is ever allowed to play, even at
 // the footer — leaves ~13% of the clip (and so ~13% of the structure)
@@ -138,9 +147,40 @@ export default function Deconstruction() {
       }
     }
 
+    // Last crossfade target from onUpdate — re-applied once the video has a
+    // decoded frame, so the anchor photo never dissolves into an empty video.
+    let lastCrossfade = 0
+    const applyCrossfade = (crossfade: number) => {
+      lastCrossfade = crossfade
+      const v = videoRef.current
+      const shown = v && v.readyState >= 2 ? crossfade : 0
+      gsap.set(anchorRef.current, {
+        opacity: 1 - shown,
+        scale: 1 + (ANCHOR_PUSH_SCALE - 1) * crossfade,
+      })
+      gsap.set(videoRef.current, { opacity: shown })
+    }
+    const onFrameReady = () => {
+      onMetadata()
+      applyCrossfade(lastCrossfade)
+    }
+
     video?.addEventListener('loadedmetadata', onMetadata)
-    video?.addEventListener('loadeddata', onMetadata)
-    video?.load()
+    video?.addEventListener('loadeddata', onFrameReady)
+
+    // The video only appears after the Hero's full pinned runway, so don't
+    // spend bandwidth on it during first paint: start the download on the
+    // visitor's first scroll (or straight away if the page opens scrolled).
+    let loadStarted = false
+    const startLoading = () => {
+      if (loadStarted || !video) return
+      loadStarted = true
+      window.removeEventListener('scroll', startLoading)
+      video.src = pickVideoSrc()
+      video.load()
+    }
+    if (window.scrollY > 0) startLoading()
+    else window.addEventListener('scroll', startLoading, { passive: true })
 
     const heroEndPx = () => {
       const heroEl = document.getElementById('top')
@@ -165,12 +205,8 @@ export default function Deconstruction() {
         const localP = Math.min(1, scrollPastHero / localSpanPx)
 
         // Hero image -> video dissolve, right at the handoff
-        const crossfade = Math.min(1, localP / CROSSFADE_LOCAL_P)
-        gsap.set(anchorRef.current, {
-          opacity: 1 - crossfade,
-          scale: 1 + (ANCHOR_PUSH_SCALE - 1) * crossfade,
-        })
-        gsap.set(videoRef.current, { opacity: crossfade })
+        if (localP > 0) startLoading()
+        applyCrossfade(Math.min(1, localP / CROSSFADE_LOCAL_P))
 
         // ── Navbar reveal
         const navReveal = Math.min(1, localP / 0.25)
@@ -189,8 +225,9 @@ export default function Deconstruction() {
     return () => {
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
       st.kill()
+      window.removeEventListener('scroll', startLoading)
       video?.removeEventListener('loadedmetadata', onMetadata)
-      video?.removeEventListener('loadeddata', onMetadata)
+      video?.removeEventListener('loadeddata', onFrameReady)
     }
   }, [])
 
@@ -211,9 +248,7 @@ export default function Deconstruction() {
           playsInline
           preload="auto"
           aria-hidden="true"
-        >
-          <source src={VIDEO_SRC} type="video/mp4" />
-        </video>
+        />
       </div>
 
       {/* Static typography — identical markup/classes to HeroV2's resting
@@ -232,7 +267,7 @@ export default function Deconstruction() {
             href="#about"
             onClick={(e) => {
               e.preventDefault()
-              document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
+              scrollToId('about')
             }}
             className={heroStyles.heroCtaGroup}
             style={{ cursor: 'pointer', textDecoration: 'none' }}

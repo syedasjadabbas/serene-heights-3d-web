@@ -2,13 +2,20 @@ import { useEffect, useState } from 'react'
 import { useProgress } from '@react-three/drei'
 import styles from './ResortLoader.module.css'
 
-export default function ResortLoader() {
+interface ResortLoaderProps {
+  /** The <Canvas> has been created (its first frame is ready to show). */
+  canvasReady: boolean
+}
+
+export default function ResortLoader({ canvasReady }: ResortLoaderProps) {
   const { active, progress } = useProgress()
   const [shouldRender, setShouldRender] = useState(true)
   const [fadingOut, setFadingOut] = useState(false)
 
   useEffect(() => {
-    if (!active && progress >= 100) {
+    // Done once the canvas exists and no asset is mid-download. Checking
+    // progress >= 100 alone never fires when the scene has nothing to fetch.
+    if (canvasReady && !active) {
       setFadingOut(true)
       const timer = setTimeout(() => {
         setShouldRender(false)
@@ -18,7 +25,7 @@ export default function ResortLoader() {
       setShouldRender(true)
       setFadingOut(false)
     }
-  }, [active, progress])
+  }, [active, canvasReady])
 
   if (!shouldRender) return null
 

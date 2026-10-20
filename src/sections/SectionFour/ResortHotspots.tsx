@@ -13,17 +13,27 @@ export default function ResortHotspots() {
         return (
           <group key={hotspot.id} position={hotspot.position}>
             <Html center distanceFactor={14} zIndexRange={[100, 0]}>
-              <div
+              <button
+                type="button"
+                aria-label={`${hotspot.title}: ${hotspot.subtitle}`}
+                aria-expanded={isActive}
                 style={{
                   position: 'relative',
                   display: 'flex',
                   alignItems: 'center',
                   cursor: 'pointer',
                   userSelect: 'none',
+                  padding: 0,
+                  border: 0,
+                  background: 'none',
+                  font: 'inherit',
+                  pointerEvents: 'auto',
                 }}
                 onClick={() => setActiveHotspot(isActive ? null : hotspot.id)}
                 onMouseEnter={() => setActiveHotspot(hotspot.id)}
                 onMouseLeave={() => setActiveHotspot(null)}
+                onFocus={() => setActiveHotspot(hotspot.id)}
+                onBlur={() => setActiveHotspot(null)}
               >
                 {/* Pulse Point Marker */}
                 <div
@@ -54,6 +64,7 @@ export default function ResortHotspots() {
                 {/* Hotspot Popover Tooltip */}
                 {isActive && (
                   <div
+                    aria-hidden="true"
                     style={{
                       position: 'absolute',
                       left: '32px',
@@ -92,7 +103,7 @@ export default function ResortHotspots() {
                     </div>
                   </div>
                 )}
-              </div>
+              </button>
             </Html>
           </group>
         )

@@ -1,4 +1,4 @@
-import { Component, useRef, useMemo, useEffect } from 'react'
+import { Component, useRef, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
@@ -98,21 +98,8 @@ function ResortGLBModel({ url }: { url: string }) {
   const gltf = useGLTF(url)
   const clonedScene = useMemo(() => gltf.scene.clone(), [gltf])
 
-  useEffect(() => {
-    return () => {
-      // Clean resource disposal on unmount
-      clonedScene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh) {
-          obj.geometry.dispose()
-          if (Array.isArray(obj.material)) {
-            obj.material.forEach((mat) => mat.dispose())
-          } else {
-            obj.material.dispose()
-          }
-        }
-      })
-    }
-  }, [clonedScene])
+  // No manual dispose: scene.clone() shares geometries/materials with drei's
+  // cached gltf, so disposing them here would break the cache on remount.
 
   return <primitive object={clonedScene} position={[0, -1, 0]} />
 }

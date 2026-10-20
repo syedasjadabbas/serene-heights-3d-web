@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
+import { scrollToId, scrollToTarget, startScroll, stopScroll } from '../../motion/lenis'
 import {
   getNavVisibilityProgress,
   subscribeNavVisibilityProgress,
@@ -30,6 +31,7 @@ export default function Navigation() {
   const navRef = useRef<HTMLElement>(null)
   const barRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [activeSectionId, setActiveSectionId] = useState<string>('about')
 
@@ -112,14 +114,26 @@ export default function Navigation() {
       setActiveSectionId(currentActive)
     }
 
-    window.addEventListener('scroll', checkActiveSection, { passive: true })
+    // Lenis moves the real window scroll, so native scroll events cover
+    // every scroll; refresh covers pin-spacer layout changes. One check per
+    // frame at most.
+    let rafId: number | null = null
+    const scheduleCheck = () => {
+      if (rafId !== null) return
+      rafId = requestAnimationFrame(() => {
+        rafId = null
+        checkActiveSection()
+      })
+    }
+
+    window.addEventListener('scroll', scheduleCheck, { passive: true })
+    ScrollTrigger.addEventListener('refresh', scheduleCheck)
     checkActiveSection()
 
-    const timer = setInterval(checkActiveSection, 250)
-
     return () => {
-      window.removeEventListener('scroll', checkActiveSection)
-      clearInterval(timer)
+      window.removeEventListener('scroll', scheduleCheck)
+      ScrollTrigger.removeEventListener('refresh', scheduleCheck)
+      if (rafId !== null) cancelAnimationFrame(rafId)
     }
   }, [])
 
@@ -128,15 +142,21 @@ export default function Navigation() {
     if (!panel) return
 
     if (isOpen) {
+      stopScroll()
       document.body.style.overflow = 'hidden'
-      gsap.to(panel, { opacity: 1, visibility: 'visible', duration: 0.35, ease: 'power2.out' })
+      // Visible + interactive immediately (only opacity animates) so the
+      // focus effect below can move focus into the panel this same commit.
+      gsap.set(panel, { visibility: 'visible', pointerEvents: 'auto' })
+      gsap.to(panel, { opacity: 1, duration: 0.35, ease: 'power2.out' })
       gsap.fromTo(
         panel.querySelectorAll(`.${styles.mobileLink}`),
         { y: 16, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.4, stagger: 0.04, delay: 0.06, ease: 'power2.out' },
       )
     } else {
+      startScroll()
       document.body.style.overflow = ''
+      gsap.set(panel, { pointerEvents: 'none' })
       gsap.to(panel, {
         opacity: 0,
         duration: 0.25,
@@ -146,17 +166,53 @@ export default function Navigation() {
     }
   }, [isOpen])
 
+  // Mobile menu keyboard handling: Escape closes, Tab stays inside the
+  // panel, focus moves in on open and back to the toggle on close.
+  useEffect(() => {
+    if (!isOpen) return
+    const panel = panelRef.current
+    const toggle = toggleRef.current
+    if (!panel) return
+
+    const focusables = () =>
+      Array.from(panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'))
+    focusables()[0]?.focus()
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setIsOpen(false)
+        return
+      }
+      if (e.key !== 'Tab') return
+      const items = [toggle, ...focusables()].filter((el): el is HTMLElement => !!el)
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      toggle?.focus()
+    }
+  }, [isOpen])
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     const targetId = href.replace('#', '')
     if (targetId === 'top' || targetId === 'hero') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      scrollToTarget(0)
       return
     }
-    const targetEl = document.getElementById(targetId)
-    if (targetEl) {
-      targetEl.scrollIntoView({ behavior: 'smooth' })
-    }
+    scrollToId(targetId)
   }
 
   return (
@@ -190,6 +246,7 @@ export default function Navigation() {
           </Button>
 
           <button
+            ref={toggleRef}
             type="button"
             className={styles.menuToggle}
             data-open={isOpen}
@@ -204,7 +261,16 @@ export default function Navigation() {
         </div>
       </div>
 
-      <div id="mobile-menu" ref={panelRef} className={styles.mobilePanel} aria-hidden={!isOpen}>
+      <div
+        id="mobile-menu"
+        ref={panelRef}
+        className={styles.mobilePanel}
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Site menu"
+      >
         <div className={styles.mobileLinksContainer}>
           {NAV_ITEMS.map((item) => (
             <a

@@ -61,6 +61,9 @@
   --leading-headline: 1.08;
   --leading-snug: 1.25;
   --leading-body: 1.55;
+  /* Body default. 'normal' matches what the page has always rendered with
+     (the variable used to be undefined, so the browser default applied). */
+  --leading-normal: normal;
 
   /* Layout & Spacing */
   --container-max: 1560px;

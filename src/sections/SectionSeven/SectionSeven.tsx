@@ -5,8 +5,14 @@
 import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
-import { prefersReducedMotion } from '../../motion/reducedMotion'
+import { scrollToTarget } from '../../motion/lenis'
 const SectionSevenCanvas = lazy(() => import('./SectionSevenCanvas'))
+import apartmentLivingRoomImg from '../../assets/gallery/apartment-living-room.webp'
+import apartmentLoungeImg from '../../assets/gallery/apartment-lounge.webp'
+import resortExteriorSnowNightImg from '../../assets/gallery/resort-exterior-snow-night.webp'
+import resortExteriorDayImg from '../../assets/gallery/resort-exterior-day.webp'
+import conciergeDeskImg from '../../assets/gallery/concierge-desk.webp'
+import mountainRangeImg from '../../assets/gallery/mountain-range.webp'
 import styles from './SectionSeven.module.css'
 
 interface SpecItem {
@@ -32,15 +38,15 @@ const INVESTMENT_STAGES: InvestmentStage[] = [
     tag: 'SELECTION',
     title: 'Choose your alpine residence.',
     description:
-      'Select from 150+ hotel apartments or fractional Smart Property Units engineered for flexible luxury living.',
+      'Select from 150+ fully furnished hotel apartments or co-owned Smart Property Units of 50 sq ft each.',
     stat: '150+ HOTEL APARTMENTS',
     imageUrl:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop',
+      apartmentLivingRoomImg,
     specs: [
-      { label: 'Unit Inventory', value: '150+ Luxury Suites' },
-      { label: 'Fractional Units', value: 'Available from 1/8th' },
-      { label: 'Elevation', value: '7,400 ft Altitude View' },
-      { label: 'Architectural Style', value: 'Alpine Modern Stone' },
+      { label: 'Unit Inventory', value: '150+ Hotel Apartments' },
+      { label: 'Smart Property Unit', value: '50 sq ft Co-Ownership' },
+      { label: 'Elevation', value: '7,906 ft Altitude' },
+      { label: 'Layouts', value: '1, 2 & 3 Bedrooms' },
     ],
   },
   {
@@ -49,15 +55,15 @@ const INVESTMENT_STAGES: InvestmentStage[] = [
     tag: 'RESERVATION',
     title: 'Reserve your unit with confidence.',
     description:
-      'Secure your allotment with an initial deposit and lock in early prime real estate valuation in Nathia Gali.',
+      'Secure your unit with a 30% booking, with the balance spread across 36 monthly installments.',
     stat: '30% INITIAL DOWN PAYMENT',
     imageUrl:
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600&auto=format&fit=crop',
+      apartmentLoungeImg,
     specs: [
       { label: 'Initial Deposit', value: '30% Down Payment' },
-      { label: 'Escrow Account', value: '100% Protected' },
-      { label: 'Valuation Guarantee', value: 'Early Lock-in' },
-      { label: 'Booking Speed', value: 'Digital Confirmation' },
+      { label: 'Installments', value: '36 Monthly' },
+      { label: 'Apartment Rate', value: 'PKR 40,000 / sq ft' },
+      { label: 'SPU Down Payment', value: 'PKR 675,000' },
     ],
   },
   {
@@ -66,66 +72,66 @@ const INVESTMENT_STAGES: InvestmentStage[] = [
     tag: 'DEVELOPMENT',
     title: 'Precision structural execution.',
     description:
-      'Track 36-month construction milestones built by DM Consortium using weather-resistant alpine stone.',
-    stat: '36-MONTH MILESTONE PLAN',
+      'Follow construction through published progress updates, backed by DM Consortium and its 15+ completed projects.',
+    stat: 'PROGRESS UPDATES · 2024–2026',
     imageUrl:
-      'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
+      resortExteriorSnowNightImg,
     specs: [
-      { label: 'Timeline', value: '36 Months Phased' },
-      { label: 'Developer', value: 'DM Consortium' },
-      { label: 'Structural Rating', value: 'Seismic Zone 4' },
-      { label: 'Milestone Tracking', value: 'Quarterly Video Audits' },
+      { label: 'Latest Update', value: 'April 2026' },
+      { label: 'Backed By', value: 'DM Consortium' },
+      { label: 'Track Record', value: '15+ Completed Projects' },
+      { label: 'First Update', value: 'July 2024' },
     ],
   },
   {
     id: 'handover',
     number: '04',
     tag: 'HANDOVER',
-    title: '100% Freehold ownership.',
+    title: 'Ownership, protected and transferable.',
     description:
-      'Receive full legal title deed with zero ongoing owner maintenance fees guaranteed for life.',
-    stat: 'FREEHOLD TITLE · PKR 0 FEES',
+      'Smart Property ownership is protected by legal agreements, and apartment owners pay zero maintenance fees.',
+    stat: 'LEGAL AGREEMENTS · ZERO FEES',
     imageUrl:
-      'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop',
+      resortExteriorDayImg,
     specs: [
-      { label: 'Title Deed', value: '100% Freehold Rights' },
-      { label: 'Owner Fees', value: 'PKR 0 Lifetime Fees' },
-      { label: 'Legal Verification', value: 'Tehsil Municipal Registered' },
-      { label: 'Transfer Cost', value: 'Zero Hidden Levies' },
+      { label: 'Ownership', value: 'Protected by Legal Agreements' },
+      { label: 'Maintenance Fees', value: 'Zero for Owners' },
+      { label: 'Transferability', value: 'Sell or Transfer Anytime' },
+      { label: 'Family Stays', value: 'Extended-Stay Discount' },
     ],
   },
   {
     id: 'hospitality',
     number: '05',
     tag: 'HOSPITALITY',
-    title: 'Turnkey 5-star resort management.',
+    title: 'Turnkey resort management.',
     description:
-      'DM Consortium handles guest reservations, housekeeping, private chef dining, and 24-hour valet.',
-    stat: '5-STAR HOTEL OPERATIONS',
+      'Managed by DM Consortium — rentals, maintenance and returns — with a 24/7 front desk and concierge.',
+    stat: 'MANAGED BY DM CONSORTIUM',
     imageUrl:
-      'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
+      conciergeDeskImg,
     specs: [
-      { label: 'Operations', value: '5-Star Resort Brand' },
-      { label: 'Services', value: 'Valet, Chef & Housekeeping' },
-      { label: 'Owner Stays', value: '30 Free Nights / Year' },
-      { label: 'App Management', value: 'Live Booking Dashboard' },
+      { label: 'Management', value: 'DM Consortium' },
+      { label: 'Front Desk', value: '24/7 Concierge' },
+      { label: 'Owner Stays', value: '28 Free Nights / Year' },
+      { label: 'Dining', value: 'Rooftop Restaurant' },
     ],
   },
   {
     id: 'returns',
     number: '06',
     tag: 'RETURNS',
-    title: 'Automated passive rental yield.',
+    title: 'Passive rental yield.',
     description:
-      'Receive automated quarterly rental distributions paired with long-term capital appreciation.',
-    stat: '13–15% PROJECTED ANNUAL ROI',
+      'Receive quarterly profit distributions from hotel revenue streams, alongside annual capital appreciation.',
+    stat: '13–15% SMART PROPERTY UNIT ROI',
     imageUrl:
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop',
+      mountainRangeImg,
     specs: [
-      { label: 'Annual Net ROI', value: '13% - 15% Projected' },
-      { label: 'Payout Schedule', value: 'Quarterly Direct Deposit' },
-      { label: 'Capital Growth', value: '18% - 22% Est. Appreciation' },
-      { label: 'Tax Efficiency', value: 'Real Estate Trust Structure' },
+      { label: 'SPU ROI', value: '13% – 15%' },
+      { label: 'Profit Distribution', value: 'Quarterly' },
+      { label: 'Apartment Appreciation', value: '5% – 8% Annually' },
+      { label: 'Apartment Rental Income', value: 'PKR 80K–120K / Month' },
     ],
   },
 ]
@@ -150,12 +156,24 @@ export default function SectionSeven() {
   }
 
   useLayoutEffect(() => {
-    if (prefersReducedMotion()) return
+    const section = sectionRef.current
+    if (!section) return
 
-    const ctx = gsap.context(() => {
-      registerScrollTrigger()
+    registerScrollTrigger()
+    const mm = gsap.matchMedia(section)
 
-      if (!sectionRef.current) return
+    // Pinned 3D deck scrub only on desktop with motion allowed (same 900px
+    // breakpoint the CSS uses). Mobile and reduced motion fall back to the
+    // static stacked layout defined at the end of SectionSeven.module.css.
+    mm.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {
+      // Cached once — the per-frame onUpdate path never queries the DOM.
+      const scenes = scenesRef.current.filter((el): el is HTMLDivElement => el !== null)
+      const cards = cardsRef.current.filter((el): el is HTMLDivElement => el !== null)
+      const sceneImages = scenesRef.current.map(
+        (scene) => scene?.querySelector<HTMLElement>(`.${styles.sceneImage}`) ?? null
+      )
+      const headerEl = section.querySelector<HTMLElement>(`.${styles.header}`)
+      const stageEl = section.querySelector<HTMLElement>(`.${styles.stageContainer}`)
 
       const updateStep = (progress: number) => {
         const numStages = 6
@@ -203,7 +221,7 @@ export default function SectionSeven() {
             scale = 1.10
           }
 
-          const img = scene.querySelector(`.${styles.sceneImage}`) as HTMLElement | null
+          const img = sceneImages[idx]
 
           gsap.set(scene, {
             opacity,
@@ -289,16 +307,18 @@ export default function SectionSeven() {
           if (!dot) return
           if (idx === activeIdx) {
             dot.classList.add(styles.dotActive)
+            dot.setAttribute('aria-current', 'step')
           } else {
             dot.classList.remove(styles.dotActive)
+            dot.removeAttribute('aria-current')
           }
         })
       }
 
       // Pin section and scrub step progress unhurriedly (5.4x viewport height runway)
-      const st = gsap.to(sectionRef.current, {
+      const st = gsap.to(section, {
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: section,
           pin: true,
           pinSpacing: true,
           anticipatePin: 1,
@@ -308,8 +328,6 @@ export default function SectionSeven() {
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             updateStep(self.progress)
-            const headerEl = sectionRef.current?.querySelector(`.${styles.header}`)
-            const stageEl = sectionRef.current?.querySelector(`.${styles.stageContainer}`)
 
             let fade = 1.0
             if (self.progress < 0.04) {
@@ -331,9 +349,20 @@ export default function SectionSeven() {
       }
 
       updateStep(0)
-    }, sectionRef)
 
-    return () => ctx.revert()
+      // Per-frame gsap.set() calls run outside the matchMedia context, so they
+      // aren't auto-reverted — clear them when leaving the desktop/motion query
+      // so the static layout starts from its CSS defaults.
+      return () => {
+        scrollTriggerRef.current = null
+        gsap.set(scenes, { clearProps: 'opacity,transform,zIndex' })
+        gsap.set(cards, { clearProps: 'opacity,transform,pointerEvents,zIndex' })
+        gsap.set(sceneImages.filter((img): img is HTMLElement => img !== null), { clearProps: 'filter' })
+        gsap.set([headerEl, stageEl].filter((el): el is HTMLElement => el !== null), { clearProps: 'opacity' })
+      }
+    })
+
+    return () => mm.revert()
   }, [])
 
   // Mouse tilt handlers for right editorial cards
@@ -420,10 +449,16 @@ export default function SectionSeven() {
     const totalScroll = st.end - st.start
     const targetProgress = (idx + 0.4) / 6
     const targetY = st.start + totalScroll * targetProgress
-    window.scrollTo({
-      top: targetY,
-      behavior: 'smooth',
-    })
+    scrollToTarget(targetY)
+  }
+
+  const handleCardKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, id: string) => {
+    // Ignore keys bubbling up from the inner flip buttons — they handle themselves.
+    if (e.target !== e.currentTarget) return
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      toggleFlip(id)
+    }
   }
 
   return (
@@ -464,7 +499,13 @@ export default function SectionSeven() {
                 ref={(el) => { scenesRef.current[idx] = el }}
                 className={`${styles.visualScene} ${idx === 0 ? styles.sceneActive : ''}`}
               >
-                <img src={item.imageUrl} alt={item.title} className={styles.sceneImage} />
+                <img
+                  src={item.imageUrl}
+                  alt={item.title}
+                  className={styles.sceneImage}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div className={styles.sceneOverlay} aria-hidden="true" />
                 <div className={styles.sceneWatermark}>
                   STAGE {item.number} / NATHIA GALI
@@ -488,6 +529,10 @@ export default function SectionSeven() {
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 onClick={() => toggleFlip(item.id)}
+                onKeyDown={(e) => handleCardKeyDown(e, item.id)}
+                role="button"
+                tabIndex={0}
+                aria-pressed={isFlipped}
               >
                 <div className={`${styles.cardInner} ${isFlipped ? styles.isFlipped : ''}`}>
                   {/* FRONT FACE */}
@@ -508,9 +553,10 @@ export default function SectionSeven() {
                             toggleFlip(item.id)
                           }}
                           title="Flip for specifications"
+                          tabIndex={isFlipped ? -1 : 0}
                         >
                           <span>SPECS</span>
-                          <svg className={styles.flipIcon} viewBox="0 0 24 24">
+                          <svg className={styles.flipIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                             <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
                           </svg>
                         </button>
@@ -540,9 +586,10 @@ export default function SectionSeven() {
                             e.stopPropagation()
                             toggleFlip(item.id)
                           }}
+                          tabIndex={isFlipped ? 0 : -1}
                         >
                           <span>FRONT</span>
-                          <svg className={styles.flipIcon} viewBox="0 0 24 24">
+                          <svg className={styles.flipIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                             <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
                           </svg>
                         </button>
@@ -561,7 +608,7 @@ export default function SectionSeven() {
                     </div>
 
                     <div className={styles.backFooter}>
-                      <span className={styles.backBadge}>VERIFIED DM CONSORTIUM ASSET</span>
+                      <span className={styles.backBadge}>MANAGED BY DM CONSORTIUM</span>
                     </div>
                   </div>
                 </div>
@@ -570,7 +617,7 @@ export default function SectionSeven() {
           })}
 
           {/* Progress Step Indicator Dots */}
-          <div className={styles.stepProgressDots} aria-hidden="true">
+          <div className={styles.stepProgressDots}>
             {INVESTMENT_STAGES.map((item, idx) => (
               <button
                 key={item.id}
@@ -578,7 +625,8 @@ export default function SectionSeven() {
                 ref={(el) => { dotsRef.current[idx] = el }}
                 className={`${styles.dot} ${idx === 0 ? styles.dotActive : ''}`}
                 onClick={() => handleDotClick(idx)}
-                aria-label={`Jump to stage ${item.number}`}
+                aria-label={`Go to step ${idx + 1}`}
+                aria-current={idx === 0 ? 'step' : undefined}
               />
             ))}
           </div>

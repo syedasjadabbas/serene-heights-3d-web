@@ -17,9 +17,9 @@ function FloatingInvestmentWireframes() {
   // Blueprint wireframe cubes & planes data
   const frames = useMemo(() => {
     return [
-      { pos: [-6, 3, -4] as const, scale: 1.5, rotSpeed: 0.08 },
-      { pos: [6.5, -2, -3] as const, scale: 1.8, rotSpeed: 0.06 },
-      { pos: [-5.5, -6, -5] as const, scale: 1.2, rotSpeed: 0.1 },
+      { pos: [-6, 3, -4] as const, scale: 1.5 },
+      { pos: [6.5, -2, -3] as const, scale: 1.8 },
+      { pos: [-5.5, -6, -5] as const, scale: 1.2 },
     ]
   }, [])
 
@@ -92,7 +92,7 @@ function FloatingGoldParticles() {
 }
 
 export default function SectionFiveCanvas() {
-  const { containerRef, isVisible } = useCanvasVisibility()
+  const { containerRef, isVisible, shouldMount } = useCanvasVisibility()
 
   return (
     <div
@@ -105,20 +105,19 @@ export default function SectionFiveCanvas() {
         overflow: 'hidden',
       }}
     >
-      <Canvas
-        camera={{ position: [0, 0, 9], fov: 45 }}
-        gl={{ alpha: true, antialias: true }}
-        dpr={[1, 1.5]}
-        frameloop={isVisible ? 'always' : 'never'}
-      >
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 8, 5]} intensity={0.6} color="#f3d498" />
+      {shouldMount && (
+        <Canvas
+          camera={{ position: [0, 0, 9], fov: 45 }}
+          gl={{ alpha: true, antialias: true }}
+          dpr={[1, 1.5]}
+          frameloop={isVisible ? 'always' : 'never'}
+        >
+          <FloatingInvestmentWireframes />
+          <FloatingGoldParticles />
 
-        <FloatingInvestmentWireframes />
-        <FloatingGoldParticles />
-
-        <fog attach="fog" args={['#0a1410', 6, 22]} />
-      </Canvas>
+          <fog attach="fog" args={['#0a1410', 6, 22]} />
+        </Canvas>
+      )}
     </div>
   )
 }

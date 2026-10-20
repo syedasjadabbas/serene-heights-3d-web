@@ -12,6 +12,9 @@
 
 .bar {
   pointer-events: auto;
+  /* Above .mobilePanel so the toggle stays reachable to close the menu */
+  position: relative;
+  z-index: 41;
   width: 100%;
   max-width: 1320px;
   display: grid;

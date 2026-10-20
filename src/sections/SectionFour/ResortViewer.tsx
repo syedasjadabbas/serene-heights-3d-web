@@ -34,7 +34,7 @@ export default function ResortViewer() {
         background: 'transparent',
       }}
     >
-      <ResortLoader />
+      <ResortLoader canvasReady={canvasReady} />
 
       {hasMounted && (
         <div

@@ -16,8 +16,7 @@ export default function Logo({ className, markOnly = false }: LogoProps) {
       <img
         src={logoSvg}
         className={styles.mark}
-        alt="Serene Heights Logo Mark"
-        aria-hidden="true"
+        alt=""
       />
       {!markOnly && <span className={styles.wordmark}>Serene Heights</span>}
     </span>

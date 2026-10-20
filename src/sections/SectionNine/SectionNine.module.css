@@ -110,6 +110,14 @@
   transform-style: preserve-3d;
 }
 
+/* GSAP scroll-entrance shell. GSAP writes its inline transform here; the
+   mouse tilt lives on the child (.heroPieceContainer / .exhibitCard), so the
+   two transforms compose instead of overriding each other. */
+.tiltShell {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
 /* Light Glare Sheen */
 .cardLight {
   position: absolute;
@@ -165,12 +173,12 @@
 }
 
 .heroPieceContainer:hover {
-  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(28px) scale(1.015) !important;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(28px) scale(1.015);
   box-shadow:
     inset 0 1px 0 rgba(243, 212, 152, 0.5),
     inset 1px 0 0 rgba(255, 255, 255, 0.18),
     0 40px 95px -18px rgba(0, 0, 0, 0.98),
-    0 0 40px rgba(243, 212, 152, 0.25) !important;
+    0 0 40px rgba(243, 212, 152, 0.25);
 }
 
 .heroImageFrame {
@@ -189,7 +197,8 @@
   background-position: center;
   filter: brightness(0.88) contrast(1.02);
   will-change: transform;
-  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.5s ease;
+  /* No transform transition: GSAP scrubs this element's transform per frame. */
+  transition: filter 0.5s ease;
   transform: scale(1.02);
 }
 
@@ -358,12 +367,12 @@
 }
 
 .exhibitCard:hover {
-  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(28px) scale(1.015) !important;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(28px) scale(1.015);
   box-shadow:
     inset 0 1px 0 rgba(243, 212, 152, 0.5),
     inset 1px 0 0 rgba(255, 255, 255, 0.18),
     0 40px 95px -18px rgba(0, 0, 0, 0.98),
-    0 0 40px rgba(243, 212, 152, 0.25) !important;
+    0 0 40px rgba(243, 212, 152, 0.25);
 }
 
 .cardTall {
@@ -399,7 +408,8 @@
   background-position: center;
   filter: brightness(0.88) contrast(1.0);
   will-change: transform;
-  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.5s ease;
+  /* No transform transition: GSAP scrubs this element's transform per frame. */
+  transition: filter 0.5s ease;
   transform: scale(1.02);
 }
 
@@ -437,7 +447,8 @@
     0 20px 48px -15px rgba(0, 0, 0, 0.75);
   transform-style: preserve-3d;
   transform: translateZ(35px);
-  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+  /* No transform transition: GSAP tweens this element's transform on entrance. */
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .exhibitCard:hover .captionWrap {
@@ -499,6 +510,15 @@
   line-height: 1.1;
   color: var(--color-cream);
   text-shadow: 0 4px 28px rgba(0, 0, 0, 0.85);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroPieceContainer,
+  .exhibitCard,
+  .heroPieceContainer:hover,
+  .exhibitCard:hover {
+    transform: none;
+  }
 }
 
 @media (max-width: 900px) {

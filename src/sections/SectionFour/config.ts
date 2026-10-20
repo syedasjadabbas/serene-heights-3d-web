@@ -27,20 +27,20 @@ export interface Hotspot {
 export const RESORT_HOTSPOTS: Hotspot[] = [
   {
     id: 'tower-a',
-    title: 'Tower A · Alpine Suites',
-    subtitle: '150+ Fully Furnished Hotel Apartments',
+    title: 'Three Towers · Hotel Apartments',
+    subtitle: '150+ Fully Furnished 1, 2 & 3 Bed Apartments',
     position: [0, 3.8, 0],
   },
   {
     id: 'sky-lounge',
-    title: 'Sky Lounge & Spa',
-    subtitle: 'Mountain-view Wellness Center',
+    title: 'Rooftop Restaurant & Spa',
+    subtitle: 'Sauna, Jacuzzi & Massage',
     position: [-2.8, 2.2, 1.2],
   },
   {
     id: 'helipad',
-    title: 'Private Helipad',
-    subtitle: 'Executive VIP Access',
+    title: 'Helipad Access',
+    subtitle: '50 m from the PAF Airbase',
     position: [2.8, 4.8, -1.2],
   },
 ]

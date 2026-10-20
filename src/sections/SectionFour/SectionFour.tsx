@@ -7,6 +7,7 @@ import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
 import Button from '../../components/ui/Button'
+import ErrorBoundary from '../../components/util/ErrorBoundary'
 const ResortViewer = lazy(() => import('./ResortViewer'))
 import styles from './SectionFour.module.css'
 
@@ -50,9 +51,11 @@ export default function SectionFour() {
     <section ref={sectionRef} id="amenities" data-alias="architecture-3d" className={styles.section}>
       {/* 3D Scene Canvas Container */}
       <div className={styles.canvasContainer}>
-        <Suspense fallback={null}>
-          <ResortViewer />
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={null}>
+            <ResortViewer />
+          </Suspense>
+        </ErrorBoundary>
       </div>
 
       {/* Dark Gradient Vignette Overlay for Readability */}
@@ -79,7 +82,7 @@ export default function SectionFour() {
             <Button href="#floor-plans" variant="ghost">
               EXPLORE FLOOR PLANS
             </Button>
-            <Button href="#enquire" variant="ghost">
+            <Button href="#contact" variant="ghost">
               SCHEDULE PRIVATE VIEWING
             </Button>
           </div>

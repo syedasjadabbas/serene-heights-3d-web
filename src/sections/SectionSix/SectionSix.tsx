@@ -5,8 +5,12 @@
 import { lazy, Suspense, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
-import { prefersReducedMotion } from '../../motion/reducedMotion'
 const SectionSixCanvas = lazy(() => import('./SectionSixCanvas'))
+import resortExteriorDayImg from '../../assets/gallery/resort-exterior-day.webp'
+import conciergeDeskImg from '../../assets/gallery/concierge-desk.webp'
+import apartmentLivingRoomImg from '../../assets/gallery/apartment-living-room.webp'
+import infinityPoolImg from '../../assets/gallery/infinity-pool.webp'
+import resortTowerNightImg from '../../assets/gallery/resort-tower-night.webp'
 import styles from './SectionSix.module.css'
 
 interface ExhibitionCard {
@@ -25,12 +29,12 @@ const EXHIBITION_CARDS: ExhibitionCard[] = [
     id: 'arrival',
     num: '01',
     tag: 'ARRIVAL EXPERIENCE',
-    title: 'A Descent Into the Galyat Range',
+    title: 'An Ascent Into the Galyat Range',
     subtitle:
-      'Private helicopter transfers connect Islamabad to Nathia Gali in 25 minutes, arriving 7,906 feet above sea level.',
-    spec: 'ARRIVAL SPEC · PRIVATE HELIPAD',
+      'A scenic two-hour drive from Islamabad climbs to 7,906 feet, just off Kala Bagh Air Base Road in Nathia Gali.',
+    spec: 'ARRIVAL SPEC · HELIPAD ACCESS',
     imageUrl:
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600&auto=format&fit=crop',
+      resortExteriorDayImg,
     sizeClass: 'cardLarge',
   },
   {
@@ -39,10 +43,10 @@ const EXHIBITION_CARDS: ExhibitionCard[] = [
     tag: 'GRAND LOBBY',
     title: 'Three Towers, One Grand Arrival',
     subtitle:
-      'A marble and gold reception hall welcomes owners into Towers A, B, and C — the first impression of an alpine sanctuary.',
-    spec: 'LOBBY SPEC · TOWERS A · B · C',
+      'A 24/7 front desk and concierge welcome owners across three towers set on 30+ kanals of the Nathia Gali hillside.',
+    spec: 'LOBBY SPEC · 24/7 CONCIERGE',
     imageUrl:
-      'https://images.unsplash.com/photo-1758193783649-13371d7fb8dd?q=80&w=1600&auto=format&fit=crop',
+      conciergeDeskImg,
     sizeClass: 'cardMedium',
   },
   {
@@ -51,34 +55,34 @@ const EXHIBITION_CARDS: ExhibitionCard[] = [
     tag: 'LUXURY RESIDENCES',
     title: '150+ Fully Furnished Suites',
     subtitle:
-      'Hand-carved alpine oak, marble hearths, and thermal glass across 1, 2, and 3-bedroom residences.',
+      'Fully furnished 1, 2, and 3-bedroom hotel apartments, finished with double-glazed UPVC windows.',
     spec: 'RESIDENCE SPEC · FULLY FURNISHED',
     imageUrl:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop',
+      apartmentLivingRoomImg,
     sizeClass: 'cardLarge',
   },
   {
     id: 'wellness',
     num: '04',
     tag: 'WELLNESS & SPA',
-    title: 'Heated Indoor Infinity Pool',
+    title: 'Heated Infinity Pool',
     subtitle:
-      'A climate-controlled sanctuary offering uninterrupted wellness — heated year-round against the alpine winter.',
-    spec: 'WELLNESS SPEC · 34°C HEATED',
+      'A heated infinity pool in year-round operation, joined by sauna, jacuzzi, massage and spa.',
+    spec: 'WELLNESS SPEC · YEAR-ROUND',
     imageUrl:
-      'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
+      infinityPoolImg,
     sizeClass: 'cardLarge',
   },
   {
     id: 'investment',
     num: '05',
     tag: 'INVESTMENT OPPORTUNITY',
-    title: '13–15% Projected Annual ROI',
+    title: '13–15% Smart Property Unit ROI',
     subtitle:
-      'Freehold ownership, zero maintenance fees, and turnkey rental management by DM Consortium.',
-    spec: 'INVESTMENT SPEC · FREEHOLD TITLE',
+      'Smart Property Units from PKR 2,250,000, with rentals, maintenance and returns managed by DM Consortium.',
+    spec: 'INVESTMENT SPEC · SMART PROPERTY UNIT',
     imageUrl:
-      'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop',
+      resortTowerNightImg,
     sizeClass: 'cardMedium',
   },
 ]
@@ -91,69 +95,69 @@ export default function SectionSix() {
   const rafIdRef = useRef<number | null>(null)
 
   useLayoutEffect(() => {
-    if (prefersReducedMotion()) return
-
     const section = sectionRef.current
     const track = trackRef.current
     if (!section || !track) return
 
     const cards = cardsRef.current.filter((c): c is HTMLDivElement => c !== null)
 
-    let ctx: ReturnType<typeof gsap.context> | null = null
+    const ScrollTrigger = registerScrollTrigger()
+    const mm = gsap.matchMedia(section)
 
-    try {
-      ctx = gsap.context(() => {
-        registerScrollTrigger()
+    // Pin + horizontal scrub only on desktop with motion allowed. At ≤900px the
+    // CSS hands the row to native swipe scrolling, and under reduced motion the
+    // viewport becomes natively scrollable instead (see SectionSix.module.css).
+    mm.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {
+      // Cached once per ScrollTrigger refresh so the per-frame path never
+      // touches layout (offsetLeft/offsetWidth) or the DOM tree (querySelector).
+      const images = cards.map((card) => card.querySelector<HTMLImageElement>(`.${styles.cardImage}`))
+      const lastFocus: number[] = cards.map(() => -1)
+      const lastParallax: number[] = cards.map(() => NaN)
 
-        const getStartX = () => {
-          const card1 = cards[0]
-          if (!card1) return 0
-          const c1Center = card1.offsetLeft + card1.offsetWidth / 2
-          return window.innerWidth / 2 - c1Center
-        }
+      const getStartX = () => {
+        const card1 = cards[0]
+        if (!card1) return 0
+        const c1Center = card1.offsetLeft + card1.offsetWidth / 2
+        return window.innerWidth / 2 - c1Center
+      }
 
-        const getEndX = () => {
-          const cardLast = cards[cards.length - 1]
-          if (!cardLast) return 0
-          const cLastCenter = cardLast.offsetLeft + cardLast.offsetWidth / 2
-          return window.innerWidth / 2 - cLastCenter
-        }
+      const getEndX = () => {
+        const cardLast = cards[cards.length - 1]
+        if (!cardLast) return 0
+        const cLastCenter = cardLast.offsetLeft + cardLast.offsetWidth / 2
+        return window.innerWidth / 2 - cLastCenter
+      }
 
-        const getScrollDistance = () => Math.abs(getStartX() - getEndX())
+      const getScrollDistance = () => Math.abs(getStartX() - getEndX())
 
-        // Progress-Driven Exhibition Focus Algorithm — Centered Geometry Math
-        const updateCardFocus = () => {
-          const startX = getStartX()
-          const endX = getEndX()
-          const totalDist = Math.abs(startX - endX)
-          const trackX = (gsap.getProperty(track, 'x') as number) || startX
-          const scrollProgress = totalDist > 0 ? Math.min(1, Math.max(0, (startX - trackX) / totalDist)) : 0
-          const numCards = cards.length
+      // Progress-Driven Exhibition Focus Algorithm — Centered Geometry Math.
+      // The track tween is linear (ease: 'none') and scrubbed 1:1, so the
+      // trigger's progress equals the track's normalised x position.
+      const updateCardFocus = (scrollProgress: number) => {
+        const numCards = cards.length
 
-          cards.forEach((card, idx) => {
-            // Symmetrical progress target for card idx across 0.0 to 1.0
-            const targetProgress = numCards > 1 ? idx / (numCards - 1) : 0
-            const progressDist = Math.abs(scrollProgress - targetProgress)
+        cards.forEach((card, idx) => {
+          // Symmetrical progress target for card idx across 0.0 to 1.0
+          const targetProgress = numCards > 1 ? idx / (numCards - 1) : 0
+          const progressDist = Math.abs(scrollProgress - targetProgress)
 
-            // Symmetrical focus plateau curve
-            let fp = 0
-            if (progressDist < 0.06) {
-              fp = 1.0
-            } else {
-              const normDist = (progressDist - 0.06) / 0.22
-              fp = Math.max(0, Math.pow(1 - Math.min(1, normDist), 1.5))
-            }
+          // Symmetrical focus plateau curve
+          let fp = 0
+          if (progressDist < 0.06) {
+            fp = 1.0
+          } else {
+            const normDist = (progressDist - 0.06) / 0.22
+            fp = Math.max(0, Math.pow(1 - Math.min(1, normDist), 1.5))
+          }
 
+          // Only write card styles when its focus value actually changed —
+          // most cards sit on the 0 / 1 plateau for most of the scrub.
+          if (fp !== lastFocus[idx]) {
+            lastFocus[idx] = fp
             const scale = 0.96 + 0.04 * fp
             const borderGold = 0.25 + 0.60 * fp
             const borderTop = 0.14 + 0.28 * fp
             const shadowDepth = 0.45 + 0.40 * fp
-
-            // Symmetrical image parallax pan (-18px to +18px)
-            const relProgress = (scrollProgress - targetProgress) * 4
-            const parallaxX = Math.max(-18, Math.min(18, relProgress * 18))
-
-            const img = card.querySelector(`.${styles.cardImage}`) as HTMLElement | null
 
             gsap.set(card, {
               scale,
@@ -163,50 +167,71 @@ export default function SectionSix() {
               boxShadow: `inset 0 1px 0 rgba(243, 212, 152, ${0.14 + 0.18 * fp}), 0 ${18 + 18 * fp}px ${40 + 40 * fp}px -15px rgba(0, 0, 0, ${shadowDepth})`,
               zIndex: Math.round(1 + fp * 10),
             })
-
-            if (img) {
-              gsap.set(img, {
-                x: parallaxX,
-                opacity: 1,
-              })
-            }
-          })
-        }
-
-        // Horizontal Gallery Scrub: Translates trackX from getStartX() to getEndX()
-        // so Card 1 starts 100% centered, and Card 5 ends 100% centered with equal margins.
-        gsap.fromTo(
-          track,
-          { x: () => getStartX() },
-          {
-            x: () => getEndX(),
-            ease: 'none',
-            scrollTrigger: {
-              trigger: section,
-              pin: true,
-              pinSpacing: true,
-              anticipatePin: 1,
-              scrub: true,
-              start: 'top top',
-              end: () => `+=${getScrollDistance()}`,
-              invalidateOnRefresh: true,
-              onUpdate: () => {
-                updateCardFocus()
-              },
-              onRefresh: updateCardFocus,
-            },
           }
-        )
 
-        updateCardFocus()
-      }, section)
-    } catch (err) {
-      // silent
-    }
+          // Symmetrical image parallax pan (-18px to +18px)
+          const relProgress = (scrollProgress - targetProgress) * 4
+          const parallaxX = Math.max(-18, Math.min(18, relProgress * 18))
 
-    return () => {
-      if (ctx) ctx.revert()
-    }
+          const img = images[idx]
+          if (img && parallaxX !== lastParallax[idx]) {
+            lastParallax[idx] = parallaxX
+            gsap.set(img, {
+              x: parallaxX,
+              opacity: 1,
+            })
+          }
+        })
+      }
+
+      // Horizontal Gallery Scrub: Translates trackX from getStartX() to getEndX()
+      // so Card 1 starts 100% centered, and Card 5 ends 100% centered with equal margins.
+      gsap.fromTo(
+        track,
+        { x: () => getStartX() },
+        {
+          x: () => getEndX(),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            pin: true,
+            pinSpacing: true,
+            anticipatePin: 1,
+            scrub: true,
+            start: 'top top',
+            end: () => `+=${getScrollDistance()}`,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => updateCardFocus(self.progress),
+            onRefresh: (self) => updateCardFocus(self.progress),
+          },
+        }
+      )
+
+      updateCardFocus(0)
+
+      // Lazy images clipped by the overflow:hidden viewport only start loading
+      // once they slide into view mid-scrub. Promote them to eager as the
+      // section approaches so cards 3–5 are decoded before they arrive.
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top bottom',
+        once: true,
+        onEnter: () => {
+          images.forEach((img) => {
+            if (img) img.loading = 'eager'
+          })
+        },
+      })
+
+      // Per-frame gsap.set() calls run outside the matchMedia context, so they
+      // aren't auto-reverted — clear them when leaving the desktop/motion query.
+      return () => {
+        gsap.set(cards, { clearProps: 'transform,opacity,borderLeftColor,borderTopColor,boxShadow,zIndex' })
+        gsap.set(images.filter((img): img is HTMLImageElement => img !== null), { clearProps: 'transform,opacity' })
+      }
+    })
+
+    return () => mm.revert()
   }, [])
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -302,12 +327,14 @@ export default function SectionSix() {
               <div className={styles.cardLight} aria-hidden="true" />
               <span className={styles.cardWatermark}>{card.spec}</span>
 
-              {/* High-res Image (eager load for width measurement) */}
+              {/* High-res Image (card size is fixed in CSS, so lazy loading is layout-safe) */}
               <div className={styles.imageFrame}>
                 <img
                   src={card.imageUrl}
                   alt={card.title}
                   className={styles.cardImage}
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className={styles.imageOverlay} aria-hidden="true" />
               </div>

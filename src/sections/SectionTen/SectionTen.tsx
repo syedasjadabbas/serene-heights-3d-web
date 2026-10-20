@@ -8,7 +8,13 @@ import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
 import Button from '../../components/ui/Button'
 import section10BgVideo from '../../assets/videos/section10-bg.mp4'
+import section10Poster from '../../assets/videos/section10-poster.webp'
 import styles from './SectionTen.module.css'
+
+// Contact details as published on sereneheightsnathiagali.com/nathiagali/contact-us
+const WHATSAPP_NUMBER = '923214979447'
+const whatsappLink = (message: string) =>
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
 
 export default function SectionTen() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -22,6 +28,10 @@ export default function SectionTen() {
     const videoEl = videoRef.current
     if (!sectionEl || !videoEl) return
 
+    // preload="none" + no autoplay: the first play() (just before the footer
+    // scrolls in) is what starts the download. Reduced motion keeps the poster.
+    if (prefersReducedMotion()) return
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -30,7 +40,7 @@ export default function SectionTen() {
           videoEl.pause()
         }
       },
-      { threshold: 0.05 },
+      { rootMargin: '50% 0px' },
     )
 
     observer.observe(sectionEl)
@@ -112,12 +122,12 @@ export default function SectionTen() {
           <video
             ref={videoRef}
             src={section10BgVideo}
+            poster={section10Poster}
             className={styles.bgVideo}
-            autoPlay
             muted
             loop
             playsInline
-            preload="auto"
+            preload="none"
             aria-hidden="true"
           />
         </div>
@@ -139,18 +149,57 @@ export default function SectionTen() {
           </h2>
 
           <p className={styles.subcopy}>
-            Conceived at 7,906 ft in Nathia Gali. Master-crafted by DM Consortium for those who seek timeless alpine living.
+            Conceived at 7,906 ft in Nathia Gali. Backed by DM Consortium's track record of 15+ completed projects, for those who seek timeless alpine living.
           </p>
 
           <div ref={ctaRef} className={styles.ctaGroup}>
-            <Button href="#enquire" variant="ghost">
+            <Button
+              href={whatsappLink('Hello, I would like to schedule a private showcase of Serene Heights Nathia Gali.')}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="ghost"
+            >
               SCHEDULE PRIVATE SHOWCASE
             </Button>
-            <Button href="#download-brochure" variant="ghost">
-              REQUEST ARCHITECTURAL PLANS
+            <Button
+              href={whatsappLink('Hello, I would like to receive the Serene Heights Nathia Gali floor plans and payment plan.')}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="ghost"
+            >
+              REQUEST FLOOR PLANS
             </Button>
           </div>
         </div>
+
+        {/* Contact details */}
+        <address className={styles.contactRow}>
+          <span className={styles.contactItem}>
+            <span className={styles.contactLabel}>SALES</span>
+            <a href="tel:+9242111111744" className={styles.contactLink}>042-111-111-744</a>
+            <span className={styles.contactDivider} aria-hidden="true">·</span>
+            <a href="tel:+923008497999" className={styles.contactLink}>+92 300 8497999</a>
+          </span>
+          <span className={styles.contactItem}>
+            <span className={styles.contactLabel}>WHATSAPP</span>
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.contactLink}
+            >
+              +92 321 4979447
+            </a>
+          </span>
+          <span className={styles.contactItem}>
+            <span className={styles.contactLabel}>SITE</span>
+            <span>1.5 KM, Kala Bagh Air Base Road, Nathia Gali</span>
+          </span>
+          <span className={styles.contactItem}>
+            <span className={styles.contactLabel}>HEAD OFFICE</span>
+            <span>DM Consortium, 71 C3 Gulberg III, Lahore</span>
+          </span>
+        </address>
 
         {/* Minimal Footer Navigation Bar */}
         <div className={styles.minimalFooter}>
@@ -159,7 +208,7 @@ export default function SectionTen() {
             <span className={styles.brandLocation}>NATHIA GALI · PAKISTAN</span>
           </div>
 
-          <div className={styles.navLinks}>
+          <nav className={styles.navLinks} aria-label="Footer">
             <a href="#about" className={styles.navLink}>OVERVIEW</a>
             <a href="#lifestyle" className={styles.navLink}>LIFESTYLE</a>
             <a href="#amenities" className={styles.navLink}>AMENITIES</a>
@@ -167,7 +216,7 @@ export default function SectionTen() {
             <a href="#smart-unit" className={styles.navLink}>SMART UNIT</a>
             <a href="#payment-plan" className={styles.navLink}>INVESTMENT</a>
             <a href="#exhibition" className={styles.navLink}>EXHIBITION</a>
-          </div>
+          </nav>
 
           <div className={styles.creditLine}>
             <span className={styles.creditText}>

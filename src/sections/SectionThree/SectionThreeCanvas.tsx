@@ -111,7 +111,7 @@ function GoldParticles() {
 }
 
 export default function SectionThreeCanvas() {
-  const { containerRef, isVisible } = useCanvasVisibility()
+  const { containerRef, isVisible, shouldMount } = useCanvasVisibility()
 
   return (
     <div
@@ -121,22 +121,30 @@ export default function SectionThreeCanvas() {
         inset: 0,
         pointerEvents: 'none',
         zIndex: 1,
-        overflow: 'hidden',
+        // clip (not hidden) so the sticky child below still sticks
+        overflow: 'clip',
       }}
     >
-      <Canvas
-        camera={{ position: [0, 0, 10], fov: 50 }}
-        dpr={[1, 1.5]}
-        frameloop={isVisible ? 'always' : 'never'}
-        gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
-      >
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1.2} color="#fef3d6" />
-        <fog attach="fog" args={['#080f0c', 8, 26]} />
+      {/* The section is many viewports tall: keep the drawing buffer one
+          viewport in size and let it ride along, instead of filling the
+          whole section's height every frame. */}
+      <div style={{ position: 'sticky', top: 0, height: '100svh', width: '100%' }}>
+      {shouldMount && (
+        <Canvas
+          camera={{ position: [0, 0, 10], fov: 50 }}
+          dpr={[1, 1.5]}
+          frameloop={isVisible ? 'always' : 'never'}
+          gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
+        >
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[10, 10, 5]} intensity={1.2} color="#fef3d6" />
+          <fog attach="fog" args={['#080f0c', 8, 26]} />
 
-        <FloatingArchitecturalObjects />
-        <GoldParticles />
-      </Canvas>
+          <FloatingArchitecturalObjects />
+          <GoldParticles />
+        </Canvas>
+      )}
+      </div>
     </div>
   )
 }

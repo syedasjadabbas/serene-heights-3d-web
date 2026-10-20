@@ -4,6 +4,7 @@
   background: transparent;
   width: 100%;
   height: 100vh;
+  height: 100svh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -182,6 +183,12 @@
   will-change: transform, opacity;
   transform-style: preserve-3d;
   backface-visibility: hidden;
+}
+
+/* First scene is visible before JS takes over (gsap.set drives opacity on
+   desktop; the static layout below shows every scene). */
+.sceneActive {
+  opacity: 1;
 }
 
 .sceneImage {
@@ -661,3 +668,89 @@
   }
 }
 
+/* --- Static layout: mobile (≤900px) and reduced motion ---
+   The pinned deck scrub only runs at ≥901px with motion allowed (see
+   gsap.matchMedia in SectionSeven.tsx). Everywhere else every scene and card
+   must be visible without JS-driven opacity, so the stacked/absolute deck is
+   unstacked: scenes become a native swipe strip, cards a vertical flow sized
+   to their content. Placed last so it overrides the fixed mobile heights. */
+@media (max-width: 900px), (prefers-reduced-motion: reduce) {
+  .section {
+    height: auto;
+  }
+
+  .stageContainer {
+    height: auto;
+    align-items: start;
+  }
+
+  .visualInner {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .visualInner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .visualScene {
+    position: relative;
+    inset: auto;
+    flex: 0 0 100%;
+    opacity: 1;
+    scroll-snap-align: start;
+  }
+
+  .editorialStage {
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: clamp(16px, 2.4vh, 24px);
+  }
+
+  .editorialCard {
+    position: relative;
+    inset: auto;
+    height: auto;
+    opacity: 1;
+  }
+
+  /* Both faces share one grid cell so the card grows to the taller face
+     while the 180° flip still works. */
+  .cardInner {
+    display: grid;
+    height: auto;
+  }
+
+  .cardFront,
+  .cardBack {
+    position: relative;
+    inset: auto;
+    grid-area: 1 / 1;
+    height: auto;
+    min-height: 220px;
+  }
+
+  /* Dots scrub a pinned timeline that doesn't exist here */
+  .stepProgressDots {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cardInner {
+    transition: none;
+  }
+}
+
+/* Desktop reduced motion: the stage no longer has a fixed height, so give the
+   scene strip the same height the pinned stage used (mobile keeps its own). */
+@media (min-width: 901px) and (prefers-reduced-motion: reduce) {
+  .visualStageFrame {
+    height: clamp(360px, 50vh, 500px);
+  }
+}

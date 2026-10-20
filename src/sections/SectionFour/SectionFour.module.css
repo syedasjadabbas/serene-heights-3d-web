@@ -2,7 +2,8 @@
   position: relative;
   width: 100%;
   height: 100vh;
-  min-height: 700px;
+  height: 100svh;
+  min-height: 600px;
   background: transparent;
   overflow: hidden;
   display: flex;
@@ -36,6 +37,12 @@
   justify-content: flex-end;
   padding-bottom: clamp(60px, 10vh, 120px);
   padding-inline: clamp(28px, 5vw, 84px);
+  /* Let drags reach the 3D viewer underneath; the copy itself stays clickable */
+  pointer-events: none;
+}
+
+.contentWrap > * {
+  pointer-events: auto;
 }
 
 .overlayInner {

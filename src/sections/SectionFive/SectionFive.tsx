@@ -1,5 +1,5 @@
 /**
- * Section: Amenities
+ * Section: Smart Investment (ownership tiers: whole apartment, Smart Property Unit, managed operations)
  * Assets: src/assets/amenities/
  */
 import { lazy, Suspense, useLayoutEffect, useRef } from 'react'
@@ -27,18 +27,18 @@ const INVESTMENT_TIERS: InvestmentTier[] = [
   {
     id: 'whole-suite',
     num: '01',
-    tag: 'WHOLE SUITE TITLE',
-    statValue: '100%',
-    statLabel: 'FREEHOLD TITLE DEED',
+    tag: 'WHOLE APARTMENT',
+    statValue: '5–8%',
+    statLabel: 'ANNUAL APPRECIATION',
     title: 'Full Residence Ownership',
     description:
-      'Acquire whole 1, 2, or 3-bedroom luxury hotel apartments with perpetual title deeds and zero annual maintenance costs for owners.',
-    watermark: 'SPEC 01 · FULL TITLE',
+      'Own a whole fully furnished 1, 2, or 3-bedroom hotel apartment with zero maintenance fees and quarterly profit distribution.',
+    watermark: 'SPEC 01 · WHOLE UNIT',
     tagStyle: styles.tagGold,
     specs: [
-      { label: 'PERPETUAL TITLE', value: 'FREEHOLD' },
-      { label: 'CAPITAL GROWTH', value: '12–14% / YR' },
-      { label: 'OWNER STAY RIGHTS', value: '30 DAYS / YR' },
+      { label: 'PRICE', value: 'PKR 40,000 / SQ FT' },
+      { label: 'RENTAL INCOME', value: 'PKR 80–120K / MO' },
+      { label: 'OWNER STAY', value: '28 FREE NIGHTS / YR' },
     ],
   },
   {
@@ -47,32 +47,32 @@ const INVESTMENT_TIERS: InvestmentTier[] = [
     tag: 'SMART PROPERTY UNIT · FEATURED HERO',
     statValue: '13–15%',
     statLabel: 'PROJECTED ANNUAL ROI',
-    title: 'Fractional Smart Units',
+    title: 'Co-Owned Smart Units',
     description:
-      'Entry-level fractional investment starting at 50 sq ft SPU units. Enjoy passive rental yield deposited directly into your account.',
-    watermark: 'SPEC 02 · FRACTIONAL',
+      'Entry-level co-ownership in fixed 50 sq ft Smart Property Units, with rentals, maintenance and returns managed by DM Consortium.',
+    watermark: 'SPEC 02 · CO-OWNERSHIP',
     isHero: true,
     tagStyle: styles.tagHero,
     specs: [
-      { label: 'ENTRY TICKET', value: 'PKR 1.85M' },
-      { label: 'RENTAL YIELD', value: '13–15% / YR' },
-      { label: 'MANAGEMENT', value: '100% TURNKEY' },
+      { label: 'UNIT VALUE', value: 'PKR 2.25M' },
+      { label: 'RENTAL INCOME', value: 'PKR 300K / YR' },
+      { label: 'MANAGEMENT', value: 'DM CONSORTIUM' },
     ],
   },
   {
     id: 'dm-hospitality',
     num: '03',
     tag: 'HOSPITALITY MANAGEMENT',
-    statValue: '5-STAR',
-    statLabel: 'DM CONSORTIUM OPERATOR',
-    title: 'Turnkey Suite Operations',
+    statValue: '15+',
+    statLabel: 'DM CONSORTIUM PROJECTS',
+    title: 'Managed Suite Operations',
     description:
-      'Complete hotel suite booking, maintenance, guest reception, and revenue distribution handled seamlessly by DM Consortium.',
+      'Rentals, maintenance and returns managed by DM Consortium, with profit sharing from hotel revenue streams.',
     watermark: 'SPEC 03 · OPERATOR',
     tagStyle: styles.tagSage,
     specs: [
-      { label: 'OCCUPANCY TARGET', value: '78% ANNUAL' },
-      { label: 'OWNER MAINTENANCE', value: 'PKR 0' },
+      { label: 'FRONT DESK', value: '24/7 CONCIERGE' },
+      { label: 'OWNER MAINTENANCE', value: 'ZERO FEES' },
       { label: 'PAYOUT CYCLE', value: 'QUARTERLY' },
     ],
   },
@@ -135,19 +135,6 @@ export default function SectionFive() {
         )
       })
 
-      // Smooth Exit Transition into Next Section
-      if (sectionRef.current) {
-        gsap.to(sectionRef.current, {
-          opacity: 0.92,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'bottom 80%',
-            end: 'bottom top',
-            scrub: true,
-          },
-        })
-      }
     }, sectionRef)
 
     return () => ctx.revert()
@@ -230,12 +217,12 @@ export default function SectionFive() {
             <span>SMART INVESTMENT PRESENTATION</span>
           </p>
           <h2 className={styles.headerHeadline}>
-            High yield mountain real estate.
+            Winter resort real estate.
             <br />
-            Structured for <span className={styles.headerAccent}>effortless returns.</span>
+            Structured for <span className={styles.headerAccent}>managed returns.</span>
           </h2>
           <p className={styles.subcopy}>
-            Explore fractional Smart Property Units, whole luxury suites, and turnkey DM Consortium hospitality rental management.
+            Explore co-owned Smart Property Units, whole hotel apartments, and rental management by DM Consortium.
           </p>
         </div>
 

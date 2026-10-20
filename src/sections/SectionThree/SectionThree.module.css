@@ -116,9 +116,9 @@
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
 }
 
-/* --- Editorial Grid Layout (PRYPCO / FINDD Inspiration) --- */
+/* --- Editorial Grid Layout --- */
 
-/* --- Editorial Grid Layout (PRYPCO / FINDD Inspiration) --- */
+/* --- Editorial Grid Layout --- */
 
 .editorialGrid {
   position: relative;
@@ -131,7 +131,9 @@
 /* Cinematic Travelling Architectural Environmental Lighting (No Graphic Beams or Lines) */
 .travelingLightBeam {
   position: absolute;
+  top: 0;
   left: 50%;
+  /* GSAP drives xPercent/yPercent/y (scroll-scrubbed travel down the grid) */
   transform: translate(-50%, -50%);
   width: 140%;
   max-width: 1200px;
@@ -145,7 +147,7 @@
   pointer-events: none;
   z-index: 1;
   filter: blur(48px);
-  will-change: top, opacity;
+  will-change: transform, opacity;
   transition: opacity 0.6s ease;
 }
 
@@ -175,7 +177,7 @@
   text-align: right;
 }
 
-/* --- PRYPCO/FINDD Luxury Presentation Slab Card --- */
+/* --- Luxury Presentation Slab Card --- */
 
 .card {
   position: relative;
@@ -392,7 +394,7 @@
   color: var(--color-accent-gold);
 }
 
-/* --- Editorial Side Meta Specs (PRYPCO Column) --- */
+/* --- Editorial Side Meta Specs --- */
 
 .editorialSideMeta {
   display: flex;

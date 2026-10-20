@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
+import { prefersReducedMotion } from '../../motion/reducedMotion'
 
 interface SectionEightCanvasProps {
   activeSeason: number // 0: Winter, 1: Spring, 2: Summer, 3: Autumn
@@ -17,6 +18,62 @@ interface Particle {
   isEdge: boolean
 }
 
+// Glow sprites: each season's particle shape is drawn ONCE with shadowBlur to
+// an offscreen canvas, then stamped with drawImage — no per-particle blur.
+const SPRITE_REF_SIZE = 8 // particle `size` (CSS px) the sprite is drawn at
+const SPRITE_PAD = 14 // room for the blur halo
+const SPRITE_SCALE = 2 // sprite resolution (matches the dpr cap)
+
+const SEASON_STYLES = [
+  { shadowBlur: 8, shadowColor: 'rgba(220, 238, 245, 0.8)', fill: 'rgba(240, 248, 255, 0.95)' },
+  { shadowBlur: 6, shadowColor: 'rgba(232, 168, 184, 0.7)', fill: 'rgba(238, 184, 196, 0.90)' },
+  { shadowBlur: 8, shadowColor: 'rgba(243, 212, 152, 0.8)', fill: 'rgba(253, 220, 140, 0.92)' },
+  { shadowBlur: 6, shadowColor: 'rgba(216, 138, 66, 0.7)', fill: 'rgba(228, 152, 76, 0.92)' },
+]
+
+interface Sprite {
+  canvas: HTMLCanvasElement
+  cssSize: number
+}
+
+const spriteCache = new Map<number, Sprite>()
+
+function getSprite(seasonIdx: number): Sprite {
+  const cached = spriteCache.get(seasonIdx)
+  if (cached) return cached
+
+  const cssSize = (SPRITE_REF_SIZE + SPRITE_PAD) * 2
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = cssSize * SPRITE_SCALE
+  const ctx = canvas.getContext('2d')
+  if (ctx) {
+    const style = SEASON_STYLES[seasonIdx] ?? SEASON_STYLES[0]
+    const s = SPRITE_REF_SIZE
+    ctx.scale(SPRITE_SCALE, SPRITE_SCALE)
+    ctx.translate(cssSize / 2, cssSize / 2)
+    ctx.shadowBlur = style.shadowBlur * SPRITE_SCALE
+    ctx.shadowColor = style.shadowColor
+    ctx.fillStyle = style.fill
+    ctx.beginPath()
+    if (seasonIdx === 0) {
+      ctx.arc(0, 0, s * 0.65, 0, Math.PI * 2)
+    } else if (seasonIdx === 1) {
+      ctx.ellipse(0, 0, s * 0.95, s * 0.5, 0, 0, Math.PI * 2)
+    } else if (seasonIdx === 2) {
+      ctx.arc(0, 0, s * 0.75, 0, Math.PI * 2)
+    } else {
+      ctx.moveTo(0, -s)
+      ctx.quadraticCurveTo(s * 0.85, 0, 0, s)
+      ctx.quadraticCurveTo(-s * 0.85, 0, 0, -s)
+    }
+    ctx.fill()
+  }
+
+  const sprite = { canvas, cssSize }
+  spriteCache.set(seasonIdx, sprite)
+  return sprite
+}
+
 export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasProps) {
   const { containerRef, isVisible } = useCanvasVisibility({ rootMargin: '300px 0px' })
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -24,6 +81,7 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
   const isInitializedRef = useRef(false)
   const activeSeasonRef = useRef(activeSeason)
   activeSeasonRef.current = activeSeason
+  const reducedMotion = prefersReducedMotion()
 
   // Initialize particle pool ONCE on component mount
   useEffect(() => {
@@ -71,53 +129,55 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
 
   // Visibility-gated render loop: Pauses offscreen, resumes instantaneously on re-entry with zero object recreation
   useEffect(() => {
-    if (!isVisible) return
+    if (!isVisible || reducedMotion) return
 
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    let animId: number
-    let width = (canvas.width = canvas.parentElement?.clientWidth || window.innerWidth)
-    let height = (canvas.height = canvas.parentElement?.clientHeight || window.innerHeight)
+    let animId = 0
+    let width = 0
+    let height = 0
+    let dpr = 1
 
-    const handleResize = () => {
-      if (!canvas || !canvas.parentElement) return
-      width = canvas.width = canvas.parentElement.clientWidth
-      height = canvas.height = canvas.parentElement.clientHeight
+    // Backing store at devicePixelRatio (capped at 2); drawing stays in CSS px
+    const resize = () => {
+      const parent = canvas.parentElement
+      width = parent?.clientWidth || window.innerWidth
+      height = parent?.clientHeight || window.innerHeight
+      dpr = Math.min(2, window.devicePixelRatio || 1)
+      canvas.width = Math.round(width * dpr)
+      canvas.height = Math.round(height * dpr)
     }
-    window.addEventListener('resize', handleResize)
+    resize()
+    const resizeObserver = new ResizeObserver(resize)
+    if (canvas.parentElement) resizeObserver.observe(canvas.parentElement)
+    window.addEventListener('resize', resize)
 
     const particles = particlesRef.current
+    let last: number | null = null
 
     const render = (now: number) => {
-      ctx.clearRect(0, 0, width, height)
-      const targetIdx = activeSeasonRef.current < 0 ? 0 : activeSeasonRef.current
+      // Time-based motion: the original per-frame steps were tuned at 60 Hz,
+      // so scale them by elapsed 60 Hz frames (clamped after tab switches/stalls)
+      const dt = last === null ? 0 : Math.min((now - last) / 1000, 0.05)
+      last = now
+      const f = dt * 60
 
-      if (targetIdx === 0) {
-        ctx.shadowBlur = 8
-        ctx.shadowColor = 'rgba(220, 238, 245, 0.8)'
-        ctx.fillStyle = 'rgba(240, 248, 255, 0.95)'
-      } else if (targetIdx === 1) {
-        ctx.shadowBlur = 6
-        ctx.shadowColor = 'rgba(232, 168, 184, 0.7)'
-        ctx.fillStyle = 'rgba(238, 184, 196, 0.90)'
-      } else if (targetIdx === 2) {
-        ctx.shadowBlur = 8
-        ctx.shadowColor = 'rgba(243, 212, 152, 0.8)'
-        ctx.fillStyle = 'rgba(253, 220, 140, 0.92)'
-      } else {
-        ctx.shadowBlur = 6
-        ctx.shadowColor = 'rgba(216, 138, 66, 0.7)'
-        ctx.fillStyle = 'rgba(228, 152, 76, 0.92)'
-      }
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.globalAlpha = 1
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      const targetIdx = activeSeasonRef.current < 0 ? 0 : activeSeasonRef.current
+      const sprite = getSprite(targetIdx)
+      const half = sprite.cssSize / 2
 
       // Render living seasonal particles with high visibility & soft glow
       particles.forEach((p) => {
-        p.x += p.vx + Math.sin(now * 0.0012 + p.y * 0.008) * 0.4
-        p.y += p.vy
-        p.rotation += p.rotSpeed
+        p.x += (p.vx + Math.sin(now * 0.0012 + p.y * 0.008) * 0.4) * f
+        p.y += p.vy * f
+        p.rotation += p.rotSpeed * f
 
         // Wrap around boundaries smoothly
         if (p.y > height + 25) {
@@ -129,45 +189,29 @@ export default function SectionEightCanvas({ activeSeason }: SectionEightCanvasP
             : Math.random() * width
         }
 
-        ctx.save()
-        ctx.translate(p.x, p.y)
-        ctx.rotate(p.rotation)
+        // Rotate + scale the pre-rendered glow sprite in one transform
+        const k = (p.size / SPRITE_REF_SIZE) * dpr
+        const cos = Math.cos(p.rotation) * k
+        const sin = Math.sin(p.rotation) * k
+        ctx.setTransform(cos, sin, -sin, cos, p.x * dpr, p.y * dpr)
         ctx.globalAlpha = p.alpha
-
-        if (targetIdx === 0) {
-          ctx.beginPath()
-          ctx.arc(0, 0, p.size * 0.65, 0, Math.PI * 2)
-          ctx.fill()
-        } else if (targetIdx === 1) {
-          ctx.beginPath()
-          ctx.ellipse(0, 0, p.size * 0.95, p.size * 0.5, 0, 0, Math.PI * 2)
-          ctx.fill()
-        } else if (targetIdx === 2) {
-          ctx.beginPath()
-          ctx.arc(0, 0, p.size * 0.75, 0, Math.PI * 2)
-          ctx.fill()
-        } else {
-          ctx.beginPath()
-          ctx.moveTo(0, -p.size)
-          ctx.quadraticCurveTo(p.size * 0.85, 0, 0, p.size)
-          ctx.quadraticCurveTo(-p.size * 0.85, 0, 0, -p.size)
-          ctx.fill()
-        }
-
-        ctx.restore()
+        ctx.drawImage(sprite.canvas, -half, -half, sprite.cssSize, sprite.cssSize)
       })
 
       animId = requestAnimationFrame(render)
     }
 
-    // Synchronous initial frame render
-    render(performance.now())
+    animId = requestAnimationFrame(render)
 
     return () => {
-      window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(animId)
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', resize)
     }
-  }, [isVisible])
+  }, [isVisible, reducedMotion])
+
+  // Reduced motion: no particles at all (the scenes carry the season)
+  if (reducedMotion) return null
 
   return (
     <div

@@ -2,10 +2,15 @@
  * Section: SectionNine (Curated Architectural Gallery)
  * Assets: src/assets/investment/
  */
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger } from '../../motion/scrollTrigger'
 import { prefersReducedMotion } from '../../motion/reducedMotion'
+import resortExteriorDayImg from '../../assets/gallery/resort-exterior-day.webp'
+import apartmentBedroomImg from '../../assets/gallery/apartment-bedroom.webp'
+import infinityPoolImg from '../../assets/gallery/infinity-pool.webp'
+import apartmentLoungeImg from '../../assets/gallery/apartment-lounge.webp'
+import mountainRangeImg from '../../assets/gallery/mountain-range.webp'
 import styles from './SectionNine.module.css'
 
 interface ExhibitionPiece {
@@ -15,6 +20,8 @@ interface ExhibitionPiece {
   title: string
   caption: string
   imageUrl: string
+  /** Accessible description of the (CSS background) photograph. */
+  imageLabel: string
 }
 
 const EXHIBITS: ExhibitionPiece[] = [
@@ -22,51 +29,56 @@ const EXHIBITS: ExhibitionPiece[] = [
     id: 'hero-terrace',
     exhibitNum: 'EXHIBIT 01',
     tag: 'ARCHITECTURE & LANDSCAPE · FEATURED HERO',
-    title: 'High-Altitude Cantilevered Terrace',
+    title: 'A Mountain Retreat at 7,906 Feet',
     caption:
-      'Elevated 7,906 ft above sea level, cantilevered private balconies offer uninterrupted cloud inversion vistas.',
+      'Set 7,906 ft above sea level on Kala Bagh Air Base Road, with rooftop dining above the Nathia Gali pine forest.',
     imageUrl:
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop',
+      resortExteriorDayImg,
+    imageLabel: 'Serene Heights resort towers rising above the pine forest, with the approach road in the foreground',
   },
   {
     id: 'residence-interior',
     exhibitNum: 'EXHIBIT 02',
     tag: 'PRIVATE LIVING SUITE',
-    title: 'Heated Hearth & Alpine Glass',
+    title: 'Furnished Suites & Alpine Light',
     caption:
-      'Hand-cut alpine granite hearths framed by 18-foot triple-glazed glass opening onto Nathia Gali pine forest slopes.',
+      'Fully furnished 1, 2 and 3 bedroom hotel apartments with double-glazed UPVC windows facing Nathia Gali pine slopes.',
     imageUrl:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop',
+      apartmentBedroomImg,
+    imageLabel: 'Furnished bedroom with soft lighting and tall windows onto the hillside',
   },
   {
     id: 'pool-sanctuary',
     exhibitNum: 'EXHIBIT 03',
     tag: 'WELLNESS & HYDROTHERAPY',
-    title: 'Climate-Controlled Infinity Sanctuary',
+    title: 'Heated Infinity Pool Sanctuary',
     caption:
-      'Year-round heated indoor-outdoor infinity pool designed with seamless edge overflow into mountain pine wilderness.',
+      'A heated infinity pool in year-round operation, paired with sauna, jacuzzi, massage and spa for every season.',
     imageUrl:
-      'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1600&auto=format&fit=crop',
+      infinityPoolImg,
+    imageLabel: 'Infinity pool edge looking out over forested mountain slopes',
   },
   {
     id: 'lounge-club',
     exhibitNum: 'EXHIBIT 04',
     tag: 'EXECUTIVE HOSPITALITY',
-    title: 'Fireside Library & Cognac Bar',
+    title: 'Business & Executive Center',
     caption:
-      'Exclusive private owner lounge offering curated spirits, executive meeting suites, and 24-hour concierge service.',
+      'A business & executive center, conference room and banquet hall, supported by a 24/7 front desk and concierge.',
     imageUrl:
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600&auto=format&fit=crop',
+      apartmentLoungeImg,
+    imageLabel: 'Furnished lounge with a chandelier and glass doors opening onto a balcony',
   },
   {
     id: 'sunset-view',
     exhibitNum: 'EXHIBIT 05',
-    tag: 'HIMALAYAN HORIZON',
-    title: 'Evening Sunset Over Galyat Range',
+    tag: 'ALPINE HORIZON',
+    title: 'Snow Peaks & Evergreen Valleys',
     caption:
-      'Watch golden dusk colors illuminate the Himalayan snowcaps from the highest luxury vantage point in Nathia Gali.',
+      'Snow-capped ridges and evergreen valleys by day, and a refractor telescope for clear mountain nights.',
     imageUrl:
-      'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop',
+      mountainRangeImg,
+    imageLabel: 'Snow-capped mountain range above evergreen forest under a bright sky',
   },
 ]
 
@@ -80,7 +92,9 @@ export default function SectionNine() {
   const closingStatementRef = useRef<HTMLDivElement>(null)
 
   const rectCacheRef = useRef<Map<HTMLDivElement, DOMRect>>(new Map())
-  const rafIdRef = useRef<number | null>(null)
+  // One pending tilt frame per card, so moving between cards never cancels
+  // another card's update (and every pending frame is cancelled on unmount).
+  const rafIdsRef = useRef<Map<HTMLDivElement, number>>(new Map())
 
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
@@ -229,13 +243,24 @@ export default function SectionNine() {
     return () => ctx.revert()
   }, [])
 
-  // Mouse 3D Tilt Handlers
+  // Cancel every pending tilt frame on unmount
+  useEffect(() => {
+    const rafIds = rafIdsRef.current
+    return () => {
+      rafIds.forEach((id) => cancelAnimationFrame(id))
+      rafIds.clear()
+    }
+  }, [])
+
+  // Mouse 3D Tilt Handlers — bound to the inner tilt layer, never to the
+  // element GSAP animates, so the scroll entrance and the tilt compose.
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = e.currentTarget
     rectCacheRef.current.set(card, card.getBoundingClientRect())
   }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion()) return
     const card = e.currentTarget
     let rect = rectCacheRef.current.get(card)
     if (!rect) {
@@ -248,21 +273,26 @@ export default function SectionNine() {
     const tiltX = (0.5 - py) * 16
     const tiltY = (px - 0.5) * 18
 
-    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+    const rafIds = rafIdsRef.current
+    const pending = rafIds.get(card)
+    if (pending !== undefined) cancelAnimationFrame(pending)
 
-    rafIdRef.current = requestAnimationFrame(() => {
+    rafIds.set(card, requestAnimationFrame(() => {
+      rafIds.delete(card)
       card.style.setProperty('--tilt-x', `${tiltX}deg`)
       card.style.setProperty('--tilt-y', `${tiltY}deg`)
       card.style.setProperty('--light-x', `${px * 100}%`)
       card.style.setProperty('--light-y', `${py * 100}%`)
       card.classList.add(styles.cardHovered)
-    })
+    }))
   }
 
   const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = e.currentTarget
     rectCacheRef.current.delete(card)
-    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
+    const pending = rafIdsRef.current.get(card)
+    if (pending !== undefined) cancelAnimationFrame(pending)
+    rafIdsRef.current.delete(card)
 
     card.style.setProperty('--tilt-x', '0deg')
     card.style.setProperty('--tilt-y', '0deg')
@@ -290,37 +320,40 @@ export default function SectionNine() {
         </div>
         <h2 className={styles.headerTitle}>Visual moments in Nathia Gali.</h2>
         <p className={styles.headerSubcopy}>
-          A private exhibition of high-altitude architecture, interior sanctuaries, and Himalayan horizon vistas.
+          A private exhibition of high-altitude architecture, interior sanctuaries, and Galyat horizon vistas.
         </p>
       </div>
 
       {/* 2. Dominant Hero Piece (Exhibit 01) */}
       <div className={`container ${styles.heroPieceWrap}`}>
-        <div
-          ref={heroPieceRef}
-          className={styles.heroPieceContainer}
-          onMouseEnter={handleMouseEnter}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className={styles.cardLight} aria-hidden="true" />
-          <div className={styles.heroImageFrame}>
-            <div
-              ref={heroImageRef}
-              className={styles.heroExhibitImage}
-              style={{ backgroundImage: `url(${ex01.imageUrl})` }}
-            />
-            <div className={styles.heroImageOverlay} aria-hidden="true" />
-            <span className={styles.heroWatermark}>{ex01.exhibitNum} · DOMINANT FEATURE</span>
-          </div>
-
-          <div ref={heroCaptionRef} className={styles.heroCaptionPlate}>
-            <div className={styles.metaRow}>
-              <span className={styles.exhibitNum}>{ex01.exhibitNum}</span>
-              <span className={styles.exhibitTag}>{ex01.tag}</span>
+        <div ref={heroPieceRef} className={styles.tiltShell}>
+          <div
+            className={styles.heroPieceContainer}
+            onMouseEnter={handleMouseEnter}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className={styles.cardLight} aria-hidden="true" />
+            <div className={styles.heroImageFrame}>
+              <div
+                ref={heroImageRef}
+                className={styles.heroExhibitImage}
+                style={{ backgroundImage: `url(${ex01.imageUrl})` }}
+                role="img"
+                aria-label={ex01.imageLabel}
+              />
+              <div className={styles.heroImageOverlay} aria-hidden="true" />
+              <span className={styles.heroWatermark}>{ex01.exhibitNum} · DOMINANT FEATURE</span>
             </div>
-            <h3 className={styles.heroExhibitTitle}>{ex01.title}</h3>
-            <p className={styles.heroExhibitCaption}>{ex01.caption}</p>
+
+            <div ref={heroCaptionRef} className={styles.heroCaptionPlate}>
+              <div className={styles.metaRow}>
+                <span className={styles.exhibitNum}>{ex01.exhibitNum}</span>
+                <span className={styles.exhibitTag}>{ex01.tag}</span>
+              </div>
+              <h3 className={styles.heroExhibitTitle}>{ex01.title}</h3>
+              <p className={styles.heroExhibitCaption}>{ex01.caption}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -328,56 +361,62 @@ export default function SectionNine() {
       {/* 3. Staggered Asymmetric Dual-Spread (Exhibits 02 & 03) */}
       <div className={styles.dualSpreadContainer}>
         {/* Exhibit 02 - Tall Portrait Composition */}
-        <div
-          ref={(el) => { exhibitCardsRef.current[0] = el }}
-          className={`${styles.exhibitCard} ${styles.cardTall}`}
-          onMouseEnter={handleMouseEnter}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className={styles.cardLight} aria-hidden="true" />
-          <div className={styles.imageFrame}>
-            <div
-              className={styles.exhibitImage}
-              style={{ backgroundImage: `url(${ex02.imageUrl})` }}
-            />
-            <div className={styles.imageOverlay} aria-hidden="true" />
-          </div>
-
-          <div className={styles.captionWrap}>
-            <div className={styles.metaRow}>
-              <span className={styles.exhibitNum}>{ex02.exhibitNum}</span>
-              <span className={styles.exhibitTag}>{ex02.tag}</span>
+        <div ref={(el) => { exhibitCardsRef.current[0] = el }} className={styles.tiltShell}>
+          <div
+            className={`${styles.exhibitCard} ${styles.cardTall}`}
+            onMouseEnter={handleMouseEnter}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className={styles.cardLight} aria-hidden="true" />
+            <div className={styles.imageFrame}>
+              <div
+                className={styles.exhibitImage}
+                style={{ backgroundImage: `url(${ex02.imageUrl})` }}
+                role="img"
+                aria-label={ex02.imageLabel}
+              />
+              <div className={styles.imageOverlay} aria-hidden="true" />
             </div>
-            <h3 className={styles.exhibitTitle}>{ex02.title}</h3>
-            <p className={styles.exhibitCaption}>{ex02.caption}</p>
+
+            <div className={styles.captionWrap}>
+              <div className={styles.metaRow}>
+                <span className={styles.exhibitNum}>{ex02.exhibitNum}</span>
+                <span className={styles.exhibitTag}>{ex02.tag}</span>
+              </div>
+              <h3 className={styles.exhibitTitle}>{ex02.title}</h3>
+              <p className={styles.exhibitCaption}>{ex02.caption}</p>
+            </div>
           </div>
         </div>
 
         {/* Exhibit 03 - Wide Landscape Offset Composition */}
-        <div
-          ref={(el) => { exhibitCardsRef.current[1] = el }}
-          className={`${styles.exhibitCard} ${styles.cardWide}`}
-          onMouseEnter={handleMouseEnter}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className={styles.cardLight} aria-hidden="true" />
-          <div className={styles.imageFrame}>
-            <div
-              className={styles.exhibitImage}
-              style={{ backgroundImage: `url(${ex03.imageUrl})` }}
-            />
-            <div className={styles.imageOverlay} aria-hidden="true" />
-          </div>
-
-          <div className={styles.captionWrap}>
-            <div className={styles.metaRow}>
-              <span className={styles.exhibitNum}>{ex03.exhibitNum}</span>
-              <span className={styles.exhibitTag}>{ex03.tag}</span>
+        <div ref={(el) => { exhibitCardsRef.current[1] = el }} className={styles.tiltShell}>
+          <div
+            className={`${styles.exhibitCard} ${styles.cardWide}`}
+            onMouseEnter={handleMouseEnter}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className={styles.cardLight} aria-hidden="true" />
+            <div className={styles.imageFrame}>
+              <div
+                className={styles.exhibitImage}
+                style={{ backgroundImage: `url(${ex03.imageUrl})` }}
+                role="img"
+                aria-label={ex03.imageLabel}
+              />
+              <div className={styles.imageOverlay} aria-hidden="true" />
             </div>
-            <h3 className={styles.exhibitTitle}>{ex03.title}</h3>
-            <p className={styles.exhibitCaption}>{ex03.caption}</p>
+
+            <div className={styles.captionWrap}>
+              <div className={styles.metaRow}>
+                <span className={styles.exhibitNum}>{ex03.exhibitNum}</span>
+                <span className={styles.exhibitTag}>{ex03.tag}</span>
+              </div>
+              <h3 className={styles.exhibitTitle}>{ex03.title}</h3>
+              <p className={styles.exhibitCaption}>{ex03.caption}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -385,56 +424,62 @@ export default function SectionNine() {
       {/* 4. Second Asymmetric Gallery Spread (Exhibits 04 & 05) */}
       <div className={styles.climaxSpreadContainer}>
         {/* Exhibit 04 - Medium Executive Hospitality Panel */}
-        <div
-          ref={(el) => { exhibitCardsRef.current[2] = el }}
-          className={`${styles.exhibitCard} ${styles.cardMedium}`}
-          onMouseEnter={handleMouseEnter}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className={styles.cardLight} aria-hidden="true" />
-          <div className={styles.imageFrame}>
-            <div
-              className={styles.exhibitImage}
-              style={{ backgroundImage: `url(${ex04.imageUrl})` }}
-            />
-            <div className={styles.imageOverlay} aria-hidden="true" />
-          </div>
-
-          <div className={styles.captionWrap}>
-            <div className={styles.metaRow}>
-              <span className={styles.exhibitNum}>{ex04.exhibitNum}</span>
-              <span className={styles.exhibitTag}>{ex04.tag}</span>
+        <div ref={(el) => { exhibitCardsRef.current[2] = el }} className={styles.tiltShell}>
+          <div
+            className={`${styles.exhibitCard} ${styles.cardMedium}`}
+            onMouseEnter={handleMouseEnter}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className={styles.cardLight} aria-hidden="true" />
+            <div className={styles.imageFrame}>
+              <div
+                className={styles.exhibitImage}
+                style={{ backgroundImage: `url(${ex04.imageUrl})` }}
+                role="img"
+                aria-label={ex04.imageLabel}
+              />
+              <div className={styles.imageOverlay} aria-hidden="true" />
             </div>
-            <h3 className={styles.exhibitTitle}>{ex04.title}</h3>
-            <p className={styles.exhibitCaption}>{ex04.caption}</p>
+
+            <div className={styles.captionWrap}>
+              <div className={styles.metaRow}>
+                <span className={styles.exhibitNum}>{ex04.exhibitNum}</span>
+                <span className={styles.exhibitTag}>{ex04.tag}</span>
+              </div>
+              <h3 className={styles.exhibitTitle}>{ex04.title}</h3>
+              <p className={styles.exhibitCaption}>{ex04.caption}</p>
+            </div>
           </div>
         </div>
 
         {/* Exhibit 05 - Panoramic Climax Horizon Piece */}
-        <div
-          ref={(el) => { exhibitCardsRef.current[3] = el }}
-          className={`${styles.exhibitCard} ${styles.cardPanorama}`}
-          onMouseEnter={handleMouseEnter}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className={styles.cardLight} aria-hidden="true" />
-          <div className={styles.imageFrame}>
-            <div
-              className={styles.exhibitImage}
-              style={{ backgroundImage: `url(${ex05.imageUrl})` }}
-            />
-            <div className={styles.imageOverlay} aria-hidden="true" />
-          </div>
-
-          <div className={styles.captionWrap}>
-            <div className={styles.metaRow}>
-              <span className={styles.exhibitNum}>{ex05.exhibitNum}</span>
-              <span className={styles.exhibitTag}>{ex05.tag}</span>
+        <div ref={(el) => { exhibitCardsRef.current[3] = el }} className={styles.tiltShell}>
+          <div
+            className={`${styles.exhibitCard} ${styles.cardPanorama}`}
+            onMouseEnter={handleMouseEnter}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className={styles.cardLight} aria-hidden="true" />
+            <div className={styles.imageFrame}>
+              <div
+                className={styles.exhibitImage}
+                style={{ backgroundImage: `url(${ex05.imageUrl})` }}
+                role="img"
+                aria-label={ex05.imageLabel}
+              />
+              <div className={styles.imageOverlay} aria-hidden="true" />
             </div>
-            <h3 className={styles.exhibitTitle}>{ex05.title}</h3>
-            <p className={styles.exhibitCaption}>{ex05.caption}</p>
+
+            <div className={styles.captionWrap}>
+              <div className={styles.metaRow}>
+                <span className={styles.exhibitNum}>{ex05.exhibitNum}</span>
+                <span className={styles.exhibitTag}>{ex05.tag}</span>
+              </div>
+              <h3 className={styles.exhibitTitle}>{ex05.title}</h3>
+              <p className={styles.exhibitCaption}>{ex05.caption}</p>
+            </div>
           </div>
         </div>
       </div>

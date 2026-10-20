@@ -5,6 +5,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { registerScrollTrigger, ScrollTrigger } from '../../motion/scrollTrigger'
+import { scrollToId } from '../../motion/lenis'
 import { setHeroTypographyOpacity, setNavVisibilityProgress } from '../../components/stage/masterVisualStageState'
 import heroImageSrc from '../../assets/hero/hero-main.webp'
 import styles from './HeroV2.module.css'
@@ -140,7 +141,6 @@ export default function HeroV2() {
   const portalImageRef = useRef<HTMLImageElement>(null)
   const logoMarkRef    = useRef<SVGSVGElement>(null)
   const brandLockupRef = useRef<HTMLDivElement>(null)
-  const videoRef       = useRef<HTMLVideoElement>(null)
 
   // Layered Title Refs
   const titleMainRef   = useRef<HTMLHeadingElement>(null)
@@ -165,7 +165,6 @@ export default function HeroV2() {
     gsap.set(logoMarkRef.current,    { opacity: 1, scale: 1, z: 0, rotateX: 0, rotateY: 0 })
     gsap.set(brandLockupRef.current, { opacity: 1 })
     gsap.set(portalImageRef.current, { z: WORLD_PUSH_Z_START, y: 0, opacity: 1 })
-    gsap.set(videoRef.current,       { scale: 1, y: 0, opacity: 0 })
 
     gsap.set(titleMainRef.current,   { opacity: 0, x: -18 })
     gsap.set(titleSubRef.current,    { opacity: 0, x: -12 })
@@ -306,9 +305,6 @@ export default function HeroV2() {
         if (portalImageRef.current) {
           portalImageRef.current.style.objectPosition = `${posX.toFixed(2)}% ${posY.toFixed(2)}%`
         }
-        gsap.set(videoRef.current, {
-          opacity: 0,
-        })
 
         // ── TYPOGRAPHY HOLD-EXIT FADE ─────────────────────────────────
         // The HERO_HOLD_PX appreciation hold (400 px of scroll after the
@@ -385,22 +381,6 @@ export default function HeroV2() {
           aria-hidden="true"
           className={styles.portalImage}
         />
-        {/* Video crossfade target */}
-        <video
-          ref={videoRef}
-          className={styles.heroVideo}
-          muted
-          playsInline
-          loop
-          preload="auto"
-          aria-hidden="true"
-        >
-          <source
-            src="/media/serene-heights/hero/deconstruction/serene-heights-v2.mp4"
-            type="video/mp4"
-          />
-        </video>
-
         {/* Dark vignette inside viewport */}
         <div className={styles.portalOverlay} aria-hidden="true" />
 
@@ -474,7 +454,7 @@ export default function HeroV2() {
             href="#about"
             onClick={(e) => {
               e.preventDefault()
-              document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
+              scrollToId('about')
             }}
             className={styles.heroCtaGroup}
             style={{ cursor: 'pointer', textDecoration: 'none' }}

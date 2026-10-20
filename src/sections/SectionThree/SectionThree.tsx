@@ -27,10 +27,10 @@ const EDITORIAL_STAGES: EditorialStage[] = [
     category: 'MOUNTAIN LIVING · FEATURED HERO',
     title: 'Sanctuary in Nathia Gali',
     description:
-      'Set high in the Galyat range at 7,906 ft, offering pristine pine forest vistas, clean alpine air, and winter snowfall.',
-    coords: '34°04’08” N / 73°23’05” E',
+      'Set at 7,906 ft on Kala Bagh Air Base Road, Nathia Gali — a 2-hour drive from Islamabad, made for mountain winters.',
+    coords: 'KALA BAGH AIR BASE ROAD',
     stats: { label: 'ALTITUDE', value: '7,906 FT' },
-    specCallout: 'LOCATION SPEC · GALYAT RANGE',
+    specCallout: 'LOCATION SPEC · NATHIA GALI',
     side: 'left',
     isFeature: true,
   },
@@ -39,8 +39,8 @@ const EDITORIAL_STAGES: EditorialStage[] = [
     category: 'LUXURY RESIDENCES',
     title: '150+ Hotel Apartments',
     description:
-      'Three signature alpine towers housing 1, 2, and 3-bedroom fully furnished residences engineered with natural stone and thermal glass facades.',
-    coords: 'TOWERS A · B · C',
+      'Three towers across 30+ kanals housing fully furnished 1, 2, and 3-bedroom hotel apartments, finished with double-glazed UPVC windows.',
+    coords: '3 TOWERS · 30+ KANALS',
     stats: { label: 'RESIDENCES', value: '150+ SUITES' },
     specCallout: 'ARCHITECTURAL TOWER SPEC',
     side: 'right',
@@ -48,10 +48,10 @@ const EDITORIAL_STAGES: EditorialStage[] = [
   {
     number: '03',
     category: 'WORLD-CLASS AMENITIES',
-    title: '50+ Resort Experiences',
+    title: '50+ Resort Amenities',
     description:
-      'Heated indoor infinity pool, mountain-view spa & wellness center, fine dining restaurants, executive lounges, and private helipad access.',
-    coords: 'LEVELS 01–04',
+      'A heated infinity pool open year-round, spa, sauna & jacuzzi, a rooftop restaurant, business & executive center, and helipad access.',
+    coords: '15+ RESORT ACTIVITIES',
     stats: { label: 'AMENITIES', value: '50+ FACILITIES' },
     specCallout: 'RESORT MASTERPLAN SPEC',
     side: 'left',
@@ -59,12 +59,12 @@ const EDITORIAL_STAGES: EditorialStage[] = [
   {
     number: '04',
     category: 'MANAGED HOSPITALITY · FEATURED HERO',
-    title: 'Turnkey Suite Operations',
+    title: 'Managed Suite Operations',
     description:
-      'Every apartment is professionally managed and rented on your behalf by DM Consortium, providing 5-star hotel services and owner peace of mind.',
-    coords: 'DM HOSPITALITY',
+      'Every apartment is managed by DM Consortium — rentals, maintenance and returns — backed by a 24/7 front desk and concierge.',
+    coords: '15+ COMPLETED PROJECTS',
     stats: { label: 'OPERATOR', value: 'DM CONSORTIUM' },
-    specCallout: '5-STAR HOTEL OPERATIONS',
+    specCallout: 'MANAGED HOTEL OPERATIONS',
     side: 'right',
     isFeature: true,
   },
@@ -73,7 +73,7 @@ const EDITORIAL_STAGES: EditorialStage[] = [
     category: 'SMART INVESTMENT',
     title: '13–15% Projected Annual ROI',
     description:
-      'Invest in whole residences or 50 sq ft Smart Property Units, pairing high rental income potential with long-term capital growth.',
+      'Invest in whole apartments or 50 sq ft Smart Property Units, pairing rental income with 5–8% annual appreciation on apartments.',
     coords: 'YIELD METRICS',
     stats: { label: 'PROJECTED ROI', value: '13–15% / YR' },
     specCallout: 'FINANCIAL YIELD STRUCTURE',
@@ -84,10 +84,10 @@ const EDITORIAL_STAGES: EditorialStage[] = [
     category: 'OWNERSHIP EXPERIENCE',
     title: 'Zero Maintenance Fees',
     description:
-      'Enjoy complete ownership rights with zero owner maintenance costs and seamless rental yield transfers.',
+      'Owners pay zero maintenance fees, receive quarterly profit distribution, and enjoy 28 free nights stay every year.',
     coords: 'OWNERSHIP TERMS',
-    stats: { label: 'MAINTENANCE', value: 'PKR 0' },
-    specCallout: 'FREEHOLD TITLE GUARANTEE',
+    stats: { label: 'MAINTENANCE', value: 'ZERO FEES' },
+    specCallout: 'OWNER BENEFITS SPEC',
     side: 'right',
   },
 ]
@@ -130,15 +130,20 @@ export default function SectionThree() {
       if (gridRef.current && lightBeamRef.current) {
         gsap.fromTo(
           lightBeamRef.current,
-          { top: '0%' },
+          { xPercent: -50, yPercent: -50, y: 0 },
           {
-            top: '100%',
+            // Same path as the old top: 0% → 100%, but on the compositor:
+            // translate by the grid's height instead of re-laying out `top`.
+            xPercent: -50,
+            yPercent: -50,
+            y: () => gridRef.current?.offsetHeight ?? 0,
             ease: 'none',
             scrollTrigger: {
               trigger: gridRef.current,
               start: 'top 65%',
               end: 'bottom 45%',
               scrub: true,
+              invalidateOnRefresh: true,
             },
           },
         )
@@ -257,11 +262,11 @@ export default function SectionThree() {
             Pakistan’s <span className={styles.headlineAccent}>premier resort.</span>
           </h2>
           <p className={styles.subcopy}>
-            Discover the design philosophy, luxury residences, world-class amenities, and turnkey investment model of Serene Heights Nathia Gali.
+            Discover the design philosophy, luxury residences, world-class amenities, and managed investment model of Serene Heights Nathia Gali.
           </p>
         </div>
 
-        {/* PRYPCO / FINDD Architectural Editorial Cards Grid */}
+        {/* Architectural Editorial Cards Grid */}
         <div ref={gridRef} className={styles.editorialGrid}>
           {/* Traveling Architectural Light Spotlight Beam (No Graphic Lines) */}
           <div ref={lightBeamRef} className={styles.travelingLightBeam} aria-hidden="true" />

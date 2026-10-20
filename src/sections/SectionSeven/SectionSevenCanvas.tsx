@@ -65,7 +65,7 @@ function AmbientGoldParticles() {
 }
 
 export default function SectionSevenCanvas() {
-  const { containerRef, isVisible } = useCanvasVisibility()
+  const { containerRef, isVisible, shouldMount } = useCanvasVisibility()
 
   return (
     <div
@@ -78,20 +78,22 @@ export default function SectionSevenCanvas() {
         overflow: 'hidden',
       }}
     >
-      <Canvas
-        camera={{ position: [0, 0, 8], fov: 45 }}
-        gl={{ alpha: true, antialias: true }}
-        dpr={[1, 1.5]}
-        frameloop={isVisible ? 'always' : 'never'}
-      >
-        <ambientLight intensity={0.4} />
-        <directionalLight position={[4, 6, 4]} intensity={0.5} color="#f3d498" />
+      {shouldMount && (
+        <Canvas
+          camera={{ position: [0, 0, 8], fov: 45 }}
+          gl={{ alpha: true, antialias: true }}
+          dpr={[1, 1.5]}
+          frameloop={isVisible ? 'always' : 'never'}
+        >
+          <ambientLight intensity={0.4} />
+          <directionalLight position={[4, 6, 4]} intensity={0.5} color="#f3d498" />
 
-        <FloatingBlueprintGrid />
-        <AmbientGoldParticles />
+          <FloatingBlueprintGrid />
+          <AmbientGoldParticles />
 
-        <fog attach="fog" args={['#0a1410', 5, 18]} />
-      </Canvas>
+          <fog attach="fog" args={['#0a1410', 5, 18]} />
+        </Canvas>
+      )}
     </div>
   )
 }

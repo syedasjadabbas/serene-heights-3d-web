@@ -14,16 +14,23 @@ import SectionEight from './sections/SectionEight/SectionEight'
 import SectionNine from './sections/SectionNine/SectionNine'
 import SectionTen from './sections/SectionTen/SectionTen'
 import { initLenis } from './motion/lenis'
+import { ScrollTrigger } from './motion/scrollTrigger'
 
 function App() {
+  // Web fonts swap in after first layout and change text heights, which
+  // shifts every pin below them — re-measure once they've all loaded.
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual'
-      }
-      window.scrollTo(0, 0)
+    let cancelled = false
+    document.fonts?.ready.then(() => {
+      if (!cancelled) ScrollTrigger.refresh()
+    })
+    return () => {
+      cancelled = true
     }
+  }, [])
 
+  useEffect(() => {
+    // (scroll restoration + scroll-to-top already run in main.tsx)
     if (new URLSearchParams(window.location.search).has('noLenis')) return
     const { destroy } = initLenis()
 
