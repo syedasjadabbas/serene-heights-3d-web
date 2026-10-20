@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
 import ResortLighting from './ResortLighting'
@@ -9,20 +9,14 @@ import ResortLoader from './ResortLoader'
 import { CAMERA_CONFIG } from './config'
 
 export default function ResortViewer() {
-  // One-time latch: once the section enters the viewport, the Canvas mounts
-  // permanently — we never unmount it (avoids GPU context destruction / flash).
-  const [hasMounted, setHasMounted] = useState(false)
   const [canvasReady, setCanvasReady] = useState(false)
 
   // Shared visibility hook: drives both the one-time mount and the frameloop gate.
   // rootMargin '300px' pre-wakes 300 px before entry (same as the old custom IO)
   // so the Canvas and ContactShadows have time to initialise before the user arrives.
-  const { containerRef, isVisible } = useCanvasVisibility({ rootMargin: '300px 0px' })
-
-  // Promote isVisible → hasMounted exactly once (never reverts to false).
-  useEffect(() => {
-    if (isVisible && !hasMounted) setHasMounted(true)
-  }, [isVisible, hasMounted])
+  // shouldMount: created once during idle time after load (or when the visitor
+  // approaches first), then kept — no WebGL context creation mid-scroll.
+  const { containerRef, isVisible, shouldMount } = useCanvasVisibility({ rootMargin: '300px 0px' })
 
   return (
     <div
@@ -36,7 +30,7 @@ export default function ResortViewer() {
     >
       <ResortLoader canvasReady={canvasReady} />
 
-      {hasMounted && (
+      {shouldMount && (
         <div
           style={{
             width: '100%',
@@ -56,11 +50,11 @@ export default function ResortViewer() {
               alpha: true,
               powerPreference: 'high-performance',
             }}
-            // Gate the render loop: when off-screen, frameloop="never" stops
+            // Gate the render loop: when off-screen, frameloop="demand" stops
             // ALL useFrame subscribers — ContactShadows shadow pass, OrbitControls
             // damping updates, model drift animations — everything freezes at zero
             // GPU cost until the section is visible again.
-            frameloop={isVisible ? 'always' : 'never'}
+            frameloop={isVisible ? 'always' : 'demand'}
             onCreated={() => setCanvasReady(true)}
           >
             <ResortLighting />

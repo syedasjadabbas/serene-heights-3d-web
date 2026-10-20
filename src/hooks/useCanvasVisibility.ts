@@ -9,10 +9,9 @@ interface UseCanvasVisibilityOptions {
    */
   rootMargin?: string
   /**
-   * IntersectionObserver rootMargin for mounting the <Canvas> at all.
-   * Wider than rootMargin so the WebGL context is created a little before
-   * rendering starts, and released once the section is far away.
-   * Default: "100% 0px" (one viewport of lookahead).
+   * IntersectionObserver rootMargin that forces the <Canvas> to mount if the
+   * visitor scrolls towards it before the idle pre-warm queue reached it.
+   * Default: "150% 0px".
    */
   mountMargin?: string
 }
@@ -22,15 +21,47 @@ interface UseCanvasVisibilityResult {
   containerRef: React.RefObject<HTMLDivElement | null>
   /**
    * True when the section is within rootMargin of the viewport.
-   * Drive <Canvas frameloop={isVisible ? 'always' : 'never'}> with this.
+   * Drive <Canvas frameloop={isVisible ? 'always' : 'demand'}> with this.
    */
   isVisible: boolean
   /**
-   * True when the section is within mountMargin of the viewport.
-   * Render the <Canvas> only while this is true: unmounting releases the
-   * WebGL context, so only the canvases near the viewport hold GPU memory.
+   * Becomes true once (idle pre-warm, or approaching the section) and stays
+   * true. Render the <Canvas> only when this is true.
    */
   shouldMount: boolean
+}
+
+// ── Idle pre-warm queue ────────────────────────────────────────────────
+// Creating a WebGL context and compiling its shaders stalls the main thread
+// for 100–250 ms on integrated GPUs. Doing that mid-scroll is a visible
+// hitch, so every canvas is created ahead of time, one per idle slot after
+// the page has loaded, and then kept for the life of the page.
+const warmQueue: Array<() => void> = []
+let warmScheduled = false
+
+const whenIdle = (fn: () => void) => {
+  if ('requestIdleCallback' in window) window.requestIdleCallback(fn, { timeout: 3000 })
+  else setTimeout(fn, 200)
+}
+
+function drainWarmQueue() {
+  const next = warmQueue.shift()
+  if (!next) {
+    warmScheduled = false
+    return
+  }
+  next()
+  // Leave a gap so one context's shader compile never stacks on the next
+  setTimeout(() => whenIdle(drainWarmQueue), 400)
+}
+
+function enqueueWarm(fn: () => void) {
+  warmQueue.push(fn)
+  if (warmScheduled) return
+  warmScheduled = true
+  const start = () => setTimeout(() => whenIdle(drainWarmQueue), 1500)
+  if (document.readyState === 'complete') start()
+  else window.addEventListener('load', start, { once: true })
 }
 
 /**
@@ -40,26 +71,37 @@ interface UseCanvasVisibilityResult {
  *   const { containerRef, isVisible, shouldMount } = useCanvasVisibility()
  *   <div ref={containerRef}>
  *     {shouldMount && (
- *       <Canvas frameloop={isVisible ? 'always' : 'never'}>
+ *       <Canvas frameloop={isVisible ? 'always' : 'demand'}>
  *         ...
  *       </Canvas>
  *     )}
  *   </div>
  *
- * When isVisible is false, R3F's render loop is paused completely:
- * - All useFrame callbacks stop executing
- * - Zero GPU draw calls are submitted
- * - The WebGL context stays warm while the section is within mountMargin,
- *   so scrolling back and forth nearby resumes in one frame
- * - Beyond mountMargin the <Canvas> unmounts and its context is released
+ * - The <Canvas> mounts during idle time after load (or earlier if the
+ *   visitor scrolls towards it first) and is never unmounted, so no WebGL
+ *   context is created or destroyed while the visitor is scrolling.
+ * - frameloop 'demand' while off-screen renders exactly one frame on mount
+ *   (compiling shaders off the critical path) and then nothing: all
+ *   useFrame callbacks stop and zero draw calls are submitted until the
+ *   section comes back into view.
  */
 export function useCanvasVisibility(
   options: UseCanvasVisibilityOptions = {},
 ): UseCanvasVisibilityResult {
-  const { rootMargin = '200px 0px', mountMargin = '100% 0px' } = options
+  const { rootMargin = '200px 0px', mountMargin = '150% 0px' } = options
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [shouldMount, setShouldMount] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    enqueueWarm(() => {
+      if (!cancelled) setShouldMount(true)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     const el = containerRef.current
@@ -74,7 +116,10 @@ export function useCanvasVisibility(
 
     const mountObserver = new IntersectionObserver(
       ([entry]) => {
-        setShouldMount(entry.isIntersecting)
+        if (entry.isIntersecting) {
+          setShouldMount(true)
+          mountObserver.disconnect()
+        }
       },
       { rootMargin: mountMargin },
     )

@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
+import FrameLimiter from '../../components/util/FrameLimiter'
 
 function FloatingInvestmentWireframes() {
   const groupRef = useRef<THREE.Group>(null)
@@ -110,8 +111,11 @@ export default function SectionFiveCanvas() {
           camera={{ position: [0, 0, 9], fov: 45 }}
           gl={{ alpha: true, antialias: true }}
           dpr={[1, 1.5]}
-          frameloop={isVisible ? 'always' : 'never'}
+          // Renders once on mount (shader warm-up), then at a capped 30 fps while
+          // on screen via FrameLimiter, and not at all while off screen
+          frameloop="demand"
         >
+          <FrameLimiter fps={30} active={isVisible} />
           <FloatingInvestmentWireframes />
           <FloatingGoldParticles />
 

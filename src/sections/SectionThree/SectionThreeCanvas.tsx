@@ -2,6 +2,7 @@ import { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useCanvasVisibility } from '../../hooks/useCanvasVisibility'
+import FrameLimiter from '../../components/util/FrameLimiter'
 
 /**
  * Floating Wireframe Glass Cubes & Architectural Geometries.
@@ -133,9 +134,12 @@ export default function SectionThreeCanvas() {
         <Canvas
           camera={{ position: [0, 0, 10], fov: 50 }}
           dpr={[1, 1.5]}
-          frameloop={isVisible ? 'always' : 'never'}
+          // Renders once on mount (shader warm-up), then at a capped 30 fps while
+          // on screen via FrameLimiter, and not at all while off screen
+          frameloop="demand"
           gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
         >
+          <FrameLimiter fps={30} active={isVisible} />
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1.2} color="#fef3d6" />
           <fog attach="fog" args={['#080f0c', 8, 26]} />

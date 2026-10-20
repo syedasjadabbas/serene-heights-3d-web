@@ -146,7 +146,8 @@
   );
   pointer-events: none;
   z-index: 1;
-  filter: blur(48px);
+  /* No filter: blur() — the radial gradient is already fully soft, and a
+     48px blur on a moving 1200px layer was a per-frame GPU cost */
   will-change: transform, opacity;
   transition: opacity 0.6s ease;
 }
